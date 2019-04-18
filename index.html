@@ -9,21 +9,9 @@
 <link rel="icon" type="image/png" href="favicon.png" />
 <link rel="stylesheet" href="vtf.css" />
 <script>
-        if (!mobileConsole.status.initialized) {
-            mobileConsole.init();
-        }
-        function traceThis() {
-            var variable = 'string';
-            function bar() {
-                console.trace();
-            }
-            function foo() {
-                bar(variable);
-            }
-            foo();
-        }
-
-        var testObject = { 'test' : 'one', 'func' : function() {return 'Hello world'; },'array' : [1,2,3,4,5, [1,2,3]], 'emptyArray' : [], 'object' : {'anotherObject' : 'Why not', 'emptyObject' : {}}, 'finalkey' : 'finalvalue'}
+if ((typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1)) {
+    mobileConsole.init();
+}
 </script>
 </head>
 <body>
