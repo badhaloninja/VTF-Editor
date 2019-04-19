@@ -75,7 +75,6 @@ function setResolution() {
 
 function setOutputVersion(ver) {
 	version = ver.split(".");
-	console.log(version[0]+"."+version[1]);
 }
 function check() {
 	if (getEstFileSize(false)/1024 >= 512 && getEstFileSize(false)/1024 < 513){
@@ -404,7 +403,6 @@ function convertPixels(canvas, fwidth, fheight) {
 	if (shortened)
 		fwidth = fwidth - 4;
 	var pix = mipmaps[canvas].getContext("2d").getImageData(mipmaps[canvas].width/2 - fwidth/2, 0, fwidth, fheight);
-	console.log("pix1: "+pix);
 
 	if (outputType == 13 || outputType == 15) {
 		for (var b=0; b<=2; b++) {
@@ -695,7 +693,6 @@ function convertPixels(canvas, fwidth, fheight) {
 		outputImage[canvas] = pix.data;
 	}
 	mipmaps[canvas].getContext("2d").putImageData(pix,mipmaps[canvas].width/2 - fwidth/2,0);
-	console.log("pix.data: "+pix.data);
 }
 
 function createVTF() {
@@ -910,26 +907,18 @@ function restoreAlpha(alpha1, alpha2, num){
 }
 
 function writeShort(data, pos, value){
-	console.log("Start writeShort("+data+", "+pos+", "+value+"): ");
 	data[pos] = value & 0xFF;
-	console.log("--dpos1: "+data[pos]);
 	data[pos + 1] = (value >>> 8) & 0xFF;
-	console.log("--dpos2: "+data[pos + 1]);
-	console.log("End writeShort");
 }
 
 
 function writeInt(data, pos, value, bytes){
-	console.log("Start writeInt("+data+", "+pos+", "+value+", "+bytes+"): ");
 	for (var i = 0; i < bytes; i++) {
 		data[pos + i] = (value >>> i*8) & 0xFF;
-		console.log("--data.pos"+i+": "+data[pos + i]);
 	}
-	console.log("End writeInt");
 }
 
 function reduceColors(data, rb, gb, bb, ab, dith) {
-	console.log("Start reduceColors("+data+", "+rb+", "+gb+", "+bb+", "+ab+", "+dith+"): ");
 	var d = data.data;
 	var rs = 8-rb;
 	var gs = 8-gb;
@@ -994,7 +983,6 @@ function reduceColors(data, rb, gb, bb, ab, dith) {
     }
     
     // context.putImageData(png, 0, 0);
-    console.log("End reduceColors");
 }
 // Function to download data to a file
 function download(data, filename) {
