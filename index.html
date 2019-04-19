@@ -24,28 +24,30 @@
 	<span style="color: #cc3333">Transparency is broken in Linux version of TF2!</span><br />
 	<div id="resolutionNotice" style="visibility: hidden">Using 1024x1020, no mipmaps</div>
 	<select class="textInput" value="1024" id="widthSetting" onchange="setResolution()">
-		<option value=1024>1024</option>
-		<option value=512>512</option>
-		<option value=256>256</option>
-		<option value=128>128</option>
-		<option value=64>64</option>
-		<option value=32>32</option>
-		<option value=16>16</option>
-		<option value=8>8</option>
-		<option value=4>4</option>
-	</select>
-	 x 
-	<select class="textInput" value="1024" id="heightSetting" onchange="setResolution()">
-		<option value=1024>1024</option>
-		<option value=512>512</option>
-		<option value=256>256</option>
-		<option value=128>128</option>
-		<option value=64>64</option>
-		<option value=32>32</option>
-		<option value=16>16</option>
-		<option value=8>8</option>
-		<option value=4>4</option>
-	</select>
+	<option value=1024>1024</option>
+	<option value=512>512</option>
+	<option value=256>256</option>
+	<option value=128>128</option>
+	<option value=64>64</option>
+	<option value=32>32</option>
+	<option value=16>16</option>
+	<option value=8>8</option>
+	<option value=4>4</option>
+	<option value=2>2</option>
+</select>
+ x 
+<select class="textInput" value="1024" id="heightSetting" onchange="setResolution()">
+	<option value=1024>1024</option>
+	<option value=512>512</option>
+	<option value=256>256</option>
+	<option value=128>128</option>
+	<option value=64>64</option>
+	<option value=32>32</option>
+	<option value=16>16</option>
+	<option value=8>8</option>
+	<option value=4>4</option>
+	<option value=2>2</option>
+</select>
 	<br />
 	<input type="checkbox" name="mipmaps" id="mipmapsCheck" disabled onchange="showMipmap(this)">Generate Mipmaps<br />
 	<input type="checkbox" name="rescale" id="rescaleCheck" onchange="check()" checked>Scale to fit<br />
@@ -54,6 +56,14 @@
 	<input type="checkbox" name="singleFrame" id="singleFrame" onchange="setSingleFrame()">Use single image for animation<br />
 	<p id="filesizee"></p>
 	<p>Image Encode settings:</p>
+	Version: <select class="textInput" value="7.1" id="versonSetting" onchange="setOutputVersion(this.value)">
+		<option value="7.0">7.0</option>
+		<option value="7.1" selected>7.1</option>
+		<option value="7.2">7.2</option>
+		<option value="7.3">7.3</option>
+		<option value="7.4">7.4</option>
+		<option value="7.5">7.5</option>
+	</select><br/>
 	Texture format: <select class="textInput" value=13 id="format" onchange="setOutputType(this)">
 		<option value=0>RGBA8888</option>
 		<option value=2>RGB888</option>
