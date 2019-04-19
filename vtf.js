@@ -21,6 +21,8 @@ var shortened = false;
 var colorSqrt = false;
 var forceDither = false;
 var colorDifference = 0;
+var version = [7,1];
+var lumaWeights = [0.213,0.715,0.072];//[0.2126,0.7152,0.0722] ITU-R BT.709
 setResolution();
 function setResolution() {
 	colorTable = [];
@@ -71,6 +73,10 @@ function setResolution() {
 	}
 }
 
+function setOutputVersion(ver) {
+	version = ver.split(".");
+	console.log(version[0]+"."+version[1]);
+}
 function check() {
 	if (getEstFileSize(false)/1024 >= 512 && getEstFileSize(false)/1024 < 513){
 		shortened = true;
@@ -429,7 +435,7 @@ function convertPixels(canvas, fwidth, fheight) {
 				for (var y=0; y<4; y++) { // pixel rows in block
 					for (var x=0; x<16; x+=4) { // pixel columns in block
 						position = x+(fwidth*4*y)+(16*i)+(fwidth*16*j); // position of a pixel in canvas
-						var luma = (0.2126*pix.data[position])+(0.7152*pix.data[position+1])+(0.0722*pix.data[position+2]); // ITU-R BT.709
+						var luma = (lumaWeights[0]*pix.data[position])+(lumaweights[1]*pix.data[position+1])+(lumaweights[2]*pix.data[position+2]); // ITU-R BT.709
 						if (pix.data[position+3] > 127 || outputType == 15) { // find most different colors, unless transparent
 							if (luma > lumaMax) {
 								lumaMax = luma;
@@ -540,7 +546,7 @@ function convertPixels(canvas, fwidth, fheight) {
 								pix.data[position+2] = palette[trans][2];
 							}
 							else{
-								var luma = (0.2126*pix.data[position])+(0.7152*pix.data[position+1])+(0.0722*pix.data[position+2]); // ITU-R BT.709
+								var luma = (lumaWeights[0]*pix.data[position])+(lumaweights[1]*pix.data[position+1])+(lumaweights[2]*pix.data[position+2]); // ITU-R BT.709
 								if (luma < lumaBelow) { 
 									pix.data[position] = pikselMin[0];
 									pix.data[position+1] = pikselMin[1];
@@ -605,7 +611,7 @@ function convertPixels(canvas, fwidth, fheight) {
 					for (var y=0; y<4; y++) {
 						for (var x=0; x<16; x+=4) {
 							position = x+(fwidth*4*y)+(16*i)+(fwidth*16*j);
-							var luma = (0.2126*pix.data[position])+(0.7152*pix.data[position+1])+(0.0722*pix.data[position+2]); // ITU-R BT.709
+							var luma = (lumaWeights[0]*pix.data[position])+(lumaweights[1]*pix.data[position+1])+(lumaweights[2]*pix.data[position+2]); // ITU-R BT.709
 							if (pix.data[position+3] < 128) {
 								pix.data[position+3] = 0;
 								if (y<2) pixelTable[blockPosition] += pixelOrder[3] << 2*((x/4)+(4*y));
@@ -707,13 +713,13 @@ function createVTF() {
 	}
 	var file = new Uint8Array(size+64);
 	console.log("save: "+width+" "+height+" "+ size);
-	var header = [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,0,0,0,0,12 + document.getElementById("sampling").value,35-hasMipmaps,0,0,frameCount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,hasMipmaps ? getReducedMipmapCount()+1 : 1,13,0,0,0,0,0,1]; // 64B (bare minimum)
+	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + document.getElementById("sampling").value,35-hasMipmaps,0,0,frameCount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,hasMipmaps ? getReducedMipmapCount()+1 : 1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1];
 	writeShort(header,16, shortened ? width - 4 : width);
 	writeShort(header,18, height);
 	for (var i=0; i<header.length; i++) {
 		file[i] = header[i];
 	}
-	if (outputType == 13) {
+	if (outputType == 13) {//DXT1
 		for (var i=64; i<file.length; i+=8) {
 			var blockNum = (i-64)/4;
 			writeShort(file, i, colorTable[blockNum]);
@@ -723,7 +729,7 @@ function createVTF() {
 			
 		}
 	}
-	else if (outputType == 15) {
+	else if (outputType == 15) {//DXT5
 		for (var i=64; i<file.length; i+=16) {
 			var blockNum = (i-64)/8;
 
@@ -739,7 +745,7 @@ function createVTF() {
 			writeShort(file, i+14, pixelTable[blockNum+1]);
 		}
 	}
-	else if (outputType == 0){
+	else if (outputType == 0){//RGBA8888
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -749,7 +755,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == 2){
+	else if (outputType == 2){//RGB888
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -761,7 +767,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == 4){
+	else if (outputType == 4){//RGB565
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -771,7 +777,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == 21){
+	else if (outputType == 21){//BGRA5551
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -781,7 +787,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == 19){
+	else if (outputType == 19){//BGRA4444
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
