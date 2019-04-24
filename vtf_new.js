@@ -1,3 +1,20 @@
+/*
+var exportOptions = {
+	resolution:[2,2], //w,h
+	hasMipmaps:false,
+	colorDifference:0,
+	version:[7,1],
+	lumaWeights:[0.213,0.715,0.072], //[0.2126,0.7152,0.0722] ITU-R BT.709
+	sampling:"16",
+	sampling:{
+		selected:16,
+		point:1, 
+		trilinear:2,
+		anisotropic:16
+	}
+	outputType:formats.RGBA8888
+ }
+*/
 var colorTable = [];
 var pixelTable = [];
 var alphaValueTable = [];
@@ -713,28 +730,37 @@ function convertPixels(canvas, fwidth, fheight) {
 			}
 		}
 	}
-	else if(outputType == formats.RGBA8888) { // RGBA8888
+	else if(outputType == formats.RGBA8888) { // RGBA8888; 0
 		outputImage[canvas] = pix.data;
 	}
-	else if (outputType == formats.RGB888) {// RGB888
+	else if (outputType == formats.RGB888) {// RGB888; 2
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == formats.RGB565) { // RGB565
+	else if (outputType == formats.BGR888) {// BGR888; 3
+		for (var i = 0; i < pix.data.length; i += 4){
+			pix.data[i+3] = 255;
+		}
+		outputImage[canvas] = pix.data;
+	}
+	else if(outputType == formats.RGB565) { // RGB565; 4
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		reduceColors(pix, 5, 6, 5, 8, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == formats.BGRA5551) { //BGRA5551
-		reduceColors(pix, 5, 5, 5, 1, document.getElementById('ditherCheck').checked);
+	else if(outputType == formats.BGRA8888) { // BGRA8888; 12
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == formats.BGRA4444) { // BGRA4444
+	else if(outputType == formats.BGRA4444) { // BGRA4444; 19
 		reduceColors(pix, 4, 4, 4, 4, document.getElementById('ditherCheck').checked);
+		outputImage[canvas] = pix.data;
+	}
+	else if(outputType == formats.BGRA5551) { //BGRA5551; 21
+		reduceColors(pix, 5, 5, 5, 1, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
 	mipmaps[canvas].getContext("2d").putImageData(pix,mipmaps[canvas].width/2 - fwidth/2,0);
@@ -787,7 +813,7 @@ function createVTF() {
 			writeShort(file, i+14, pixelTable[blockNum+1]);
 		}
 	}
-	else if (outputType == formats.RGBA8888){//RGBA8888
+	else if (outputType == formats.RGBA8888){//RGBA8888; 0
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -797,7 +823,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == formats.RGB888){//RGB888
+	else if (outputType == formats.RGB888){//RGB888; 2
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -809,7 +835,19 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == formats.RGB565){//RGB565
+	else if (outputType == formats.BGR888){//BGR888; 3 --test
+		var pos = 64;
+		for (var i = outputImage.length-1; i >= 0; i--){
+			var data = outputImage[i];
+			for (var j = 0; j < data.length; j+=4){
+				file[pos] = data[j+2];
+				file[pos+1] = data[j+1];
+				file[pos+2] = data[j];
+				pos+=3;
+			}
+		}
+	}
+	else if (outputType == formats.RGB565){//RGB565; 4
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -819,22 +857,35 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == formats.BGRA5551){//BGRA5551
+	else if (outputType == formats.BGRA8888){//BGRA8888; 12 --test
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
-			for (var j = 0; j < outputImage[i].length; j+=4){
-				writeShort(file,pos, ((data[j]>>3) << 10) + ((data[j+1]>>3) << 5) + ((data[j+2]>>3 )) + ((data[j+3] >> 7) << 15));
-				pos+=2;
+			for (var j = 0; j < data.length; j++){
+				file[pos] = data[j+2];
+				file[pos+1] = data[j+1];
+				file[pos+2] = data[j];
+				file[pos+3] = data[j+3];
+				pos+=4;
 			}
 		}
 	}
-	else if (outputType == formats.BGRA4444){//BGRA4444
+	else if (outputType == formats.BGRA4444){//BGRA4444; 19
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
 			for (var j = 0; j < outputImage[i].length; j+=4){
 				writeShort(file,pos, ((data[j]>>4) << 8)+ ((data[j+1]>>4) << 4) + ((data[j+2]>>4 )) + ((data[j+3] >> 4) << 12));
+				pos+=2;
+			}
+		}
+	}
+	else if (outputType == formats.BGRA5551){//BGRA5551; 21
+		var pos = 64;
+		for (var i = outputImage.length-1; i >= 0; i--){
+			var data = outputImage[i];
+			for (var j = 0; j < outputImage[i].length; j+=4){
+				writeShort(file,pos, ((data[j]>>3) << 10) + ((data[j+1]>>3) << 5) + ((data[j+2]>>3 )) + ((data[j+3] >> 7) << 15)); //REALIZATION  ((data[j+n]>>?8)<<?)
 				pos+=2;
 			}
 		}
