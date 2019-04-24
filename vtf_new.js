@@ -3,8 +3,8 @@ var pixelTable = [];
 var alphaValueTable = [];
 var alphaLookupTable = [];
 var blockCount = 65280;
-var width = 1024;
-var height = 1024;
+var width = 2;
+var height = 2;
 var hasMipmaps = false;
 var mipmapCount = 0;
 var blockPosition = 0;
@@ -15,7 +15,7 @@ var imagesLoaded = 0;
 var singleImageAnim = false;
 var mipmaps = [document.createElement('canvas')];
 var converted = false;
-var outputType = 13;
+var outputType = 0;
 var outputImage = [];
 var shortened = false;
 var colorSqrt = false;
@@ -24,6 +24,35 @@ var colorDifference = 0;
 var version = [7,1];
 var lumaWeights = [0.213,0.715,0.072];//[0.2126,0.7152,0.0722] ITU-R BT.709
 var sampling = "16";
+var formats = {
+	  NONE:-1,
+    RGBA8888:0,
+    ABGR8888:1,
+    RGB888:2,
+    BGR888:3,
+    RGB565:4,
+    I8:5,
+    IA88:6,
+    P8:7,
+    A8:8,
+    RGB888_BLUESCREEN:9,
+    BGR888_BLUESCREEN:10,
+    ARGB8888:11,
+    BGRA8888:12,
+    DXT1:13,
+    DXT3:14,
+    DXT5:15,
+    BGRX8888:16,
+    BGR565:17,
+    BGRX5551:18,
+    BGRA4444:19,
+    DXT1_ONEBITALPHA:20,
+    BGRA5551:21,
+    UV88:22,
+    UVWQ8888:23,
+    RGBA16161616F:24,
+    RGBA16161616:25,
+    UVLX8888:26};
 setResolution();
 $(document).ready(function(){
   $('#widthSetting').change(function(){
@@ -63,7 +92,7 @@ function setResolution() {
 	shortened = false;
 	//document.getElementById('convertButton').disabled = true;
 	document.getElementById('saveButton').disabled = true;
-	
+
 	/*if (width == 1024 && height == 1024) {
 		height = 1020;
 		document.getElementById("resolutionNotice").style.visibility = "visible";
@@ -123,7 +152,7 @@ setInterval(function(){
 			var mipwidth = width;
 			var mipheight = height;
 		for(var i = 0; i <= mipmapCount; i++) {
-			
+
 			generatePreview(i, mipwidth, mipheight);
 			mipwidth /= 2;
 			mipheight /= 2;
@@ -144,19 +173,19 @@ function handleFileSelect(evt) {
 	document.getElementById('convertButton').disabled = true;
 	document.getElementById('saveButton').disabled = true;
 	document.getElementById('files0').disabled = true;
-	
-	
+
+
 	frameCount = files.length;
 	frames = [];
 	frames[0] = [];
-	
+
 	for (var i = 0; i < files.length; i++ ) {
 		if (files[i] && files[i].type.match('image.*')) {
 			var reader = new FileReader();
 			// Closure to capture the file information.
 			reader.fileIndex = i;
 			reader.fileType = files[i].type;
-			
+
 			reader.onload = (function(e) {
 					console.log(this.fileType);
 					var img = new Image();
@@ -179,7 +208,7 @@ function handleFileSelect(evt) {
 					}
 					else {
 						img.src = e.target.result;
-						
+
 						img.onload = function () {
 							if (singleImageAnim)
 								frameCount = img.height / height;
@@ -191,7 +220,7 @@ function handleFileSelect(evt) {
 							}
 						}
 					}
-					
+
 				});
 			document.getElementById('convertButton').disabled = false;
 			if (files[i].type == "image/gif" || files[i].type == "image/x-tga" || files[i].type == "image/targa"){
@@ -201,7 +230,7 @@ function handleFileSelect(evt) {
 			}
 			else
 				reader.readAsDataURL(files[i]);
-			
+
 		}
 	}
 	mipmaps[0].getContext("2d").clearRect(0,0,width,height);
@@ -322,7 +351,7 @@ function changeMipmap(evt,mipmapNumber) { // this code, it scares me
 
 	document.getElementById('convertButton').disabled = true;
 	document.getElementById('saveButton').disabled = true;
-	
+
 	var mipimages = 0;
 	var cwidth = width/(Math.pow(2,mipmapNumber));
 	var cheight = height/(Math.pow(2,mipmapNumber));
@@ -336,7 +365,7 @@ function changeMipmap(evt,mipmapNumber) { // this code, it scares me
 					var img = new Image();
 					if (this.fileType == "image/gif"){
 						var gif = new SuperGif( {gif: img, auto_play: false});
-						gif.load_raw(new Uint8Array(e.target.result), 
+						gif.load_raw(new Uint8Array(e.target.result),
 						function (el) {
 							handleGifLoad(gif, frames[mipmapNumber]);
 							loadMipmaps(mipmapNumber, cwidth, cheight);
@@ -352,7 +381,7 @@ function changeMipmap(evt,mipmapNumber) { // this code, it scares me
 						}
 					}
 					else{
-						
+
 						img.src = e.target.result;
 						img.onload = function () {
 							frames[mipmapNumber].push(img);
@@ -362,8 +391,8 @@ function changeMipmap(evt,mipmapNumber) { // this code, it scares me
 							}
 						}
 					}
-					
-					
+
+
 				});
 		// Read in the image file as a data URL.
 			if (files[i].type == "image/gif" || files[i].type == "image/x-tga" || files[i].type == "image/targa"){
@@ -387,7 +416,7 @@ function loadMipmaps(mipmapNumber, cwidth, cheight) {
 	mipmaps[mipmapNumber].getContext("2d").clearRect(0,0,cwidth,cheight * frameCount);
 	generateCanvas(mipmapNumber, cwidth, cheight);
 	generatePreview(mipmapNumber, cwidth, cheight);
-	
+
 	document.getElementById('saveButton').disabled = true;
 	document.getElementById('convertButton').disabled = false;
 	document.body.style.cursor = "auto";
@@ -415,14 +444,12 @@ function setOutputType(el){
 	createCanvas();
 }
 
-
-
 function convertPixels(canvas, fwidth, fheight) {
 	if (shortened)
 		fwidth = fwidth - 4;
 	var pix = mipmaps[canvas].getContext("2d").getImageData(mipmaps[canvas].width/2 - fwidth/2, 0, fwidth, fheight);
 
-	if (outputType == 13 || outputType == 15) {
+	if (outputType == formats.DXT1 || outputType == formats.DXT5) { // DXT1; DXT5
 		for (var b=0; b<=2; b++) {
 			if (document.getElementById("brightnessform")[b].checked) var brightness = b;
 		}
@@ -439,10 +466,10 @@ function convertPixels(canvas, fwidth, fheight) {
 				var lumaMin = 255;
 				//var hue1 = -1;
 				//var hue2 = -1;
-				var pikselMax = [0,0,0];
-				var pikselMin = [255,255,255];
+				var pixelMax = [0,0,0];
+				var pixelMin = [255,255,255];
 				var isAlpha = false;
-				var pixelOrder = [0,2,3,1]; // kolejność kolorów dla nieodwróconych kolorów bez przezroczystości
+				var pixelOrder = [0,2,3,1]; // the order of colors for un-inverted colors without transparency
 				var alphaOrder = [1,7,6,5,4,3,2,0];
 				var alphaMax = 0;
 				var alphaMin = 255;
@@ -452,18 +479,18 @@ function convertPixels(canvas, fwidth, fheight) {
 					for (var x=0; x<16; x+=4) { // pixel columns in block
 						position = x+(fwidth*4*y)+(16*i)+(fwidth*16*j); // position of a pixel in canvas
 						var luma = (lumaWeights[0]*pix.data[position])+(lumaweights[1]*pix.data[position+1])+(lumaweights[2]*pix.data[position+2]); // ITU-R BT.709
-						if (pix.data[position+3] > 127 || outputType == 15) { // find most different colors, unless transparent
+						if (pix.data[position+3] > 127 || outputType == formats.DXT5) { // find most different colors, unless transparent; DXT5
 							if (luma > lumaMax) {
 								lumaMax = luma;
-								pikselMax[0] = pix.data[position];
-								pikselMax[1] = pix.data[position+1];
-								pikselMax[2] = pix.data[position+2];
+								pixelMax[0] = pix.data[position];
+								pixelMax[1] = pix.data[position+1];
+								pixelMax[2] = pix.data[position+2];
 							}
 							if (luma < lumaMin) {
 								lumaMin = luma;
-								pikselMin[0] = pix.data[position];
-								pikselMin[1] = pix.data[position+1];
-								pikselMin[2] = pix.data[position+2];
+								pixelMin[0] = pix.data[position];
+								pixelMin[1] = pix.data[position+1];
+								pixelMin[2] = pix.data[position+2];
 							}
 							if (pix.data[position+3] > alphaMax) {
 								alphaMax = pix.data[position+3];
@@ -478,30 +505,30 @@ function convertPixels(canvas, fwidth, fheight) {
 				var alphaInter = (alphaMax-alphaMin) / 7;
 				alphaValueTable[blockPosition] = alphaMax;
 				alphaValueTable[blockPosition+1] = alphaMin;
-				colorTable[blockPosition] = (Math.round((pikselMin[0]+(2*brightness))*31/255)<<11)+(Math.round((pikselMin[1]+brightness)*63/255)<<5)+(Math.round((pikselMin[2]+(2*brightness))*31/255)); // RGB888 to RGB565 color1
-				colorTable[blockPosition+1] = (Math.round((pikselMax[0]+(2*brightness))*31/255)<<11)+(Math.round((pikselMax[1]+brightness)*63/255)<<5)+(Math.round((pikselMax[2]+(2*brightness))*31/255)); // RGB888 to RGB565 color2
+				colorTable[blockPosition] = (Math.round((pixelMin[0]+(2*brightness))*31/255)<<11)+(Math.round((pixelMin[1]+brightness)*63/255)<<5)+(Math.round((pixelMin[2]+(2*brightness))*31/255)); // RGB888 to RGB565 color1
+				colorTable[blockPosition+1] = (Math.round((pixelMax[0]+(2*brightness))*31/255)<<11)+(Math.round((pixelMax[1]+brightness)*63/255)<<5)+(Math.round((pixelMax[2]+(2*brightness))*31/255)); // RGB888 to RGB565 color2
 				/*if(colorTable[blockPosition] == colorTable[blockPosition+1]){
-					colorTable[blockPosition] = (Math.floor((pikselMin[0]+(2*brightness))*31/255)<<11)+(Math.floor((pikselMin[1]+brightness)*63/255)<<5)+(Math.floor((pikselMin[2]+(2*brightness))*31/255)); // RGB888 to RGB565 color1
-					colorTable[blockPosition+1] = (Math.ceil((pikselMax[0]+(2*brightness))*31/255)<<11)+(Math.ceil((pikselMax[1]+brightness)*63/255)<<5)+(Math.ceil((pikselMax[2]+(2*brightness))*31/255)); // RGB888 to RGB565 color2
+					colorTable[blockPosition] = (Math.floor((pixelMin[0]+(2*brightness))*31/255)<<11)+(Math.floor((pixelMin[1]+brightness)*63/255)<<5)+(Math.floor((pixelMin[2]+(2*brightness))*31/255)); // RGB888 to RGB565 color1
+					colorTable[blockPosition+1] = (Math.ceil((pixelMax[0]+(2*brightness))*31/255)<<11)+(Math.ceil((pixelMax[1]+brightness)*63/255)<<5)+(Math.ceil((pixelMax[2]+(2*brightness))*31/255)); // RGB888 to RGB565 color2
 				}*/
-				pikselMin[0] = ((colorTable[blockPosition] >> 11) & 31) * (255/31);
-				pikselMin[1] = ((colorTable[blockPosition] >> 5) & 63) * (255/63);
-				pikselMin[2] = ((colorTable[blockPosition]) & 31) * (255/31);
-				pikselMax[0] = ((colorTable[blockPosition+1] >> 11) & 31) * (255/31);
-				pikselMax[1] = ((colorTable[blockPosition+1] >> 5) & 63) * (255/63);
-				pikselMax[2] = ((colorTable[blockPosition+1]) & 31) * (255/31);
+				pixelMin[0] = ((colorTable[blockPosition] >> 11) & 31) * (255/31);
+				pixelMin[1] = ((colorTable[blockPosition] >> 5) & 63) * (255/63);
+				pixelMin[2] = ((colorTable[blockPosition]) & 31) * (255/31);
+				pixelMax[0] = ((colorTable[blockPosition+1] >> 11) & 31) * (255/31);
+				pixelMax[1] = ((colorTable[blockPosition+1] >> 5) & 63) * (255/63);
+				pixelMax[2] = ((colorTable[blockPosition+1]) & 31) * (255/31);
 				if (document.getElementById("lumaavgform")[0].checked) var lumaAvg = (lumaMax+lumaMin)/2;
 				else var lumaAvg = Math.sqrt(((lumaMax*lumaMax)+(lumaMin*lumaMin))/2);
-				if (isAlpha == false) { // bez przezroczystości w bloku
-					if (colorTable[blockPosition] < colorTable[blockPosition+1]) { // upewnijmy się że kolor1 > kolor2
+				if (isAlpha == false) { // without transparency in the block
+					if (colorTable[blockPosition] < colorTable[blockPosition+1]) { // let's make sure that color1> color2
 						var temp = colorTable[blockPosition];
 						colorTable[blockPosition] = colorTable[blockPosition+1];
 						colorTable[blockPosition+1] = temp;
 						pixelOrder = [1,3,2,0];
 					}
-					if (colorTable[blockPosition] == colorTable[blockPosition+1]) { // wyjątek
+					if (colorTable[blockPosition] == colorTable[blockPosition+1]) { // exception
 						if (colorTable[blockPosition+1] > 0) {
-							colorTable[blockPosition+1]--; // na zapas, żeby silnik gry nie myślał że blok ma przezroczystość
+							colorTable[blockPosition+1]--; // to spare so that the game engine does not think that the block has transparency
 							pixelOrder = [0,0,0,0];
 						}
 						else {
@@ -511,7 +538,7 @@ function convertPixels(canvas, fwidth, fheight) {
 					}
 					if (alphaValueTable[blockPosition] == alphaValueTable[blockPosition+1]) {
 						if (alphaValueTable[blockPosition+1] > 0) {
-							alphaValueTable[blockPosition+1]--; // na zapas, żeby silnik gry nie myślał że blok ma przezroczystość
+							alphaValueTable[blockPosition+1]--; // to spare so that the game engine does not think that the block has transparency
 							alphaOrder = [0,0,0,0,0,0,0,0];
 						}
 						else {
@@ -520,27 +547,27 @@ function convertPixels(canvas, fwidth, fheight) {
 						}
 					}
 					if (document.getElementById("lumathrform")[0].checked) {
-						var lumaBelow = (lumaMin+lumaAvg)/2; // poniżej tego progu rysuj pikselMin
-						var lumaAbove = (lumaMax+lumaAvg)/2; // poniżej tego progu rysuj piksel23
+						var lumaBelow = (lumaMin+lumaAvg)/2; // below this threshold draw pixelMin
+						var lumaAbove = (lumaMax+lumaAvg)/2; // below this threshold draw pixel23
 					}
 					else {
-						var lumaBelow = Math.sqrt(((lumaMin*lumaMin)+(lumaAvg*lumaAvg))/2); // poniżej tego progu rysuj pikselMin
-						var lumaAbove = Math.sqrt(((lumaMax*lumaMax)+(lumaAvg*lumaAvg))/2); // poniżej tego progu rysuj piksel23
+						var lumaBelow = Math.sqrt(((lumaMin*lumaMin)+(lumaAvg*lumaAvg))/2); // below this threshold draw pixelMin
+						var lumaAbove = Math.sqrt(((lumaMax*lumaMax)+(lumaAvg*lumaAvg))/2); // below this threshold draw pixel23
 					}
-					var piksel13 = [(pikselMin[0]+pikselMin[0]+pikselMax[0])/3,(pikselMin[1]+pikselMin[1]+pikselMax[1])/3,(pikselMin[2]+pikselMin[2]+pikselMax[2])/3]; // 1/3 między kolorami
-					var piksel23 = [(pikselMin[0]+pikselMax[0]+pikselMax[0])/3,(pikselMin[1]+pikselMax[1]+pikselMax[1])/3,(pikselMin[2]+pikselMax[2]+pikselMax[2])/3]; // 2/3 między kolorami
+					var pixel13 = [(pixelMin[0]+pixelMin[0]+pixelMax[0])/3,(pixelMin[1]+pixelMin[1]+pixelMax[1])/3,(pixelMin[2]+pixelMin[2]+pixelMax[2])/3]; // 1/3 between colors
+					var pixel23 = [(pixelMin[0]+pixelMax[0]+pixelMax[0])/3,(pixelMin[1]+pixelMax[1]+pixelMax[1])/3,(pixelMin[2]+pixelMax[2]+pixelMax[2])/3]; // 2/3 between colors
 					pixelTable[blockPosition] = 0;
 					pixelTable[blockPosition+1] = 0;
 					alphaLookupTable[blockPosition] = 0;
 					alphaLookupTable[blockPosition+1] = 0;
 					for (var y=0; y<4; y++) {
 						for (var x=0; x<16; x+=4) {
-							
+
 							position = x+(fwidth*4*y)+(16*i)+(fwidth*16*j);
-							
+
 
 							if (dith || colorDifference == 0) {
-								var palette = [pikselMin, piksel13, piksel23, pikselMax];
+								var palette = [pixelMin, pixel13, pixel23, pixelMax];
 								var color = [pix.data[position], pix.data[position+1], pix.data[position+2]];
 								var closest = bestMatchIndex(palette, color);
 								var closest2 = bestMatchExIndex(palette, color, closest);
@@ -550,7 +577,7 @@ function convertPixels(canvas, fwidth, fheight) {
 								else
 									closest3 = Math.round(closest[0]/(closest[0]+closest2[0]) * 16);
 								// Use the dithering matrix that is based on the closest shade and pick the color
-								
+
 								if (dith)
 									var trans = [closest[1], closest2[1]][getDither(dither[closest3], x/4, y)];
 								else
@@ -563,36 +590,36 @@ function convertPixels(canvas, fwidth, fheight) {
 							}
 							else{
 								var luma = (lumaWeights[0]*pix.data[position])+(lumaweights[1]*pix.data[position+1])+(lumaweights[2]*pix.data[position+2]); // ITU-R BT.709
-								if (luma < lumaBelow) { 
-									pix.data[position] = pikselMin[0];
-									pix.data[position+1] = pikselMin[1];
-									pix.data[position+2] = pikselMin[2];
+								if (luma < lumaBelow) {
+									pix.data[position] = pixelMin[0];
+									pix.data[position+1] = pixelMin[1];
+									pix.data[position+2] = pixelMin[2];
 									if (y<2) pixelTable[blockPosition] += pixelOrder[0] << 2*((x/4)+(4*y)); // first two rows
 									else pixelTable[blockPosition+1] += pixelOrder[0] << 2*((x/4)+(4*(y-2))); // last two rows
 								}
-								else if (luma < lumaAvg) { 
-									pix.data[position] = piksel13[0];
-									pix.data[position+1] = piksel13[1];
-									pix.data[position+2] = piksel13[2];
+								else if (luma < lumaAvg) {
+									pix.data[position] = pixel13[0];
+									pix.data[position+1] = pixel13[1];
+									pix.data[position+2] = pixel13[2];
 									if (y<2) pixelTable[blockPosition] += pixelOrder[1] << 2*((x/4)+(4*y));
 									else pixelTable[blockPosition+1] += pixelOrder[1] << 2*((x/4)+(4*(y-2)));
 								}
 								else if (luma < lumaAbove) {
-									pix.data[position] = piksel23[0];
-									pix.data[position+1] = piksel23[1];
-									pix.data[position+2] = piksel23[2];
+									pix.data[position] = pixel23[0];
+									pix.data[position+1] = pixel23[1];
+									pix.data[position+2] = pixel23[2];
 									if (y<2) pixelTable[blockPosition] += pixelOrder[2] << 2*((x/4)+(4*y));
 									else pixelTable[blockPosition+1] += pixelOrder[2] << 2*((x/4)+(4*(y-2)));
 								}
 								else {
-									pix.data[position] = pikselMax[0];
-									pix.data[position+1] = pikselMax[1];
-									pix.data[position+2] = pikselMax[2];
+									pix.data[position] = pixelMax[0];
+									pix.data[position+1] = pixelMax[1];
+									pix.data[position+2] = pixelMax[2];
 									if (y<2) pixelTable[blockPosition] += pixelOrder[3] << 2*((x/4)+(4*y));
 									else pixelTable[blockPosition+1] += pixelOrder[3] << 2*((x/4)+(4*(y-2)));
 								}
 							}
-							if (outputType == 13)
+							if (outputType == formats.DXT1) // DXT1
 								pix.data[position+3] = 255;
 							else {
 								var alphanum = 0;
@@ -607,20 +634,20 @@ function convertPixels(canvas, fwidth, fheight) {
 				}
 				else {
 					pixelOrder = [0,2,1,3];
-					if (colorTable[blockPosition] > colorTable[blockPosition+1]) { // upewnijmy się że kolor1 <= kolor2
+					if (colorTable[blockPosition] > colorTable[blockPosition+1]) { // let's make sure that color1 <= color2
 						var temp = colorTable[blockPosition];
 						colorTable[blockPosition] = colorTable[blockPosition+1];
 						colorTable[blockPosition+1] = temp;
 						pixelOrder = [1,2,0,3];
 					}
-					var pikselAvg = [(pikselMin[0]+pikselMax[0])/2,(pikselMin[1]+pikselMax[1])/2,(pikselMin[2]+pikselMax[2])/2];
+					var pixelAvg = [(pixelMin[0]+pixelMax[0])/2,(pixelMin[1]+pixelMax[1])/2,(pixelMin[2]+pixelMax[2])/2];
 					if (document.getElementById("lumathrform")[0].checked) {
-						var lumaMinimum = (lumaMin+lumaMin+lumaAvg)/3; // poniżej tego progu rysuj pikselMin
-						var lumaMaximum = (lumaMax+lumaMax+lumaAvg)/3; // poniżej tego progu rysuj pikselAvg
+						var lumaMinimum = (lumaMin+lumaMin+lumaAvg)/3; // below this threshold draw pixelMin
+						var lumaMaximum = (lumaMax+lumaMax+lumaAvg)/3; // below this threshold draw pixelAvg
 					}
 					else {
-						var lumaMinimum = Math.sqrt(((lumaMin*lumaMin)+(lumaMin*lumaMin)+(lumaAvg*lumaAvg))/3); // poniżej tego progu rysuj pikselMin
-						var lumaMaximum = Math.sqrt(((lumaMax*lumaMax)+(lumaMax*lumaMax)+(lumaAvg*lumaAvg))/3); // poniżej tego progu rysuj pikselAvg
+						var lumaMinimum = Math.sqrt(((lumaMin*lumaMin)+(lumaMin*lumaMin)+(lumaAvg*lumaAvg))/3); // below this threshold draw pixelMin
+						var lumaMaximum = Math.sqrt(((lumaMax*lumaMax)+(lumaMax*lumaMax)+(lumaAvg*lumaAvg))/3); // below this threshold draw pixelAvg
 					}
 					pixelTable[blockPosition] = 0;
 					pixelTable[blockPosition+1] = 0;
@@ -634,7 +661,7 @@ function convertPixels(canvas, fwidth, fheight) {
 								else pixelTable[blockPosition+1] += pixelOrder[3] << 2*((x/4)+(4*(y-2)));
 							}
 							else if (dith || colorDifference == 0) {
-								var palette = [pikselMin, pikselAvg, pikselMax];
+								var palette = [pixelMin, pixelAvg, pixelMax];
 								var color = [pix.data[position], pix.data[position+1], pix.data[position+2]];
 								var closest = bestMatchIndex(palette, color);
 								var closest2 = bestMatchExIndex(palette, color, closest);
@@ -644,7 +671,7 @@ function convertPixels(canvas, fwidth, fheight) {
 								else
 									closest3 = Math.round(closest[0]/(closest[0]+closest2[0]) * 16);
 								// Use the dithering matrix that is based on the closest shade and pick the color
-								
+
 								if (dith)
 									var trans = [closest[1], closest2[1]][getDither(dither[closest3], x/4, y)];
 								else
@@ -657,24 +684,24 @@ function convertPixels(canvas, fwidth, fheight) {
 							}
 							else {
 								pix.data[position+3] = 255;
-								if (luma < lumaMinimum) { 
-									pix.data[position] = pikselMin[0];
-									pix.data[position+1] = pikselMin[1];
-									pix.data[position+2] = pikselMin[2];
+								if (luma < lumaMinimum) {
+									pix.data[position] = pixelMin[0];
+									pix.data[position+1] = pixelMin[1];
+									pix.data[position+2] = pixelMin[2];
 									if (y<2) pixelTable[blockPosition] += pixelOrder[0] << 2*((x/4)+(4*y));
 									else pixelTable[blockPosition+1] += pixelOrder[0] << 2*((x/4)+(4*(y-2)));
 								}
-								else if (luma < lumaMaximum) { 
-									pix.data[position] = pikselAvg[0];
-									pix.data[position+1] = pikselAvg[1];
-									pix.data[position+2] = pikselAvg[2];
+								else if (luma < lumaMaximum) {
+									pix.data[position] = pixelAvg[0];
+									pix.data[position+1] = pixelAvg[1];
+									pix.data[position+2] = pixelAvg[2];
 									if (y<2) pixelTable[blockPosition] += pixelOrder[1] << 2*((x/4)+(4*y));
 									else pixelTable[blockPosition+1] += pixelOrder[1] << 2*((x/4)+(4*(y-2)));
 								}
 								else {
-									pix.data[position] = pikselMax[0];
-									pix.data[position+1] = pikselMax[1];
-									pix.data[position+2] = pikselMax[2];
+									pix.data[position] = pixelMax[0];
+									pix.data[position+1] = pixelMax[1];
+									pix.data[position+2] = pixelMax[2];
 									if (y<2) pixelTable[blockPosition] += pixelOrder[2] << 2*((x/4)+(4*y));
 									else pixelTable[blockPosition+1] += pixelOrder[2] << 2*((x/4)+(4*(y-2)));
 								}
@@ -686,27 +713,27 @@ function convertPixels(canvas, fwidth, fheight) {
 			}
 		}
 	}
-	else if(outputType == 0) {
+	else if(outputType == formats.RGBA8888) { // RGBA8888
 		outputImage[canvas] = pix.data;
 	}
-	else if (outputType == 2) {
+	else if (outputType == formats.RGB888) {// RGB888
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == 4) {
+	else if(outputType == formats.RGB565) { // RGB565
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		reduceColors(pix, 5, 6, 5, 8, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == 21) {
+	else if(outputType == formats.BGRA5551) { //BGRA5551
 		reduceColors(pix, 5, 5, 5, 1, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == 19) {
+	else if(outputType == formats.BGRA4444) { // BGRA4444
 		reduceColors(pix, 4, 4, 4, 4, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
@@ -715,9 +742,9 @@ function convertPixels(canvas, fwidth, fheight) {
 
 function createVTF() {
 	var size = 0;
-	if (outputType == 13)
+	if (outputType == formats.DXT1) // DXT1
 		size = (blockCount*8);
-	if (outputType == 15)
+	if (outputType == formats.DXT5) //DXT5
 		size = (blockCount*16);
 	else {
 		for (var i = 0; i < outputImage.length; i++){
@@ -734,17 +761,17 @@ function createVTF() {
 	for (var i=0; i<header.length; i++) {
 		file[i] = header[i];
 	}
-	if (outputType == 13) {//DXT1
+	if (outputType == formats.DXT1) {//DXT1
 		for (var i=64; i<file.length; i+=8) {
 			var blockNum = (i-64)/4;
 			writeShort(file, i, colorTable[blockNum]);
 			writeShort(file, i+2, colorTable[blockNum+1]);
 			writeShort(file, i+4, pixelTable[blockNum]);
 			writeShort(file, i+6, pixelTable[blockNum+1]);
-			
+
 		}
 	}
-	else if (outputType == 15) {//DXT5
+	else if (outputType == formats.DXT5) {//DXT5
 		for (var i=64; i<file.length; i+=16) {
 			var blockNum = (i-64)/8;
 
@@ -760,7 +787,7 @@ function createVTF() {
 			writeShort(file, i+14, pixelTable[blockNum+1]);
 		}
 	}
-	else if (outputType == 0){//RGBA8888
+	else if (outputType == formats.RGBA8888){//RGBA8888
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -770,7 +797,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == 2){//RGB888
+	else if (outputType == formats.RGB888){//RGB888
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -782,7 +809,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == 4){//RGB565
+	else if (outputType == formats.RGB565){//RGB565
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -792,7 +819,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == 21){//BGRA5551
+	else if (outputType == formats.BGRA5551){//BGRA5551
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -802,7 +829,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == 19){//BGRA4444
+	else if (outputType == formats.BGRA4444){//BGRA4444
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -818,16 +845,16 @@ function createVTF() {
 //Utils
 function getEstFileSize(cmipmaps) {
 	var mult = 1;
-	if (outputType == 0){
+	if (outputType == formats.RGBA8888){ // RGBA8888
 		mult = 4;
 	}
-	else if (outputType == 13){
+	else if (outputType == formats.DXT1){ // DXT1
 		mult = 0.5;
 	}
-	else if (outputType == 2){
+	else if (outputType == formats.RGB888){ // RGB888
 		mult = 3;
 	}
-	else if (outputType == 4 || outputType == 21 || outputType == 19){
+	else if (outputType == formats.RGB565 || outputType == formats.BGRA5551 || outputType == formats.BGRA4444){ // RGB565; BGRA5551; BGRA4444
 		mult = 2;
 	}
 	mult *= 1+ (1/3);
@@ -853,7 +880,7 @@ function getHue(red, green, blue){
 	var max = Math.max(Math.max(red, green),blue);
 	if (min == max)
 		return 0;
-	
+
 	if (max == red){
 		hue = (green - blue)/(max - min);
 	}
@@ -917,10 +944,10 @@ function reduceColors(data, rb, gb, bb, ab, dith) {
 	var am = 255 / (255 >> as);
 	for (var x = 0; x < data.width; x += 1) {
         for (var y = 0; y < data.height; y += 1) {
-            
+
             var pixel = (y * data.width * 4) + (x * 4);
 			var color = [d[pixel], d[pixel + 1], d[pixel + 2]];
-			
+
 			var floor = [Math.round(Math.floor(d[pixel] / rm) * rm),Math.round(Math.floor(d[pixel+1] / gm) * gm),Math.round(Math.floor(d[pixel+2] / bm) * bm)];
 			var ceil = [Math.round(Math.ceil(d[pixel] / rm) * rm),Math.round(Math.ceil(d[pixel+1] / gm) * gm),Math.round(Math.ceil(d[pixel+2] / bm) * bm)];
 			var closest = bestMatch([floor, ceil], color);
@@ -938,26 +965,26 @@ function reduceColors(data, rb, gb, bb, ab, dith) {
 			}
 			if (dith) {
 				var between;
-					
+
 				between = [];
-			
+
 				// Get the 17 colors between the two previously found colors
-			
+
 				for (var b = 0; b < 17; b += 1) {
 					between.push([closest[0] + (closest2[0] - closest[0]) * b/16,closest[1] + (closest2[1] - closest[1]) * b/16,closest[2] + (closest2[2] - closest[2]) * b/16]/*addColor(closest, multiplyColor(divideColor(closest2, 17), b))*/);
 				}
 				// Get the closest shade to the current pixel from the new 15 colors
-				
+
 				var closest3 = bestMatch(between, color);
 				var index3 = between.indexOf(closest3);
-				
+
 				// Use the dithering matrix that is based on the closest shade and pick the color
-				
+
 				var trans = [closest, closest2][getDither(dither[index3], x, y)];
 				d[pixel] = trans[0];
 				d[pixel + 1] = trans[1];
 				d[pixel + 2] = trans[2];
-				
+
 				// Apply the color to the image with full opacity
 			}
 			else {
@@ -965,10 +992,10 @@ function reduceColors(data, rb, gb, bb, ab, dith) {
 				d[pixel + 1] = closest[1];
 				d[pixel + 2] = closest[2];
 			}
-            d[pixel + 3] = alpha;     
+            d[pixel + 3] = alpha;
         }
     }
-    
+
     // context.putImageData(png, 0, 0);
 }
 // Function to download data to a file
@@ -985,8 +1012,8 @@ function download(data, filename) {
         a.click();
         setTimeout(function() {
             document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);  
-        }, 0); 
+            window.URL.revokeObjectURL(url);
+        }, 0);
     }
 }
 

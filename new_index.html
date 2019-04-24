@@ -12,7 +12,7 @@
 	<div id="title">VTF Editor 0.01</div>
 	<div id="fileSelect"><input type="file" id="files" name="files[]" accept="image/*,.tga,.vtf" onchange="handleFileSelect(event)" multiple/></div>
 	<div id="resolutionNotice" style="visibility: hidden">Using 1024x1020, no mipmaps</div>
-	<select class="textInput" value="1024" id="widthSetting" onchange="setResolution()">
+	<select class="textInput" value="2" id="widthSetting" onchange="setResolution()">
 	<option value=1024>1024</option>
 	<option value=512>512</option>
 	<option value=256>256</option>
@@ -22,10 +22,10 @@
 	<option value=16>16</option>
 	<option value=8>8</option>
 	<option value=4>4</option>
-	<option value=2>2</option>
+	<option value=2 selected>2</option>
 </select>
- x 
-<select class="textInput" value="1024" id="heightSetting" onchange="setResolution()">
+ x
+<select class="textInput" value="2" id="heightSetting" onchange="setResolution()">
 	<option value=1024>1024</option>
 	<option value=512>512</option>
 	<option value=256>256</option>
@@ -35,7 +35,7 @@
 	<option value=16>16</option>
 	<option value=8>8</option>
 	<option value=4>4</option>
-	<option value=2>2</option>
+	<option value=2 selected>2</option>
 </select>
 	<br />
 	<input type="checkbox" name="mipmaps" id="mipmapsCheck" style="display=none">Generate Mipmaps<br /><!--remove-->
@@ -52,13 +52,13 @@
 		<option value="7.4">7.4</option>
 		<option value="7.5">7.5</option>
 	</select><br/>
-	Texture format: <select class="textInput" value=13 id="format" onchange="setOutputType(this)">
-		<option value=0>RGBA8888</option>
+	Texture format: <select class="textInput" value=0 id="format" onchange="setOutputType(this)">
+		<option value=0 selected>RGBA8888</option>
 		<option value=2>RGB888</option>
 		<option value=4>RGB565</option>
 		<option value=21>BGRA5551</option>
 		<option value=19>BGRA4444</option>
-		<option value=13 selected>DXT1 (One bit alpha)</option>
+		<option value=13>DXT1 (One bit alpha)</option>
 		<option value=15>DXT5</option>
 	</select><br/>
 	Sampling Method: <select class="textInput" value="0" id="sampling">
@@ -68,8 +68,8 @@
 		<option value=16>Anisotropic</option>
 	</select>
 
-	<div id = "ditherBlock"><input type="checkbox" name="dither" id="ditherCheck" checked/>Use dithering</div>
-	<div id = "dxtSettings" >
+	<div id = "ditherBlock" style="display: none"><input type="checkbox" name="dither" id="ditherCheck" checked/>Use dithering</div>
+	<div id = "dxtSettings" style="display: none">
 		Color matching: <select class="textInput" value="0" onchange="colorDifference = this.value">
 			<option value=0 selected>RGB difference</option>
 			<option value=1>Luminance</option>
@@ -112,9 +112,9 @@
 	<input type="file" id="files0" name="files[]" accept="image/*" onchange="changeMipmap(event,0)" disabled multiple/>
 	<div id="mipmaps" style="display: none"></div>
 </div>
-<div id="bottomPanel">
+<div id="bottomPanel" style="height: 150px">
 	<div id="statusWindow">
-		changelog:<br />
+		<!--changelog:<br />
 		2018-08-19: added animated spray support and new texture formats<br />
 		2017-01-05: mipmap generation and modification (fading sprays)<br />
 		2016-11-25: image scaling for disproportionate sprays<br />
@@ -122,7 +122,7 @@
 		2016-11-22: added conversion settings<br />
 		2016-11-21: fixed swapped blocks, improved color handling<br />
 		2016-11-20: fixed color errors with almost-black blocks<br />
-		<br />
+		<br />-->
 	</div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
