@@ -199,10 +199,13 @@ input[type=file] {
 	border-top: 2px;
 	border-top-style: solid;
 	border-color: #000000;
-	-moz-user-drag: none;
-	-moz-user-select: none;
-	-webkit-user-drag: none;
-	-webkit-user-select: none;
-	user-drag: none; 
-	user-select: none;
+	-moz-user-drag: text;
+	-moz-user-select: text;
+	-webkit-user-drag: text;
+	-webkit-user-select: text;
+	user-drag: text; 
+	user-select: text;
+}
+#statusWindow {
+	width: 75%;
 }

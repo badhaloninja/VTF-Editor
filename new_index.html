@@ -5,12 +5,15 @@
 <title>VTF Spray Converter</title>
 <link rel="shortcut icon" href="favicon.ico" />
 <link rel="icon" type="image/png" href="favicon.png" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/clipboard.js/1.5.12/clipboard.min.js"></script>
 <link rel="stylesheet" href="vtf.css" />
 </head>
 <body>
 <div id="leftPanel">
 	<div id="title">VTF Editor 0.01</div>
 	<div id="fileSelect"><input type="file" id="files" name="files[]" accept="image/*,.tga,.vtf" onchange="handleFileSelect(event)" multiple/></div>
+	<div id="fileSelect"><input type="file" id="files2" name="files[]" accept=".vtf" onchange="handleFileSelect2(event)" single/></div>
 	<div id="resolutionNotice" style="visibility: hidden">Using 1024x1020, no mipmaps</div>
 	<select class="textInput" value="2" id="widthSetting" onchange="setResolution()">
 	<option value=1024>1024</option>
@@ -102,6 +105,7 @@
 		</div>
 	</div>
 	<div id="vtfSpecs"></div>
+	<a class="copy-text" data-clipboard-target="#content" href="#">copy Text</a>
 	<div id="convertButton" onclick="convert()">CONVERT</div>
 	<div id="saveButton" onclick="createVTF()">DOWNLOAD</div>
 <div id="rightPanel">
@@ -116,15 +120,9 @@
 </div>
 <div id="bottomPanel" style="height: 150px">
 	<div id="statusWindow">
-		<!--changelog:<br />
-		2018-08-19: added animated spray support and new texture formats<br />
-		2017-01-05: mipmap generation and modification (fading sprays)<br />
-		2016-11-25: image scaling for disproportionate sprays<br />
-		2016-11-24: added resolution settings, minor solid color changes<br />
-		2016-11-22: added conversion settings<br />
-		2016-11-21: fixed swapped blocks, improved color handling<br />
-		2016-11-20: fixed color errors with almost-black blocks<br />
-		<br />-->
+		<p id="content">
+		2-source.vtf: [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,2,0,0,0,1,255,255,255,255,0,0,1,255,0,0,0,255,0,0,0,255,0,0,0];
+	</p>
 	</div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

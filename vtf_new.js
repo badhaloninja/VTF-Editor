@@ -40,9 +40,9 @@ var forceDither = false;
 var colorDifference = 0;
 var version = [7,1];
 var lumaWeights = [0.213,0.715,0.072];//[0.2126,0.7152,0.0722] ITU-R BT.709
-var sampling = "16";
+var sampling = 0;
 var formats = {
-	  NONE:-1,
+	NONE:-1,
     RGBA8888:0,
     ABGR8888:1,
     RGB888:2,
@@ -91,7 +91,9 @@ $(document).ready(function(){
   	}
   });
 });
-
+$(function(){
+  new Clipboard('.copy-text');
+});
 
 function setResolution() {
 	colorTable = [];
@@ -182,6 +184,17 @@ setInterval(function(){
 		document.getElementById('filesizee').innerHTML = "Estimated file size: <span style='color:red'>"+filesize+"</span> [KB]";
 
 }, 200);
+
+function handleFileSelect2(evt) {
+	var files = evt.target.files;
+	var reader = new FileReader();
+	reader.readAsArrayBuffer(files[0]);
+	reader.onload = (function(e) {
+	var fileUint8Array = new Uint8Array(e.target.result);
+	console.log(fileUint8Array.toString());
+	document.getElementById('content').innerHTML += files[0].name+": ["+fileUint8Array.toString()+"]; "
+	})
+}
 
 function handleFileSelect(evt) {
 	var files = evt.target.files; // FileList object
@@ -782,7 +795,7 @@ function createVTF() {
 	var file = new Uint8Array(size+64);
 	console.log("save: "+width+" "+height+" "+ size);
 	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,35,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1]; 	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + document.getElementById("sampling").value,35-hasMipmaps,0,0,frameCount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,hasMipmaps ? getReducedMipmapCount()+1 : 1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1];
-	writeShort(header,16, shortened ? width - 4 : width);
+	writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bool ? then : else); (n,16,2)
 	writeShort(header,18, height);
 	for (var i=0; i<header.length; i++) {
 		file[i] = header[i];
@@ -890,7 +903,8 @@ function createVTF() {
 			}
 		}
 	}
-	download(file, "spray.vtf")
+	filetoconsole(file)
+	//download(file, "spray.vtf")
 }
 
 //Utils
@@ -1050,6 +1064,11 @@ function reduceColors(data, rb, gb, bb, ab, dith) {
     // context.putImageData(png, 0, 0);
 }
 // Function to download data to a file
+function filetoconsole(data) {
+	var reader = new FileReader();
+	file = new Blob([data], {type: "application/octet-stream"});
+	console.log(reader.readAsArrayBuffer(file, "application/octet-stream"));
+}
 function download(data, filename) {
     var a = document.createElement("a"),
         file = new Blob([data], {type: "application/octet-stream"});
