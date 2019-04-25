@@ -12,7 +12,7 @@ var exportOptions = {
 		trilinear:2,
 		anisotropic:16
 	}
-	outputType:formats.RGBA8888
+	outputType:VTFImageFormats.RGBA8888
  }
 */
 var colorTable = [];
@@ -40,8 +40,42 @@ var forceDither = false;
 var colorDifference = 0;
 var version = [7,1];
 var lumaWeights = [0.213,0.715,0.072];//[0.2126,0.7152,0.0722] ITU-R BT.709
-var sampling = 0;
-var formats = {
+var sampling = "0";
+var flags = "35";
+var content = {
+	    0:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0]",
+		2:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,2,0,0,0,1,255,255,255,255,0,0,1,255,0,0,0,255,0,0,0,255,0,0,0]",
+		12:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,12,0,0,0,1,255,255,255,255,0,0,1,0,0,255,255,0,255,0,255,255,0,0,255,0,0,0,0]"
+	}
+var VTFImageFormats = {
+	'-1': 'NONE',
+    0: 'RGBA8888',
+    1: 'ABGR8888',
+    2: 'RGB888',
+    3: 'BGR888',
+    4: 'RGB565',
+    5: 'I8',
+    6: 'IA88',
+    7: 'P8',
+    8: 'A8',
+    9: 'RGB888_BLUESCREEN',
+    10: 'BGR888_BLUESCREEN',
+    11: 'ARGB8888',
+    12: 'BGRA8888',
+    13: 'DXT1',
+    14: 'DXT3',
+    15: 'DXT5',
+    16: 'BGRX8888',
+    17: 'BGR565',
+    18: 'BGRX5551',
+    19: 'BGRA4444',
+    20: 'DXT1_ONEBITALPHA',
+    21: 'BGRA5551',
+    22: 'UV88',
+    23: 'UVWQ8888',
+    24: 'RGBA16161616F',
+    25: 'RGBA16161616',
+    26: 'UVLX8888',
 	NONE:-1,
     RGBA8888:0,
     ABGR8888:1,
@@ -83,12 +117,24 @@ $(document).ready(function(){
   $('#versonSetting').change(function(){
   	version = (this).value.split(".");
   });
+  $('#format').change(function(){
+  	outputType = (this).value;
+	if ((this).value != VTFImageFormats.RGBA8888 && (this).value != VTFImageFormats.RGBA8888)
+		document.getElementById('ditherBlock').style.display = "block";
+	else {
+		document.getElementById('ditherBlock').style.display = "none";
+    }
+	if ((this).value == VTFImageFormats.DXT1 || (this).value == VTFImageFormats.DXT5){
+		document.getElementById('dxtSettings').style.display = "block";
+	}
+	else {
+		document.getElementById('dxtSettings').style.display = "none";
+	}
+	check();
+	createCanvas();
+  });
   $('#sampling').change(function(){
-  	if ((this).value == 0) {
-  	sampling = "16";
-  	} else {
   	sampling = (this).value;
-  	}
   });
 });
 $(function(){
@@ -479,7 +525,7 @@ function convertPixels(canvas, fwidth, fheight) {
 		fwidth = fwidth - 4;
 	var pix = mipmaps[canvas].getContext("2d").getImageData(mipmaps[canvas].width/2 - fwidth/2, 0, fwidth, fheight);
 
-	if (outputType == formats.DXT1 || outputType == formats.DXT5) { // DXT1; DXT5
+	if (outputType == VTFImageFormats.DXT1 || outputType == VTFImageFormats.DXT5) { // DXT1; DXT5
 		for (var b=0; b<=2; b++) {
 			if (document.getElementById("brightnessform")[b].checked) var brightness = b;
 		}
@@ -509,7 +555,7 @@ function convertPixels(canvas, fwidth, fheight) {
 					for (var x=0; x<16; x+=4) { // pixel columns in block
 						position = x+(fwidth*4*y)+(16*i)+(fwidth*16*j); // position of a pixel in canvas
 						var luma = (lumaWeights[0]*pix.data[position])+(lumaweights[1]*pix.data[position+1])+(lumaweights[2]*pix.data[position+2]); // ITU-R BT.709
-						if (pix.data[position+3] > 127 || outputType == formats.DXT5) { // find most different colors, unless transparent; DXT5
+						if (pix.data[position+3] > 127 || outputType == VTFImageFormats.DXT5) { // find most different colors, unless transparent; DXT5
 							if (luma > lumaMax) {
 								lumaMax = luma;
 								pixelMax[0] = pix.data[position];
@@ -649,7 +695,7 @@ function convertPixels(canvas, fwidth, fheight) {
 									else pixelTable[blockPosition+1] += pixelOrder[3] << 2*((x/4)+(4*(y-2)));
 								}
 							}
-							if (outputType == formats.DXT1) // DXT1
+							if (outputType == VTFImageFormats.DXT1) // DXT1
 								pix.data[position+3] = 255;
 							else {
 								var alphanum = 0;
@@ -743,36 +789,36 @@ function convertPixels(canvas, fwidth, fheight) {
 			}
 		}
 	}
-	else if(outputType == formats.RGBA8888) { // RGBA8888; 0
+	else if(outputType == VTFImageFormats.RGBA8888) { // RGBA8888; 0
 		outputImage[canvas] = pix.data;
 	}
-	else if (outputType == formats.RGB888) {// RGB888; 2
+	else if (outputType == VTFImageFormats.RGB888) {// RGB888; 2
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		outputImage[canvas] = pix.data;
 	}
-	else if (outputType == formats.BGR888) {// BGR888; 3
+	else if (outputType == VTFImageFormats.BGR888) {// BGR888; 3
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == formats.RGB565) { // RGB565; 4
+	else if(outputType == VTFImageFormats.RGB565) { // RGB565; 4
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		reduceColors(pix, 5, 6, 5, 8, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == formats.BGRA8888) { // BGRA8888; 12
+	else if(outputType == VTFImageFormats.BGRA8888) { // BGRA8888; 12
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == formats.BGRA4444) { // BGRA4444; 19
+	else if(outputType == VTFImageFormats.BGRA4444) { // BGRA4444; 19
 		reduceColors(pix, 4, 4, 4, 4, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == formats.BGRA5551) { //BGRA5551; 21
+	else if(outputType == VTFImageFormats.BGRA5551) { //BGRA5551; 21
 		reduceColors(pix, 5, 5, 5, 1, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
@@ -781,9 +827,9 @@ function convertPixels(canvas, fwidth, fheight) {
 
 function createVTF() {
 	var size = 0;
-	if (outputType == formats.DXT1) // DXT1
+	if (outputType == VTFImageFormats.DXT1) // DXT1
 		size = (blockCount*8);
-	if (outputType == formats.DXT5) //DXT5
+	if (outputType == VTFImageFormats.DXT5) //DXT5
 		size = (blockCount*16);
 	else {
 		for (var i = 0; i < outputImage.length; i++){
@@ -794,13 +840,14 @@ function createVTF() {
 	}
 	var file = new Uint8Array(size+64);
 	console.log("save: "+width+" "+height+" "+ size);
-	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,35,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1]; 	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + document.getElementById("sampling").value,35-hasMipmaps,0,0,frameCount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,hasMipmaps ? getReducedMipmapCount()+1 : 1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1];
+ //var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1]; 	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + document.getElementById("sampling").value,35-hasMipmaps,0,0,frameCount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,hasMipmaps ? getReducedMipmapCount()+1 : 1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1];
+	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,outputType,0,0,0,1,255,255,255,255,0,0,1];
 	writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bool ? then : else); (n,16,2)
 	writeShort(header,18, height);
 	for (var i=0; i<header.length; i++) {
 		file[i] = header[i];
 	}
-	if (outputType == formats.DXT1) {//DXT1
+	if (outputType == VTFImageFormats.DXT1) {//DXT1
 		for (var i=64; i<file.length; i+=8) {
 			var blockNum = (i-64)/4;
 			writeShort(file, i, colorTable[blockNum]);
@@ -810,7 +857,7 @@ function createVTF() {
 
 		}
 	}
-	else if (outputType == formats.DXT5) {//DXT5
+	else if (outputType == VTFImageFormats.DXT5) {//DXT5
 		for (var i=64; i<file.length; i+=16) {
 			var blockNum = (i-64)/8;
 
@@ -826,7 +873,7 @@ function createVTF() {
 			writeShort(file, i+14, pixelTable[blockNum+1]);
 		}
 	}
-	else if (outputType == formats.RGBA8888){//RGBA8888; 0
+	else if (outputType == VTFImageFormats.RGBA8888){//RGBA8888; 0
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -836,7 +883,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == formats.RGB888){//RGB888; 2
+	else if (outputType == VTFImageFormats.RGB888){//RGB888; 2
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -848,7 +895,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == formats.BGR888){//BGR888; 3 --test
+	else if (outputType == VTFImageFormats.BGR888){//BGR888; 3 --test
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -860,7 +907,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == formats.RGB565){//RGB565; 4
+	else if (outputType == VTFImageFormats.RGB565){//RGB565; 4
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -870,20 +917,18 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == formats.BGRA8888){//BGRA8888; 12 --test
+	else if (outputType == VTFImageFormats.BGRA8888){//BGRA8888; 12 --test
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
-			for (var j = 0; j < data.length; j++){
-				file[pos] = data[j+2];
-				file[pos+1] = data[j+1];
-				file[pos+2] = data[j];
-				file[pos+3] = data[j+3];
-				pos+=4;
+			for (var j = 0; j < outputImage[i].length; j+=4){
+				writeShort(file,pos, ((data[j]) << 16)+ ((data[j+1]) << 8) + ((data[j+2])) + ((data[j+3]) << 24));
+				pos+=2;
 			}
+			
 		}
 	}
-	else if (outputType == formats.BGRA4444){//BGRA4444; 19
+	else if (outputType == VTFImageFormats.BGRA4444){//BGRA4444; 19
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -893,7 +938,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == formats.BGRA5551){//BGRA5551; 21
+	else if (outputType == VTFImageFormats.BGRA5551){//BGRA5551; 21
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -910,16 +955,16 @@ function createVTF() {
 //Utils
 function getEstFileSize(cmipmaps) {
 	var mult = 1;
-	if (outputType == formats.RGBA8888){ // RGBA8888
+	if (outputType == VTFImageFormats.RGBA8888){ // RGBA8888
 		mult = 4;
 	}
-	else if (outputType == formats.DXT1){ // DXT1
+	else if (outputType == VTFImageFormats.DXT1){ // DXT1
 		mult = 0.5;
 	}
-	else if (outputType == formats.RGB888){ // RGB888
+	else if (outputType == VTFImageFormats.RGB888){ // RGB888
 		mult = 3;
 	}
-	else if (outputType == formats.RGB565 || outputType == formats.BGRA5551 || outputType == formats.BGRA4444){ // RGB565; BGRA5551; BGRA4444
+	else if (outputType == VTFImageFormats.RGB565 || outputType == VTFImageFormats.BGRA5551 || outputType == VTFImageFormats.BGRA4444){ // RGB565; BGRA5551; BGRA4444
 		mult = 2;
 	}
 	mult *= 1+ (1/3);
@@ -1066,6 +1111,7 @@ function reduceColors(data, rb, gb, bb, ab, dith) {
 // Function to download data to a file
 function filetoconsole(data) {
 	var reader = new FileReader();
+	document.getElementById('content').innerHTML += "<br /> Out: ["+data.toString()+"]; "
 	file = new Blob([data], {type: "application/octet-stream"});
 	console.log(reader.readAsArrayBuffer(file, "application/octet-stream"));
 }

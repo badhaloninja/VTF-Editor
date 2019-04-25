@@ -207,5 +207,6 @@ input[type=file] {
 	user-select: text;
 }
 #statusWindow {
-	width: 75%;
+	width: 65%;
+	word-wrap: break-word;
 }
