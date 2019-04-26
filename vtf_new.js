@@ -1,20 +1,4 @@
-/*
-var exportOptions = {
-	resolution:[2,2], //w,h
-	hasMipmaps:false,
-	colorDifference:0,
-	version:[7,1],
-	lumaWeights:[0.213,0.715,0.072], //[0.2126,0.7152,0.0722] ITU-R BT.709
-	sampling:"16",
-	sampling:{
-		selected:16,
-		point:1, 
-		trilinear:2,
-		anisotropic:16
-	}
-	outputType:VTFImageFormats.RGBA8888
- }
-*/
+import { VTFImageFormats, ImageFormatInfo, TextureFlags } from './vtf_info.js';
 var colorTable = [];
 var pixelTable = [];
 var alphaValueTable = [];
@@ -42,12 +26,14 @@ var version = [7,1];
 var lumaWeights = [0.213,0.715,0.072];//[0.2126,0.7152,0.0722] ITU-R BT.709
 var sampling = "0";
 var flags = "35";
+var shiftvar = [0,0,0,0];
+var shiftempty = [true,true,true,true]
 var content = {
 	    0:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0]",
 		2:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,2,0,0,0,1,255,255,255,255,0,0,1,255,0,0,0,255,0,0,0,255,0,0,0]",
 		12:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,12,0,0,0,1,255,255,255,255,0,0,1,0,0,255,255,0,255,0,255,255,0,0,255,0,0,0,0]"
 	}
-var VTFImageFormats = {
+const VTFImageFormats = {
 	'-1': 'NONE',
     0: 'RGBA8888',
     1: 'ABGR8888',
@@ -103,7 +89,8 @@ var VTFImageFormats = {
     UVWQ8888:23,
     RGBA16161616F:24,
     RGBA16161616:25,
-    UVLX8888:26};
+    UVLX8888:26
+};
 setResolution();
 $(document).ready(function(){
   $('#widthSetting').change(function(){
@@ -135,6 +122,23 @@ $(document).ready(function(){
   });
   $('#sampling').change(function(){
   	sampling = (this).value;
+  });
+  $('.shiftInputs').change(function(){
+	  	if ((this).id='shiftInput1') {
+	  		(this).value==0 ? shiftempty[0]=true : shiftempty[0]=false
+	  		shiftvar[0] = (this).value
+	  	} else if ((this).id='shiftInput2') {
+	  		(this).value==0 ? shiftempty[1]=true : shiftempty[1]=false
+	  		shiftvar[1] = (this).value
+	  	} else if ((this).id='shiftInput3') {
+	  		(this).value==0 ? shiftempty[2]=true : shiftempty[2]=false
+	  		shiftvar[2] = (this).value
+	  	} else if ((this).id='shiftInput4') {
+	  		(this).value==0 ? shiftempty[3]=true : shiftempty[3]=false
+	  		shiftvar[3] = (this).value
+	  	}
+  	console.log((this).id);
+  	//shiftempty[0] ? 1 : 0
   });
 });
 $(function(){
@@ -238,7 +242,7 @@ function handleFileSelect2(evt) {
 	reader.onload = (function(e) {
 	var fileUint8Array = new Uint8Array(e.target.result);
 	console.log(fileUint8Array.toString());
-	document.getElementById('content').innerHTML += files[0].name+": ["+fileUint8Array.toString()+"]; "
+	document.getElementById('outUint8Array').innerHTML = files[0].name+": ["+fileUint8Array.toString()+"]; "
 	})
 }
 
@@ -921,9 +925,12 @@ function createVTF() {
 		var pos = 64;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
-			for (var j = 0; j < outputImage[i].length; j+=4){
-				writeShort(file,pos, ((data[j]) << 16)+ ((data[j+1]) << 8) + ((data[j+2])) + ((data[j+3]) << 24));
-				pos+=2;
+			for (var j = 0; j < data.length; j+=4){
+				file[pos] = data[j+2];
+				file[pos+1] = data[j+1];
+				file[pos+2] = data[j];
+				file[pos+3] = data[j+3];
+				pos+=4;
 			}
 			
 		}
@@ -949,7 +956,7 @@ function createVTF() {
 		}
 	}
 	filetoconsole(file)
-	//download(file, "spray.vtf")
+	download(file, "spray.vtf")
 }
 
 //Utils
@@ -1031,6 +1038,7 @@ function restoreAlpha(alpha1, alpha2, num){
 }
 
 function writeShort(data, pos, value){
+	console.log(value);
 	data[pos] = value & 0xFF;
 	data[pos + 1] = (value >>> 8) & 0xFF;
 }
@@ -1111,7 +1119,7 @@ function reduceColors(data, rb, gb, bb, ab, dith) {
 // Function to download data to a file
 function filetoconsole(data) {
 	var reader = new FileReader();
-	document.getElementById('content').innerHTML += "<br /> Out: ["+data.toString()+"]; "
+	document.getElementById('outUint8Array').innerHTML = "Out: ["+data.toString()+"]; "
 	file = new Blob([data], {type: "application/octet-stream"});
 	console.log(reader.readAsArrayBuffer(file, "application/octet-stream"));
 }

@@ -12,7 +12,6 @@
 <div id="leftPanel">
 	<div id="title">VTF Editor 0.01</div>
 	<div id="fileSelect"><input type="file" id="files" name="files[]" accept="image/*,.tga,.vtf" onchange="handleFileSelect(event)" multiple/></div>
-	<div id="fileSelect"><input type="file" id="files2" name="files[]" accept=".vtf" onchange="handleFileSelect2(event)" single/></div>
 	<div id="resolutionNotice" style="visibility: hidden">Using 1024x1020, no mipmaps</div>
 	<select class="textInput" value="2" id="widthSetting" onchange="setResolution()">
 	<option value=1024>1024</option>
@@ -104,7 +103,18 @@
 		</div>
 	</div>
 	<div id="vtfSpecs"></div>
+	<div id="developmentStuff">
+	<div id="fileSelect"><input type="file" id="files2" name="files[]" accept=".vtf" onchange="handleFileSelect2(event)" single/></div>
+	<br>
+	<input type="number" class="shiftInputs" id="shiftInput1" min="0" max="100" step="1" value="0" onchange="shiftvar[0] = this.value">
+	<input type="number" class="shiftInputs" id="shiftInput2" min="0" max="100" step="1" value="0" onchange="shiftvar[1] = this.value">
+	<br>
+	<input type="number" class="shiftInputs" id="shiftInput3" min="0" max="100" step="1" value="0" onchange="shiftvar[2] = this.value">
+	<input type="number" class="shiftInputs" id="shiftInput4" min="0" max="100" step="1" value="0" onchange="shiftvar[3] = this.value">
+	<br>
+	<br>
 	<a class="copy-text" data-clipboard-target="#content" href="#">copy Text</a>
+	</div>
 	<div id="convertButton" onclick="convert()">CONVERT</div>
 	<div id="saveButton" onclick="createVTF()">DOWNLOAD</div>
 <div id="rightPanel">
@@ -120,9 +130,11 @@
 <div id="bottomPanel" style="height: 150px">
 	<div id="statusWindow">
 		<p id="content">
+        00-source.vtf: [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,00,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+        <br>
         12-source.vtf: [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,12,0,0,0,1,255,255,255,255,0,0,1,0,0,255,255,0,255,0,255,255,0,0,255,0,0,0,0];
         <br>
-        00-source.vtf: [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,00,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+        <p id="outUint8Array"></p>
 	</p>
 	</div>
 </div>
@@ -131,6 +143,7 @@
 <script src="libgif.js" type="text/javascript"></script>
 <script src="dither.js" type="text/javascript"></script>
 <script src="quantize.js" type="text/javascript"></script>
-<script src="vtf_new.js" type="text/javascript"></script>
+<script type="module" src="vtf_info.js"></script>
+<script type="module" src="vtf_new.js"></script>
 </body>
 </head>
