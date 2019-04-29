@@ -846,7 +846,8 @@ function createVTF() {
 	console.log("save: "+width+" "+height+" "+ size);
  //var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1]; 	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + document.getElementById("sampling").value,35-hasMipmaps,0,0,frameCount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,hasMipmaps ? getReducedMipmapCount()+1 : 1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1];
 	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,outputType,0,0,0,1,255,255,255,255,0,0,1];
-	writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bool ? then : else); (n,16,2)
+// signature[4],version[8],size[4],width[2],height[2],flags[4],frames[?],firstframe[?],padding[4],
+writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bool ? then : else); (n,16,2)
 	writeShort(header,18, height);
 	for (var i=0; i<header.length; i++) {
 		file[i] = header[i];
