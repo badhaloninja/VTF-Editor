@@ -1,4 +1,4 @@
-import { VTFImageFormats, ImageFormatInfo, TextureFlags } from './vtf_info.js';
+//import { VTFImageFormats, ImageFormatInfo, TextureFlags } from './vtf_info.js';
 var colorTable = [];
 var pixelTable = [];
 var alphaValueTable = [];
@@ -26,13 +26,14 @@ var version = [7,1];
 var lumaWeights = [0.213,0.715,0.072];//[0.2126,0.7152,0.0722] ITU-R BT.709
 var sampling = "0";
 var flags = "35";
-var shiftvar = [0,0,0,0];
-var shiftempty = [true,true,true,true]
 var content = {
 	    0:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0]",
 		2:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,2,0,0,0,1,255,255,255,255,0,0,1,255,0,0,0,255,0,0,0,255,0,0,0]",
 		12:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,12,0,0,0,1,255,255,255,255,0,0,1,0,0,255,255,0,255,0,255,255,0,0,255,0,0,0,0]"
 	}
+
+var selectedFlags = ["CLAMPT","ANISOTROPIC","HINT_DXT5","SRGB","NOMIP","NOLOD","EIGHTBITALPHA"]
+/*
 const VTFImageFormats = {
 	'-1': 'NONE',
     0: 'RGBA8888',
@@ -90,7 +91,7 @@ const VTFImageFormats = {
     RGBA16161616F:24,
     RGBA16161616:25,
     UVLX8888:26
-};
+};*/
 setResolution();
 $(document).ready(function(){
   $('#widthSetting').change(function(){
@@ -122,23 +123,6 @@ $(document).ready(function(){
   });
   $('#sampling').change(function(){
   	sampling = (this).value;
-  });
-  $('.shiftInputs').change(function(){
-	  	if ((this).id='shiftInput1') {
-	  		(this).value==0 ? shiftempty[0]=true : shiftempty[0]=false
-	  		shiftvar[0] = (this).value
-	  	} else if ((this).id='shiftInput2') {
-	  		(this).value==0 ? shiftempty[1]=true : shiftempty[1]=false
-	  		shiftvar[1] = (this).value
-	  	} else if ((this).id='shiftInput3') {
-	  		(this).value==0 ? shiftempty[2]=true : shiftempty[2]=false
-	  		shiftvar[2] = (this).value
-	  	} else if ((this).id='shiftInput4') {
-	  		(this).value==0 ? shiftempty[3]=true : shiftempty[3]=false
-	  		shiftvar[3] = (this).value
-	  	}
-  	console.log((this).id);
-  	//shiftempty[0] ? 1 : 0
   });
 });
 $(function(){
@@ -1145,3 +1129,8 @@ function download(data, filename) {
 function getColorDiff(color1, color2){
 	return Math.abs(color1[0] - color2[0]) + Math.abs(color1[1] - color2[1]) + Math.abs(color1[2] - color2[2]);
 }
+const fromHexString = hexString =>
+  new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+const toHexString = bytes =>
+  bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
