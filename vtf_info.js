@@ -277,7 +277,7 @@ const VTFConst = {
 
 let byte = (value,length=1) => {return new Uint8Array(length).map((_, i) => [value][i])};
 
-let uint = number => new Uint16Array({0:number>>>0,length:4});
+let uint = number => new Uint8Array({0:number>>>0,length:4});
 
 let short = number => new Uint8Array([number & 0xFF,(number >>> 8) & 0xff]);
 
@@ -339,7 +339,10 @@ console.log(entry+" missing")
     // unsigned char    lowResImageWidth;    // Low resolution image width.
     // unsigned char    lowResImageHeight;    // Low resolution image height.
 
-function VTFHeaderConstructor() {
+function VTFHeader() {
+	if (!(this instanceof VTFHeader)) { 
+    return new VTFHeader();
+  }
   this.signature = char("VTF\0");
   this.version = [uint(7),uint(2)];
   this.headerSize = uint(64);
@@ -357,7 +360,30 @@ function VTFHeaderConstructor() {
   this.lowResImageFormat = uint(VTFImageFormats.DTX1);
   this.lowResImageWidth = byte(2);
   this.lowResImageHeight = byte(2);
-  this.totallength = function() {return this.signature.length+this.version[0].length+this.version[1].length+this.headerSize.length;}; //make recursive
+  if (VTFOptions.version[0] >=7 && VTFOptions.version[1] >= 2) {
+       this.depth = short(1);
+  }
+  if (VTFOptions.version[0] >=7 && VTFOptions.version[1] >= 3) {
+       this.padding2 = byte(0,3);
+       this.numResources = uint(0)
+  }
+  this.getLength = objLength(this);
+}
+function objLength(obj){
+  var out=0
+  var type=""
+ Object.keys(obj).forEach(function(entry) {
+   if (entry == "getLength") {return}
+   type = Object.prototype.toString.call(obj[entry])
+   if (type == "[object Array]"){
+   out += objLength(obj[entry])
+   } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+     out += obj[entry].length
+   } else {
+     console.log("Unknown: "+type+"\nValue: "+obj[entry])
+   }
+ })
+ return out
 }
 
 // function concatTypedArrays(a, b) { // a, b TypedArray of same type
