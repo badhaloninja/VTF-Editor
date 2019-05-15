@@ -257,7 +257,6 @@ const VTFEnabledFlags = {
     BORDER:"Clamp All"
 };
 
-
 let VTFOptions = {
     version: [7,2],
     width: 2,
@@ -338,6 +337,14 @@ console.log(entry+" missing")
     // unsigned int    lowResImageFormat;    // Low resolution image format (always DXT1).
     // unsigned char    lowResImageWidth;    // Low resolution image width.
     // unsigned char    lowResImageHeight;    // Low resolution image height.
+/*#define VTF_MAJOR_VERSION					7		//!< VTF major version number
+#define VTF_MINOR_VERSION					5		//!< VTF minor version number
+#define VTF_MINOR_VERSION_DEFAULT			3
+
+#define VTF_MINOR_VERSION_MIN_SPHERE_MAP	1
+#define VTF_MINOR_VERSION_MIN_VOLUME		2
+#define VTF_MINOR_VERSION_MIN_RESOURCE		3
+#define VTF_MINOR_VERSION_MIN_NO_SPHERE_MAP	5*/
 
 function SVTFFileHeader() {
   this.signature = char("VTF\0");
