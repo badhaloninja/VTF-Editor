@@ -225,41 +225,41 @@ const TextureFlags = {
 };
 
 const VTFEnabledFlags = {
-POINTSAMPLE:"Point Sample",
-TRILINEAR:"Trilinear",
-CLAMPS:"Clamp S",
-CLAMPT:"Clamp T",
-ANISOTROPIC:"Anisotropic",
-HINT_DXT5:"Hint DXT5",
-SRGB:"SRGB",
-NORMAL:"Normal Map",
-NOMIP:"No Mipmap",
-NOLOD:"No Level Of Detail",
-MINMIP:"No Minimum Mipmap",
-PROCEDURAL:"Procedural",
-ONEBITALPHA:"One Bit Alpha (Format Specific)",
-EIGHTBITALPHA:"Eight Bit Alpha (Format Specific)",
-ENVMAP:"Enviroment Map (Format Specific)",
-RENDERTARGET:"Render Target",
-DEPTHRENDERTARGET:"Depth Render Target",
-NODEBUGOVERRIDE:"No Debug Override",
-SINGLECOPY:"Single Copy",
-UNUSED0:"Unused",
-UNUSED1:"Unused",
-UNUSED2:"Unused",
-UNUSED3:"Unused",
-NODEPTHBUFFER:"No Depth Buffer",
-UNUSED4:"Unused",
-CLAMPU:"Clamp U",
-VERTEXTEXTURE:"Vertex Texture",
-SSBUMP:"SSBump",
-UNUSED5:"Unused",
-BORDER:"Clamp All"
+    POINTSAMPLE:"Point Sample",
+    TRILINEAR:"Trilinear",
+    CLAMPS:"Clamp S",
+    CLAMPT:"Clamp T",
+    ANISOTROPIC:"Anisotropic",
+    HINT_DXT5:"Hint DXT5",
+    SRGB:"SRGB",
+    NORMAL:"Normal Map",
+    NOMIP:"No Mipmap",
+    NOLOD:"No Level Of Detail",
+    MINMIP:"No Minimum Mipmap",
+    PROCEDURAL:"Procedural",
+    ONEBITALPHA:"One Bit Alpha (Format Specific)",
+    EIGHTBITALPHA:"Eight Bit Alpha (Format Specific)",
+    ENVMAP:"Enviroment Map (Format Specific)",
+    RENDERTARGET:"Render Target",
+    DEPTHRENDERTARGET:"Depth Render Target",
+    NODEBUGOVERRIDE:"No Debug Override",
+    SINGLECOPY:"Single Copy",
+    UNUSED0:"Unused",
+    UNUSED1:"Unused",
+    UNUSED2:"Unused",
+    UNUSED3:"Unused",
+    NODEPTHBUFFER:"No Depth Buffer",
+    UNUSED4:"Unused",
+    CLAMPU:"Clamp U",
+    VERTEXTEXTURE:"Vertex Texture",
+    SSBUMP:"SSBump",
+    UNUSED5:"Unused",
+    BORDER:"Clamp All"
 };
 
 
 let VTFOptions = {
-    version: [7,1],
+    version: [7,2],
     width: 2,
     height: 2,
     lumaWeights: [0.213,0.715,0.072],//[0.2126,0.7152,0.0722] ITU-R BT.709
@@ -339,13 +339,16 @@ console.log(entry+" missing")
     // unsigned char    lowResImageWidth;    // Low resolution image width.
     // unsigned char    lowResImageHeight;    // Low resolution image height.
 
-function VTFHeader() {
-	if (!(this instanceof VTFHeader)) { 
-    return new VTFHeader();
-  }
+function SVTFFileHeader() {
   this.signature = char("VTF\0");
   this.version = [uint(7),uint(2)];
   this.headerSize = uint(64);
+};
+SVTFFileHeader.prototype.greeting = function() {
+  alert('Hi! I\'m ' + this.name.first + '.');
+};
+function SVTFHeader_70() {
+  SVTFFileHeader.call(this);
   this.width = short(2048);
   this.height = short(2048);
   this.flags = TextureFlags.getflags();
@@ -357,18 +360,42 @@ function VTFHeader() {
   this.bumpmapScale = float(1.00);
   this.highResImageFormat = uint(VTFImageFormats.RGBA8888);
   this.mipmapCount = byte(0);
-  this.lowResImageFormat = uint(VTFImageFormats.DTX1);
+  this.lowResImageFormat = uint(VTFImageFormats.DXT1);
   this.lowResImageWidth = byte(2);
   this.lowResImageHeight = byte(2);
-  if (VTFOptions.version[0] >=7 && VTFOptions.version[1] >= 2) {
-       this.depth = short(1);
-  }
-  if (VTFOptions.version[0] >=7 && VTFOptions.version[1] >= 3) {
-       this.padding2 = byte(0,3);
-       this.numResources = uint(0)
-  }
-  this.getLength = objLength(this);
-}
+};//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
+SVTFHeader_70.prototype = Object.create(SVTFFileHeader.prototype);
+Object.defineProperty(SVTFHeader_70.prototype, 'constructor', { 
+    value: SVTFHeader_70, 
+    enumerable: false, // so that it does not appear in 'for in' loop
+    writable: true });
+function SVTFHeader_71(){
+  SVTFHeader_70.call(this);
+};
+
+function SVTFHeader_72(){
+  SVTFHeader_71.call(this);
+  //if (VTFOptions.version[0] >=7 && VTFOptions.version[1] >= 2) {
+  this.depth = short(1);                          //!< Depth of the largest image
+  //};
+};
+
+function SVTFHeader_73(){
+  SVTFHeader_72.call(this);
+  this.padding2 = byte(0,3);
+  this.numResources = uint(0);                          //!< Number of image resources
+};
+
+function SVTFHeader_74(){
+  SVTFHeader_73.call(this);
+
+};
+
+function SVTFHeader_75(){
+  SVTFHeader_74.call(this);
+
+};
+
 function objLength(obj){
   var out=0
   var type=""
@@ -385,6 +412,33 @@ function objLength(obj){
  })
  return out
 }
+
+
+/*let SVTFFileHeader = {
+    Signature: char("VTF\0"),                  //!< "Magic number" identifier- "VTF\0".
+    Version: [uint(7),uint(2)],                    //!< Version[0].version[1] (currently 7.2)
+    HeaderSize: uint(64)                     //!< Size of the header struct (currently 80 bytes)             
+};*/
+/*
+let SVTFHeader_70 : public SVTFFileHeader
+{
+    vlUShort        Width;                          //!< Width of the largest image
+    vlUShort        Height;                         //!< Height of the largest image
+    vlUInt          Flags;                          //!< Flags for the image
+    vlUShort        Frames;                         //!< Number of frames if animated (1 for no animation)
+    vlUShort        StartFrame;                     //!< Start frame (always 0)
+    vlByte          Padding0[4];                    //!< Reflectivity padding (16 byte alignment)
+    vlSingle        Reflectivity[3];                //!< Reflectivity vector
+    vlByte          Padding1[4];                    //!< Reflectivity padding (8 byte packing)
+    vlSingle        BumpScale;                      //!< Bump map scale
+    VTFImageFormat  ImageFormat;                    //!< Image format index
+    vlByte          MipCount;                       //!< Number of MIP levels (including the largest image)
+    VTFImageFormat  LowResImageFormat;              //!< Image format of the thumbnail image
+    vlByte          LowResImageWidth;               //!< Thumbnail image width
+    vlByte          LowResImageHeight;              //!< Thumbnail image height
+};*/
+
+
 
 // function concatTypedArrays(a, b) { // a, b TypedArray of same type
 //     var c = new (a.constructor)(a.length + b.length);
