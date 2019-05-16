@@ -58,118 +58,6 @@ const VTFImageFormats = {
     UVLX8888:26        //!<  = 4 channel format for DuDv/Normal maps - 32 bpp
 };
 
-const ImageFormatInfo = {
-    NONE: {},
-
-    RGBA8888:{
-        supported: true,
-        total_bits: 32
-    },
-    ABGR8888:{
-        supported: false,
-        total_bits: 32
-    },
-    RGB888:{
-        supported: true,
-        total_bits: 24
-    },
-    BGR888:{
-        supported: true,
-        total_bits: 24
-    },
-    RGB565:{
-        supported: true,
-        total_bits: 16
-    },
-    I8:{
-        supported: false,
-        total_bits: 8
-    },
-    IA88:{
-        supported: false,
-        total_bits: 16
-    },
-    P8:{
-        supported: false,
-        total_bits: 8
-    },
-    A8:{
-        supported: false,
-        total_bits: 8
-    },
-    RGB888_BLUESCREEN:{
-        supported: false,
-        total_bits: 24
-    },
-    BGR888_BLUESCREEN:{
-        supported: false,
-        total_bits: 24
-    },
-    ARGB8888:{
-        supported: false,
-        total_bits: 32
-    },
-    BGRA8888:{
-        supported: true,
-        total_bits: 32
-    },
-    DXT1:{
-        supported: true,
-        total_bits: 4
-    },
-    DXT3:{
-        supported: false,
-        total_bits: 8
-    },
-    DXT5:{
-        supported: true,
-        total_bits: 8
-    },
-    BGRX8888:{
-        supported: false,
-        total_bits: 32
-    },
-    BGR565:{
-        supported: false,
-        total_bits: 16
-    },
-    BGRX5551:{
-        supported: false,
-        total_bits: 16
-    },
-    BGRA4444:{
-        supported: true,
-        total_bits: 16
-    },
-    DXT1_ONEBITALPHA:{
-        supported: false,
-        total_bits: 4
-    },
-    BGRA5551:{
-        supported: true,
-        total_bits: 16
-    },
-    UV88:{
-        supported: false,
-        total_bits: 16
-    },
-    UVWQ8888:{
-        supported: false,
-        total_bits: 32
-    },
-    RGBA16161616F:{
-        supported: false,
-        total_bits: 64
-    },
-    RGBA16161616:{
-        supported: false,
-        total_bits: 64
-    },
-    UVLX8888:{
-        supported: false,
-        total_bits: 32
-    }
-};
 
 const TextureFlags = {
     POINTSAMPLE                                : 0x00000001,
@@ -217,13 +105,15 @@ const TextureFlags = {
         var tmp=0
         VTFOptions.selectedFlags.forEach(function(entry) {
           tmp = (parseInt(tmp, 16) + TextureFlags[entry]).toString(16);
-          while (tmp.length < 8) { tmp = '0' + tmp; } // Zero pad.
-        });
+          while (tmp.length < 8) { tmp = '0' + tmp;} // Zero pad.
+       });
         return fromHexString(tmp.toString()).reverse(); //.toString()
-    }
+   }
     // key: function(n){return this[Object.keys(this)[n]]}
 };
-
+Object.defineProperty(TextureFlags, 'getflags', {
+  enumerable: false
+});
 const VTFEnabledFlags = {
     POINTSAMPLE:"Point Sample",
     TRILINEAR:"Trilinear",
@@ -276,7 +166,7 @@ const VTFConst = {
 
 let byte = (value,length=1) => {return new Uint8Array(length).map((_, i) => [value][i])};
 
-let uint = number => new Uint8Array({0:number>>>0,length:4});
+let uint = number => (number!=-1)?(new Uint8Array({0:number>>>0,length:4})):(new Uint8Array([255,255,255,255]));
 
 let short = number => new Uint8Array([number & 0xFF,(number >>> 8) & 0xff]);
 
@@ -284,11 +174,11 @@ function char(s){//uint8array
 var escstr = encodeURIComponent(s);
     var binstr = escstr.replace(/%([0-9A-F]{2})/g, function(match, p1) {
         return String.fromCharCode('0x' + p1);
-    });
+   });
     var ua = new Uint8Array(binstr.length);
     Array.prototype.forEach.call(binstr, function (ch, i) {
         ua[i] = ch.charCodeAt(0);
-    });
+   });
     return ua;
 }
 
@@ -298,7 +188,7 @@ var view = new DataView(new ArrayBuffer(4)),
     result;
 view.setFloat32(0, floatnum);
 result = Array
-    .apply(null, { length: 4 })
+    .apply(null, { length: 4})
     .map((_, i) => getHex(view.getUint8(i)))
     .join('');
 return fromHexString(result).reverse();
@@ -345,81 +235,206 @@ console.log(entry+" missing")
 #define VTF_MINOR_VERSION_MIN_VOLUME		2
 #define VTF_MINOR_VERSION_MIN_RESOURCE		3
 #define VTF_MINOR_VERSION_MIN_NO_SPHERE_MAP	5*/
+/*
+this->Header = new SVTFHeader;
+    memset(this->Header, 0, sizeof(SVTFHeader));
 
-function SVTFFileHeader() {
-  this.signature = char("VTF\0");
-  this.version = [uint(7),uint(2)];
-  this.headerSize = uint(64);
+    strcpy(this->Header->TypeString, "VTF");
+    this->Header->Version[0] = VTF_MAJOR_VERSION;
+    this->Header->Version[1] = VTF_MINOR_VERSION_DEFAULT;
+    this->Header->HeaderSize = 0;
+    this->Header->Width = (vlShort)uiWidth;
+    this->Header->Height = (vlShort)uiHeight;
+    this->Header->Flags = (this->GetImageFormatInfo(ImageFormat).uiAlphaBitsPerPixel == 1 ? TEXTUREFLAGS_ONEBITALPHA : 0)
+                            | (this->GetImageFormatInfo(ImageFormat).uiAlphaBitsPerPixel > 1 ? TEXTUREFLAGS_EIGHTBITALPHA : 0)
+                            | (uiFaces == 1 ? 0 : TEXTUREFLAGS_ENVMAP)
+                            | (bMipmaps ? 0 : TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD);
+    this->Header->Frames = (vlShort)uiFrames;
+    this->Header->StartFrame = uiFaces != 6 || VTF_MINOR_VERSION_DEFAULT >= VTF_MINOR_VERSION_MIN_NO_SPHERE_MAP ? 0 : 0xffff;
+    this->Header->Reflectivity[0] = 1.0f;
+    this->Header->Reflectivity[1] = 1.0f;
+    this->Header->Reflectivity[2] = 1.0f;
+    this->Header->BumpScale = 1.0f;
+    this->Header->ImageFormat = ImageFormat;
+    this->Header->MipCount = bMipmaps ? (vlByte)this->ComputeMipmapCount(uiWidth, uiHeight, uiSlices) : 1;
+    this->Header->Depth = (vlShort)uiSlices;
+    this->Header->ResourceCount = 0;
+
+    //
+    // Generate thumbnail.
+    //
+
+    if(bThumbnail)
+    {
+        // Note: Valve informs us that DXT1 is the correct format.
+
+        //  The format DXT1 was observed in almost every official .vtf file.
+        this->Header->LowResImageFormat = IMAGE_FORMAT_DXT1;
+
+        // Note: Valve informs us that the below is the right dimensions.
+
+        // Find a thumbnail width and height (the first width and height <= 16 pixels).
+        // The value 16 was observed in almost every official .vtf file.
+
+        vlUInt uiThumbnailWidth = this->Header->Width, uiThumbnailHeight = this->Header->Height;
+
+        while(vlTrue)
+        {
+            if(uiThumbnailWidth <= 16 && uiThumbnailHeight <= 16)
+            {
+                break;
+           ]
+
+            uiThumbnailWidth >>= 1;
+            uiThumbnailHeight >>= 1;
+            
+            if(uiThumbnailWidth < 1)
+                uiThumbnailWidth = 1;
+
+            if(uiThumbnailHeight < 1)
+                uiThumbnailHeight = 1;
+       ]
+
+        this->Header->LowResImageWidth = (vlByte)uiThumbnailWidth;
+        this->Header->LowResImageHeight = (vlByte)uiThumbnailHeight;
+
+        this->uiThumbnailBufferSize = this->ComputeImageSize(this->Header->LowResImageWidth, this->Header->LowResImageHeight, 1, this->Header->LowResImageFormat);
+        this->lpThumbnailImageData = new vlByte[this->uiThumbnailBufferSize];
+
+        this->Header->Resources[this->Header->ResourceCount++].Type = VTF_LEGACY_RSRC_LOW_RES_IMAGE;
+   ]
+    else
+    {
+        this->Header->LowResImageFormat = IMAGE_FORMAT_NONE;
+        this->Header->LowResImageWidth = 0;
+        this->Header->LowResImageHeight = 0;
+
+        this->uiThumbnailBufferSize = 0;
+        this->lpThumbnailImageData = 0;
+
+*/
+class SVTFFileHeader {
+    constructor({Version=[7,1],HeaderSize=64} = {}) {
+      this.signature = char("VTF\0");
+      this.Version = [uint(Version[0]),uint(Version[1])];
+      this.HeaderSize = uint(HeaderSize);
+ }
+ getArray() {
+  var array=new Uint8Array
+   Object.keys(this).forEach(function(entry) {
+   if (entry == "getArray") {return}
+   type = Object.prototype.toString.call(this[entry])
+   if (type == "[object Array]"){
+   array = mergeTypedArrays(array,getArray(this[entry]))
+  } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+     array = mergeTypedArrays(array,this[entry])
+
+  } else {
+     console.log("Unknown: "+type+"\nValue: "+this[entry])
+  }
+ })
+ return array
+}
 };
-SVTFFileHeader.prototype.greeting = function() {
-  alert('Hi! I\'m ' + this.name.first + '.');
-};
-function SVTFHeader_70() {
-  SVTFFileHeader.call(this);
-  this.width = short(2048);
-  this.height = short(2048);
-  this.flags = TextureFlags.getflags();
-  this.frames = short(1);
-  this.firstFrame = short(0);
-  this.padding0 = byte(0,4);
-  this.reflectivity = [float(1.00),float(1.00),float(1.00)];
-  this.padding1 = byte(0.4);
-  this.bumpmapScale = float(1.00);
-  this.highResImageFormat = uint(VTFImageFormats.RGBA8888);
-  this.mipmapCount = byte(0);
-  this.lowResImageFormat = uint(VTFImageFormats.DXT1);
-  this.lowResImageWidth = byte(2);
-  this.lowResImageHeight = byte(2);
+class SVTFHeader_70 extends SVTFFileHeader {
+    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0} = {}){
+      super({Version,HeaderSize});
+      this.Width = short(Width);
+      this.Height = short(Height);
+      this.FlagArray = FlagArray;
+      this.Frames = short(Frames);
+      this.StartFrame = short(StartFrame);
+      this.padding0 = byte(0,4);
+      this.reflectivity = [float(reflectivity[0]),float(reflectivity[1]),float(reflectivity[2])];
+      this.padding1 = byte(0,4);
+      this.BumpScale = float(BumpScale);
+      this.ImageFormat = uint(ImageFormat);
+      this.MipCount = byte(MipCount);
+      this.LowResImageFormat = uint(LowResImageFormat);
+      this.LowResImageWidth = byte(LowResImageWidth);
+      this.lowResImageHeight = byte(lowResImageHeight);
+ }
+ getArray() {
+    super.getArray();
+  }
+ 
 };//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
-SVTFHeader_70.prototype = Object.create(SVTFFileHeader.prototype);
-Object.defineProperty(SVTFHeader_70.prototype, 'constructor', { 
-    value: SVTFHeader_70, 
-    enumerable: false, // so that it does not appear in 'for in' loop
-    writable: true });
-function SVTFHeader_71(){
-  SVTFHeader_70.call(this);
+
+class SVTFHeader_71 extends SVTFHeader_70 {
+    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0} = {}){
+      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
+  }
+ getArray() {
+    super.getArray();
+  }
 };
 
-function SVTFHeader_72(){
-  SVTFHeader_71.call(this);
-  //if (VTFOptions.version[0] >=7 && VTFOptions.version[1] >= 2) {
-  this.depth = short(1);                          //!< Depth of the largest image
-  //};
+class SVTFHeader_72 extends SVTFHeader_71 {
+    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1} = {}){
+      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
+      this.Depth = byte(Depth);                          //!< Depth of the largest image
+  }
+ getArray() {
+    super.getArray();
+  }
 };
 
-function SVTFHeader_73(){
-  SVTFHeader_72.call(this);
-  this.padding2 = byte(0,3);
-  this.numResources = uint(0);                          //!< Number of image resources
+class SVTFHeader_73 extends SVTFHeader_72 {
+    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
+      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth});
+      this.padding2 = byte(0,3);
+      this.ResourceCount = uint(ResourceCount);                          //!< Number of image resources
+   }
+ getArray() {
+    super.getArray();
+  }
 };
 
-function SVTFHeader_74(){
-  SVTFHeader_73.call(this);
-
+class SVTFHeader_74 extends SVTFHeader_73 {
+    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
+      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
+  }
+ getArray() {
+    super.getArray();
+  }
 };
 
-function SVTFHeader_75(){
-  SVTFHeader_74.call(this);
-
+class SVTFHeader_75 extends SVTFHeader_74 {
+    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
+      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
+  }
+ getArray() {
+    super.getArray();
+  }
 };
 
 function objLength(obj){
   var out=0
   var type=""
+  var array=new Uint8Array
  Object.keys(obj).forEach(function(entry) {
    if (entry == "getLength") {return}
    type = Object.prototype.toString.call(obj[entry])
    if (type == "[object Array]"){
-   out += objLength(obj[entry])
-   } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+   out += objLength(obj[entry])[0]
+   array = mergeTypedArrays(array,objLength(obj[entry])[1])
+  } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
      out += obj[entry].length
-   } else {
-     console.log("Unknown: "+type+"\nValue: "+obj[entry])
-   }
- })
- return out
-}
+     array = mergeTypedArrays(array,obj[entry])
 
+  } else {
+     console.log("Unknown: "+type+"\nValue: "+obj[entry])
+  }
+ })
+ return [out,array]
+}
+function mergeTypedArrays(a, b) {
+    var c = new a.constructor(a.length + b.length);
+    c.set(a);
+    c.set(b, a.length);
+
+    return c;
+}
 
 /*let SVTFFileHeader = {
     Signature: char("VTF\0"),                  //!< "Magic number" identifier- "VTF\0".
@@ -452,7 +467,7 @@ let SVTFHeader_70 : public SVTFFileHeader
 //     c.set(a, 0);
 //     c.set(b, a.length);
 //     return c;
-// }
+//]
   //this.lowResImageFormat
 
 //[86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0 ,0,0,0,0 ,0,0,128,63 ,0,0,128,63 ,0,0,128,63 ,0,0,0,0 ,0,0,128,63,outputType,0,0,0,1,255,255,255,255,0,0,1];
@@ -485,11 +500,69 @@ export const VTFHEADER {
     unsigned char    padding2[3];        // depth padding (4 byte alignment).
     unsigned int    numResources;        // Number of resources this vtf has
 }
+*/
 
+const VTFImageFormatInfo = //[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
+{
+     0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_RGBA8888,
+     1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ABGR8888, 
+     2 : ["RGB888"            , 24,  3,  8,  8,  8,  0, false,  true],        // IMAGE_FORMAT_RGB888,
+     3 : ["BGR888"            , 24,  3,  8,  8,  8,  0, false,  true],        // IMAGE_FORMAT_BGR888,
+     4 : ["RGB565"            , 16,  2,  5,  6,  5,  0, false,  true],        // IMAGE_FORMAT_RGB565, 
+     5 : ["I8"                ,  8,  1,  0,  0,  0,  0, false, false],        // IMAGE_FORMAT_I8,
+     6 : ["IA88"              , 16,  2,  0,  0,  0,  8, false, false],        // IMAGE_FORMAT_IA88
+     7 : ["P8"                ,  8,  1,  0,  0,  0,  0, false, false],        // IMAGE_FORMAT_P8
+     8 : ["A8"                ,  8,  1,  0,  0,  0,  8, false, false],        // IMAGE_FORMAT_A8
+     9 : ["RGB888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_RGB888_BLUESCREEN
+    10 : ["BGR888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_BGR888_BLUESCREEN
+    11 : ["ARGB8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ARGB8888
+    12 : ["BGRA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_BGRA8888
+    13 : ["DXT1"              ,  4,  0,  0,  0,  0,  0,  true,  true],        // IMAGE_FORMAT_DXT1
+    14 : ["DXT3"              ,  8,  0,  0,  0,  0,  8,  true, false],        // IMAGE_FORMAT_DXT3
+    15 : ["DXT5"              ,  8,  0,  0,  0,  0,  8,  true,  true],        // IMAGE_FORMAT_DXT5
+    16 : ["BGRX8888"          , 32,  4,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_BGRX8888
+    17 : ["BGR565"            , 16,  2,  5,  6,  5,  0, false, false],        // IMAGE_FORMAT_BGR565
+    18 : ["BGRX5551"          , 16,  2,  5,  5,  5,  0, false, false],        // IMAGE_FORMAT_BGRX5551
+    19 : ["BGRA4444"          , 16,  2,  4,  4,  4,  4, false,  true],        // IMAGE_FORMAT_BGRA4444
+    20 : ["DXT1 One Bit Alpha",  4,  0,  0,  0,  0,  1,  true, false],        // IMAGE_FORMAT_DXT1_ONEBITALPHA
+    21 : ["BGRA5551"          , 16,  2,  5,  5,  5,  1, false,  true],        // IMAGE_FORMAT_BGRA5551
+    22 : ["UV88"              , 16,  2,  8,  8,  0,  0, false, false],        // IMAGE_FORMAT_UV88
+    23 : ["UVWQ8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_UVWQ8899
+    24 : ["RGBA16161616F"     , 64,  8, 16, 16, 16, 16, false, false],        // IMAGE_FORMAT_RGBA16161616F
+    25 : ["RGBA16161616"      , 64,  8, 16, 16, 16, 16, false, false],        // IMAGE_FORMAT_RGBA16161616
+    26 : ["UVLX8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_UVLX8888
+    getSupported: function() {
+    var tmp=[]
+    Object.values(VTFImageFormatInfo).forEach(function(entry,i){
+        entry[8] ? tmp.push(i) : null;
+      })
+    return tmp
+    },
+    getInfo: function(Format) {
+    var info=this[Format]
+    var tmp={Name:info[0], BitsPerPixel:info[1], BytesPerPixel:info[2], RedBitsPerPixel:info[3], GreenBitsPerPixel:info[4], BlueBitsPerPixel:info[5], AlphaBitsPerPixel:info[6], IsCompressed:info[7], IsSupported:info[8]}
+    return tmp
+   }
+};
+Object.defineProperty(VTFImageFormatInfo, 'getSupported', {
+  enumerable: false
+});
+Object.defineProperty(VTFImageFormatInfo, 'getInfo', {
+  enumerable: false
+});
 
-function vtfheader(title, href, imageUri, description) {
-    this.title = title;
-    this.href = href;
-    this.imageUri = imageUri;
-    this.description = description;
-}*/
+/*
+typedef struct tagSVTFImageFormatInfo
+{
+    vlChar *lpName;                    //!< Enumeration text equivalent.
+    vlUInt    uiBitsPerPixel;            //!< Format bits per pixel.
+    vlUInt    uiBytesPerPixel;        //!< Format bytes per pixel.
+    vlUInt    uiRedBitsPerPixel;        //!< Format red bits per pixel.  0 for N/A.
+    vlUInt    uiGreenBitsPerPixel;    //!< Format green bits per pixel.  0 for N/A.
+    vlUInt    uiBlueBitsPerPixel;        //!< Format blue bits per pixel.  0 for N/A.
+    vlUInt    uiAlphaBitsPerPixel;    //!< Format alpha bits per pixel.  0 for N/A.
+    vlBool    bIsCompressed;            //!< Format is compressed (DXT).
+    vlBool    bIsSupported;            //!< Format is supported by VTFLib.
+} SVTFImageFormatInfo;
+
+*/
