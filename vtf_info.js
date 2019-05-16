@@ -210,7 +210,7 @@ console.log(entry+" missing")
 }
 
 */
-    // char        signature[4];        // File signature ("VTF\0"). (or as little-endian integer, 0x00465456)
+    /* char        signature[4];        // File signature ("VTF\0"). (or as little-endian integer, 0x00465456)
     // unsigned int    version[2];        // version[0].version[1] (currently 7.2).
     // unsigned int    headerSize;        // Size of the header struct  (16 byte aligned; currently 80 bytes) + size of the resources dictionary (7.3+).
     // unsigned short    width;            // Width of the largest mipmap in pixels. Must be a power of 2.
@@ -226,7 +226,7 @@ console.log(entry+" missing")
     // unsigned char    mipmapCount;        // Number of mipmaps.
     // unsigned int    lowResImageFormat;    // Low resolution image format (always DXT1).
     // unsigned char    lowResImageWidth;    // Low resolution image width.
-    // unsigned char    lowResImageHeight;    // Low resolution image height.
+    // unsigned char    lowResImageHeight;    // Low resolution image height.*/
 /*#define VTF_MAJOR_VERSION					7		//!< VTF major version number
 #define VTF_MINOR_VERSION					5		//!< VTF minor version number
 #define VTF_MINOR_VERSION_DEFAULT			3
@@ -313,6 +313,7 @@ this->Header = new SVTFHeader;
         this->lpThumbnailImageData = 0;
 
 */
+
 class SVTFFileHeader {
     constructor({Version=[7,1],HeaderSize=64} = {}) {
       this.signature = char("VTF\0");
@@ -320,7 +321,8 @@ class SVTFFileHeader {
       this.HeaderSize = uint(HeaderSize);
  }
  getArray() {
-  var array=new Uint8Array
+   console.log(this);
+    var array=new Uint8Array();
    Object.keys(this).forEach(function(entry) {
    if (entry == "getArray") {return}
    type = Object.prototype.toString.call(this[entry])
@@ -335,7 +337,7 @@ class SVTFFileHeader {
  })
  return array
 }
-};
+}
 class SVTFHeader_70 extends SVTFFileHeader {
     constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0} = {}){
       super({Version,HeaderSize});
@@ -406,27 +408,27 @@ class SVTFHeader_75 extends SVTFHeader_74 {
  getArray() {
     super.getArray();
   }
-};
+}
 
 function objLength(obj){
-  var out=0
-  var type=""
-  var array=new Uint8Array
+  var out=0;
+  var type="";
+  var array=new Uint8Array();
  Object.keys(obj).forEach(function(entry) {
    if (entry == "getLength") {return}
-   type = Object.prototype.toString.call(obj[entry])
+   type = Object.prototype.toString.call(obj[entry]);
    if (type == "[object Array]"){
-   out += objLength(obj[entry])[0]
-   array = mergeTypedArrays(array,objLength(obj[entry])[1])
+   out += objLength(obj[entry])[0];
+   array = mergeTypedArrays(array,objLength(obj[entry])[1]);
   } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-     out += obj[entry].length
-     array = mergeTypedArrays(array,obj[entry])
+     out += obj[entry].length;
+     array = mergeTypedArrays(array,obj[entry]);
 
   } else {
-     console.log("Unknown: "+type+"\nValue: "+obj[entry])
+     console.log("Unknown: "+type+"\nValue: "+obj[entry]);
   }
- })
- return [out,array]
+ });
+ return [out,array];
 }
 function mergeTypedArrays(a, b) {
     var c = new a.constructor(a.length + b.length);
@@ -435,7 +437,6 @@ function mergeTypedArrays(a, b) {
 
     return c;
 }
-
 /*let SVTFFileHeader = {
     Signature: char("VTF\0"),                  //!< "Magic number" identifier- "VTF\0".
     Version: [uint(7),uint(2)],                    //!< Version[0].version[1] (currently 7.2)
@@ -566,3 +567,71 @@ typedef struct tagSVTFImageFormatInfo
 } SVTFImageFormatInfo;
 
 */
+
+/*
+
+  };
+  class Test1 extends Test0 {
+    constructor({Version=[7,1],HeaderSize=64} = {}){
+      super({Version,HeaderSize});
+      this.oof = new Uint8Array(4);
+    }
+    getArray() {
+      super.getArray();
+    }
+  };
+  function combine(thing) {
+    
+    var flat = [];
+    var item;
+    console.log(Object.prototype.toString.call(thing))
+    // this will be used in the loops
+    if (thing === {}) {
+      return null; //why does this work?
+    } else if (thing === []) {
+      return null;  //why does this work?
+    }
+    
+    // see if the thing passed into the function is an object?
+    if (!Array.isArray(thing) && typeof thing === 'object') {
+      //step into the object
+      //loop through the object,
+      //adding all primitive values to the flattened, and
+      //checking to see if other values or objects or arrays, if so, call this action again:
+      for (var key in thing) {
+        item = thing[key];
+        type = Object.prototype.toString.call(type)
+        if (typeof item === 'object') {
+          flat = flat.concat(combine(item));
+        } else {
+          flat = flat.concat(item);
+        }
+      }
+      // see if the item is an array?
+      if (Array.isArray(thing)) {
+        //step into the array
+        //loop through the array,
+        //adding all primitive values to the flattened, and
+        //checking to see if other values or objects or arrays, if so, call this action:
+        for (var i = 0 ; i < thing.length ; i++){
+          item = thing[i];
+          if (typeof item === 'object' ) {
+            flat = flat.concat(combine(item));
+          } else {
+            console.log("Unknown: "+type)
+            flat = flat.concat(item);
+          }
+        }
+      }
+      
+      return flat;
+    }
+    var foo = new Test1();
+    foo.getArray()
+    
+    type = Object.prototype.toString.call(this[entry])
+    if (type == "[object Array]"){
+      array = mergeTypedArrays(array,getArray(this[entry]))
+    } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+      array = mergeTypedArrays(array,this[entry])
+      */
