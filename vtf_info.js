@@ -503,8 +503,8 @@ export const VTFHEADER {
 }
 */
 
-const VTFImageFormatInfo = //[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
-{
+const VTFImageFormatInfo = {
+//[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
      0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_RGBA8888,
      1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ABGR8888, 
      2 : ["RGB888"            , 24,  3,  8,  8,  8,  0, false,  true],        // IMAGE_FORMAT_RGB888,
@@ -568,70 +568,124 @@ typedef struct tagSVTFImageFormatInfo
 
 */
 
-/*
-
-  };
-  class Test1 extends Test0 {
-    constructor({Version=[7,1],HeaderSize=64} = {}){
-      super({Version,HeaderSize});
-      this.oof = new Uint8Array(4);
+class Test0 {
+    constructor({Version=[7,1],HeaderSize=64} = {}) {
+      this.signature = char("VTF\0");
+      this.Version = [uint(Version[0]),uint(Version[1])];
+      this.HeaderSize = uint(HeaderSize);
     }
     getArray() {
-      super.getArray();
-    }
-  };
-  function combine(thing) {
-    
-    var flat = [];
-    var item;
-    console.log(Object.prototype.toString.call(thing))
-    // this will be used in the loops
-    if (thing === {}) {
-      return null; //why does this work?
-    } else if (thing === []) {
-      return null;  //why does this work?
-    }
-    
-    // see if the thing passed into the function is an object?
-    if (!Array.isArray(thing) && typeof thing === 'object') {
-      //step into the object
-      //loop through the object,
-      //adding all primitive values to the flattened, and
-      //checking to see if other values or objects or arrays, if so, call this action again:
-      for (var key in thing) {
-        item = thing[key];
-        type = Object.prototype.toString.call(type)
-        if (typeof item === 'object') {
-          flat = flat.concat(combine(item));
-        } else {
-          flat = flat.concat(item);
+        var thing = this;
+        var item;
+        var type = Object.prototype.toString.call(thing);
+        console.log(type);
+        for (var key in thing) {
+            item = thing[key];
+            type = Object.prototype.toString.call(item)
+            console.log("Item: "+item+", \nType: "+type)
         }
-      }
-      // see if the item is an array?
-      if (Array.isArray(thing)) {
-        //step into the array
-        //loop through the array,
-        //adding all primitive values to the flattened, and
-        //checking to see if other values or objects or arrays, if so, call this action:
-        for (var i = 0 ; i < thing.length ; i++){
-          item = thing[i];
-          if (typeof item === 'object' ) {
-            flat = flat.concat(combine(item));
-          } else {
-            console.log("Unknown: "+type)
-            flat = flat.concat(item);
-          }
-        }
-      }
-      
-      return flat;
     }
-    var foo = new Test1();
-    foo.getArray()
-    
-    type = Object.prototype.toString.call(this[entry])
-    if (type == "[object Array]"){
-      array = mergeTypedArrays(array,getArray(this[entry]))
+}
+class Test1 extends Test0 {
+constructor({Version=[7,1],HeaderSize=64} = {}){
+  super({Version,HeaderSize});
+  this.oof = new Uint8Array(4);
+}
+getArray() {
+  super.getArray();
+}
+}
+
+function combine(thing) {
+
+var flat = new Uint8Array();
+var item;
+var type = Object.prototype.toString.call(thing)
+console.log(type)
+for (var key in thing) {
+    item = thing[key];
+    type = Object.prototype.toString.call(item)
+    console.log("Item: "+item+", \nType: "+type)
+    if (type == "[object Object]" || type == "[object Array]"){
+      flat = mergeTypedArrays(flat,combine(item));
     } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-      array = mergeTypedArrays(array,this[entry])
-      */
+     flat = mergeTypedArrays(flat,thing[key]);
+      } else {
+         console.log("Unknown: "+type+"\nValue: "+obj[entry]);
+      }
+}
+return flat 
+}
+/*for (var key in thing) {
+    item = thing[key];
+    type = Object.prototype.toString.call(item)
+    console.log("Item: "+item+", \nType: "+type)
+}*/
+//type == "[object Array]"
+//type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]"
+
+
+// if (type == "[object Object]" || type == "[object Array]"){
+//    out += objLength(obj[entry])[0];
+//    array = mergeTypedArrays(array,objLength(obj[entry])[1]);
+//   } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+//      out += obj[entry].length;
+//      array = mergeTypedArrays(array,obj[entry]);
+
+//   } else {
+//      console.log("Unknown: "+type+"\nValue: "+obj[entry]);
+//   }
+// see if the thing passed into the function is an object?
+/*if (!Array.isArray(thing) && typeof thing === 'object') {
+  //step into the object
+  //loop through the object,
+  //adding all primitive values to the flattened, and
+  //checking to see if other values or objects or arrays, if so, call this action again:
+  for (var key in thing) {
+    item = thing[key];
+    type = Object.prototype.toString.call(item)
+    console.log("Item: "+item+", \nType: "+type)
+    if (typeof item === 'object') {
+      flat = flat.concat(combine(item));
+    } else {
+      flat = flat.concat(item);
+    }
+  }
+  // see if the item is an array?
+  if (Array.isArray(thing)) {
+    //step into the array
+    //loop through the array,
+    //adding all primitive values to the flattened, and
+    //checking to see if other values or objects or arrays, if so, call this action:
+    for (var i = 0 ; i < thing.length ; i++){
+      item = thing[i];
+      if (typeof item === 'object' ) {
+        flat = flat.concat(combine(item));
+      } else {
+        console.log("Unknown: "+type)
+        flat = flat.concat(item);
+      }
+    }
+  }
+  
+  return flat;
+}*/
+var foo = new Test1();
+foo.getArray()
+/*
+console.log(this);
+    var array=new Uint8Array();
+   Object.keys(this).forEach(function(entry) {
+   if (entry == "getArray") {return}
+   type = Object.prototype.toString.call(this[entry])
+   if (type == "[object Array]"){
+   array = mergeTypedArrays(array,getArray(this[entry]))
+  } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+     array = mergeTypedArrays(array,this[entry])
+
+  } else {
+     console.log("Unknown: "+type+"\nValue: "+this[entry])
+  }
+ })
+ return array*/
+
