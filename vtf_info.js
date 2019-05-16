@@ -321,21 +321,30 @@ class SVTFFileHeader {
       this.HeaderSize = uint(HeaderSize);
  }
  getArray() {
-   console.log(this);
-    var array=new Uint8Array();
-   Object.keys(this).forEach(function(entry) {
-   if (entry == "getArray") {return}
-   type = Object.prototype.toString.call(this[entry])
-   if (type == "[object Array]"){
-   array = mergeTypedArrays(array,getArray(this[entry]))
-  } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-     array = mergeTypedArrays(array,this[entry])
-
-  } else {
-     console.log("Unknown: "+type+"\nValue: "+this[entry])
+  var thing = this;
+  var flat = new Uint8Array();
+  var item;
+  var type = Object.prototype.toString.call(thing);
+  console.log(type);
+  let merge = (a, b) => {
+    c = new a.constructor(a.length + b.length);
+    c.set(a);
+    c.set(b, a.length);
+    return c;
   }
- })
- return array
+  for (var key in thing) {
+    item = thing[key];
+    type = Object.prototype.toString.call(item);
+    console.log("Item: "+item+", \nType: "+type);
+    if (type == "[object Object]" || type == "[object Array]"){
+      flat = merge(flat,thing.getArray(item));
+    } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+      flat = merge(flat,thing[key]);
+    } else {
+      console.log("Unknown: "+type+"\nValue: "+thing[key]);
+    }
+  }
+  return flat;
 }
 }
 class SVTFHeader_70 extends SVTFFileHeader {
@@ -576,18 +585,27 @@ class Test0 {
     }
     getArray() {
         var thing = this;
+        var flat = new Uint8Array();
         var item;
         var type = Object.prototype.toString.call(thing);
         console.log(type);
         for (var key in thing) {
-            item = thing[key];
-            type = Object.prototype.toString.call(item)
-            console.log("Item: "+item+", \nType: "+type)
+          item = thing[key];
+          type = Object.prototype.toString.call(item);
+          console.log("Item: "+item+", \nType: "+type);
+          if (type == "[object Object]" || type == "[object Array]"){
+            flat = mergeTypedArrays(flat,thing.getArray(item));
+          } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+            flat = mergeTypedArrays(flat,thing[key]);
+          } else {
+            console.log("Unknown: "+type+"\nValue: "+obj[entry]);
+          }
         }
+        return flat;
     }
 }
 class Test1 extends Test0 {
-constructor({Version=[7,1],HeaderSize=64} = {}){
+ constructor({Version=[7,1],HeaderSize=64} = {}){
   super({Version,HeaderSize});
   this.oof = new Uint8Array(4);
 }
@@ -596,7 +614,7 @@ getArray() {
 }
 }
 
-function combine(thing) {
+function flat(thing) {
 
 var flat = new Uint8Array();
 var item;
