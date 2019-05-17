@@ -1,4 +1,4 @@
-// module "vtf_info.js"
+  // module "vtf_info.js"
 const VTFImageFormats = {
 	'-1': 'NONE',
     0: 'RGBA8888',
@@ -538,7 +538,7 @@ export const VTFHEADER {
 }
 */
 
-const VTFImageFormatInfo = {
+const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badhaloninja/vtfedit/blob/master/VTFLib/VMTFile.cpp
 //[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
      0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_RGBA8888,
      1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ABGR8888, 
