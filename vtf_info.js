@@ -164,43 +164,78 @@ const VTFConst = {
 
 }
 
+let merge = (a, b) => {
+  var c = new a.constructor(a.length + b.length);
+  c.set(a);
+  c.set(b, a.length);
+  return c;
+}
+
 let byte = (value,length=1) => {return new Uint8Array(length).map((_, i) => [value][i])};
 
-let uint = number => {
-    /*type = Object.prototype.toString.call(number);
-    console.log("Item: "+thing[key]+", \nType: "+type);
-    if (type == "[object Object]" || type == "[object Array]"){
-      for (var key in thing) {
-      flat = merge(flat,thing.getArray(thing[key]));
-      //console.log("Disabled: "+type+"\nValue: "+thing[key]);
-    } //else if (type == "[object Number]") {*/
-    (number!=-1)?(new Uint8Array({0:number>>>0,length:4})):(new Uint8Array([255,255,255,255]))
-};
 
 let short = number => new Uint8Array([number & 0xFF,(number >>> 8) & 0xff]);
 
-function char(s){//uint8array
-var escstr = encodeURIComponent(s);
-    var binstr = escstr.replace(/%([0-9A-F]{2})/g, function(match, p1) {
-        return String.fromCharCode('0x' + p1);
-   });
-    var ua = new Uint8Array(binstr.length);
-    Array.prototype.forEach.call(binstr, function (ch, i) {
-        ua[i] = ch.charCodeAt(0);
-   });
-    return ua;
+const char = s =>{//uint8array
+  var escstr = encodeURIComponent(s);
+  var binstr = escstr.replace(/%([0-9A-F]{2})/g, function(match, p1) {
+    return String.fromCharCode('0x' + p1);
+  });
+  var ua = new Uint8Array(binstr.length);
+  Array.prototype.forEach.call(binstr, function (ch, i) {
+    ua[i] = ch.charCodeAt(0);
+  });
+  return ua;
 }
 
-function float(floatnum) {
-const getHex = i => ('00' + i.toString(16)).slice(-2);
-var view = new DataView(new ArrayBuffer(4)),
-    result;
-view.setFloat32(0, floatnum);
-result = Array
-    .apply(null, { length: 4})
-    .map((_, i) => getHex(view.getUint8(i)))
-    .join('');
-return fromHexString(result).reverse();
+const float = (floatnum) => {
+  const getHex = i => ('00' + i.toString(16)).slice(-2);
+  var type = Object.prototype.toString.call(floatnum);
+  if (type == "[object Object]" || type == "[object Array]"){
+    var out = new Uint8Array()
+    for (var key in floatnum) {
+      //console.log("Float")
+      //console.log("Item: "+floatnum[key]+", \nType: "+type);
+      var view = new DataView(new ArrayBuffer(4)),
+        result;
+      view.setFloat32(0, floatnum[key]);
+      result = Array
+        .apply(null, { length: 4})
+        .map((_, i) => getHex(view.getUint8(i)))
+        .join('');
+      out = merge(out, fromHexString(result).reverse())
+    }
+    return out;
+    //console.log("Disabled: "+type+"\nValue: "+thing[key]);
+  } else if (type == "[object Number]") {
+    var view = new DataView(new ArrayBuffer(4)),
+      result;
+    view.setFloat32(0, floatnum);
+    result = Array
+      .apply(null, { length: 4})
+      .map((_, i) => getHex(view.getUint8(i)))
+      .join('');
+    return fromHexString(result).reverse();
+  } else {
+    console.log("Unknown: "+type+"\nValue: "+floatnum);
+  }
+}
+
+const uint = number => {
+  var type = Object.prototype.toString.call(number);
+  if (type == "[object Object]" || type == "[object Array]"){
+    var out = new Uint8Array()
+    for (var key in number) {
+      //console.log("Item: "+number[key]+", \nType: "+type);
+      out = merge(out,(number[key]!=-1)?(new Uint8Array({0:number[key]>>>0,length:4})):(new Uint8Array([255,255,255,255])));
+    }
+    return out;
+    //console.log("Disabled: "+type+"\nValue: "+thing[key]);
+  } else if (type == "[object Number]") {
+    return (number!=-1)?(new Uint8Array({0:number>>>0,length:4})):(new Uint8Array([255,255,255,255]))
+  } else {
+    console.log("Unknown: "+type+"\nValue: "+number);
+  }
 };
 
 /*var buffer = new ArrayBuffer(24);
@@ -329,31 +364,32 @@ class SVTFFileHeader {
       this.Version = [uint(Version[0]),uint(Version[1])];
       this.HeaderSize = uint(HeaderSize);
  }
- getArray(thing=this) {
-  console.log(thing)
+ getArray() {
+  //console.log(this.HeaderSize)
+  //console.log("thing: "+this)
   //var thing = this;
-  let merge = (a, b) => {
-    var c = new a.constructor(a.length + b.length);
-    c.set(a);
-    c.set(b, a.length);
-    return c;
-  }
+  //console.log("getArray :")
   var flat = new Uint8Array();
-  var type = Object.prototype.toString.call(thing);
-  console.log(type);
-  for (var key in thing) {
-    type = Object.prototype.toString.call(thing[key]);
-    console.log("Item: "+thing[key]+", \nType: "+type);
+  var type = Object.prototype.toString.call(this);
+  //console.log("type: "+type);
+  
+  for (var key in this) {
+    type = Object.prototype.toString.call(this[key]);
+    //console.log("Item: "+thing[key]+", \nType: "+type);
     if (type == "[object Object]" || type == "[object Array]"){
-      flat = merge(flat,thing.getArray(thing[key]));
-      //console.log("Disabled: "+type+"\nValue: "+thing[key]);
+      
+      //flat = merge(flat,thing.getArray(thing[key]));
+      console.log("Disabled: "+type+"\nValue: "+this[key]);
     } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-      flat = merge(flat,thing[key]);
+      flat = merge(flat,this[key]);
     } else {
-      console.log("Unknown: "+type+"\nValue: "+thing[key]);
+      flat = new Uint8Array([255]);
+      console.log("Unknown: "+type+"\nValue: "+this[key]);
     }
   }
+  //console.log("getArray end")
   return flat;
+  
 }
 }
 class SVTFHeader_70 extends SVTFFileHeader {
@@ -374,18 +410,11 @@ class SVTFHeader_70 extends SVTFFileHeader {
       this.LowResImageWidth = byte(LowResImageWidth);
       this.lowResImageHeight = byte(lowResImageHeight);
  }
- getArray(thing=this) {
-    super.getArray(thing);
-  }
- 
 }//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
 
 class SVTFHeader_71 extends SVTFHeader_70 {
     constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
-  }
- getArray(thing=this) {
-    super.getArray(thing);
   }
 }
 
@@ -394,9 +423,6 @@ class SVTFHeader_72 extends SVTFHeader_71 {
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
       this.Depth = byte(Depth);                          //!< Depth of the largest image
   }
- getArray(thing=this) {
-    super.getArray(thing);
-  }
 }
 
 class SVTFHeader_73 extends SVTFHeader_72 {
@@ -404,27 +430,18 @@ class SVTFHeader_73 extends SVTFHeader_72 {
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth});
       this.padding2 = byte(0,3);
       this.ResourceCount = uint(ResourceCount);                          //!< Number of image resources
-   }
- getArray(thing=this) {
-    super.getArray(thing);
-  }
+    }
 }
 
 class SVTFHeader_74 extends SVTFHeader_73 {
     constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
   }
- getArray(thing=this) {
-    super.getArray(thing);
-  }
 }
 
 class SVTFHeader_75 extends SVTFHeader_74 {
     constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
-  }
- getArray(thing=this) {
-    super.getArray(thing);
   }
 }
 
