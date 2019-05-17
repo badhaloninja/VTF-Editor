@@ -166,7 +166,16 @@ const VTFConst = {
 
 let byte = (value,length=1) => {return new Uint8Array(length).map((_, i) => [value][i])};
 
-let uint = number => (number!=-1)?(new Uint8Array({0:number>>>0,length:4})):(new Uint8Array([255,255,255,255]));
+let uint = number => {
+    /*type = Object.prototype.toString.call(number);
+    console.log("Item: "+thing[key]+", \nType: "+type);
+    if (type == "[object Object]" || type == "[object Array]"){
+      for (var key in thing) {
+      flat = merge(flat,thing.getArray(thing[key]));
+      //console.log("Disabled: "+type+"\nValue: "+thing[key]);
+    } //else if (type == "[object Number]") {*/
+    (number!=-1)?(new Uint8Array({0:number>>>0,length:4})):(new Uint8Array([255,255,255,255]))
+};
 
 let short = number => new Uint8Array([number & 0xFF,(number >>> 8) & 0xff]);
 
@@ -321,9 +330,10 @@ class SVTFFileHeader {
       this.HeaderSize = uint(HeaderSize);
  }
  getArray(thing=this) {
+  console.log(thing)
   //var thing = this;
   let merge = (a, b) => {
-    c = new a.constructor(a.length + b.length);
+    var c = new a.constructor(a.length + b.length);
     c.set(a);
     c.set(b, a.length);
     return c;
@@ -575,7 +585,7 @@ typedef struct tagSVTFImageFormatInfo
 } SVTFImageFormatInfo;
 
 */
-
+/*
 class Test0 {
     constructor({Version=[7,1],HeaderSize=64} = {}) {
       this.signature = char("VTF\0");
@@ -632,7 +642,7 @@ for (var key in thing) {
       }
 }
 return flat 
-}
+}*/
 /*for (var key in thing) {
     item = thing[key];
     type = Object.prototype.toString.call(item)
@@ -687,8 +697,6 @@ return flat
   
   return flat;
 }*/
-var foo = new Test1();
-foo.getArray()
 /*
 console.log(this);
     var array=new Uint8Array();
