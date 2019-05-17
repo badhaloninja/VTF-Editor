@@ -148,11 +148,24 @@ const VTFEnabledFlags = {
 };
 
 let VTFOptions = {
+   //{Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0}
+    HeaderSize: 64,
     version: [7,2],
     width: 2,
     height: 2,
-    lumaWeights: [0.213,0.715,0.072],//[0.2126,0.7152,0.0722] ITU-R BT.709
     selectedFlags: ["CLAMPT","ANISOTROPIC","HINT_DXT5","SRGB","NOMIP","NOLOD","EIGHTBITALPHA"], //0x00000008, 0x00000010, 0x00000020, 0x00000040, 0x00000100, 0x00000200, 0x00002000
+    Frames: 1,
+    StartFrame: 0,
+    reflectivity: [1.0,1.0,1.0],
+    BumpScale: 1.0,
+    ImageFormat: 0,
+    MipCount: 1,
+    LowResImageFormat: -1,
+    LowResImageWidth: 0,
+    lowResImageHeight: 0,
+    Depth: 1,
+    ResourceCount: 0,
+    lumaWeights: [0.213,0.715,0.072],//[0.2126,0.7152,0.0722] ITU-R BT.709
 }
 
 const VTFConst = {
@@ -172,7 +185,6 @@ let merge = (a, b) => {
 }
 
 let byte = (value,length=1) => {return new Uint8Array(length).map((_, i) => [value][i])};
-
 
 let short = number => new Uint8Array([number & 0xFF,(number >>> 8) & 0xff]);
 
@@ -365,17 +377,11 @@ class SVTFFileHeader {
       this.HeaderSize = uint(HeaderSize);
  }
  getArray() {
-  //console.log(this.HeaderSize)
-  //console.log("thing: "+this)
-  //var thing = this;
-  //console.log("getArray :")
   var flat = new Uint8Array();
   var type = Object.prototype.toString.call(this);
-  //console.log("type: "+type);
   
   for (var key in this) {
     type = Object.prototype.toString.call(this[key]);
-    //console.log("Item: "+thing[key]+", \nType: "+type);
     if (type == "[object Object]" || type == "[object Array]"){
       
       //flat = merge(flat,thing.getArray(thing[key]));
@@ -387,7 +393,6 @@ class SVTFFileHeader {
       console.log("Unknown: "+type+"\nValue: "+this[key]);
     }
   }
-  //console.log("getArray end")
   return flat;
   
 }
