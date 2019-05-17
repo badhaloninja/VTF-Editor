@@ -320,24 +320,23 @@ class SVTFFileHeader {
       this.Version = [uint(Version[0]),uint(Version[1])];
       this.HeaderSize = uint(HeaderSize);
  }
- getArray() {
-  var thing = this;
-  var flat = new Uint8Array();
-  var item;
-  var type = Object.prototype.toString.call(thing);
-  console.log(type);
+ getArray(thing=this) {
+  //var thing = this;
   let merge = (a, b) => {
     c = new a.constructor(a.length + b.length);
     c.set(a);
     c.set(b, a.length);
     return c;
   }
+  var flat = new Uint8Array();
+  var type = Object.prototype.toString.call(thing);
+  console.log(type);
   for (var key in thing) {
-    item = thing[key];
-    type = Object.prototype.toString.call(item);
-    console.log("Item: "+item+", \nType: "+type);
+    type = Object.prototype.toString.call(thing[key]);
+    console.log("Item: "+thing[key]+", \nType: "+type);
     if (type == "[object Object]" || type == "[object Array]"){
-      flat = merge(flat,thing.getArray(item));
+      flat = merge(flat,thing.getArray(thing[key]));
+      //console.log("Disabled: "+type+"\nValue: "+thing[key]);
     } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
       flat = merge(flat,thing[key]);
     } else {
@@ -365,30 +364,30 @@ class SVTFHeader_70 extends SVTFFileHeader {
       this.LowResImageWidth = byte(LowResImageWidth);
       this.lowResImageHeight = byte(lowResImageHeight);
  }
- getArray() {
-    super.getArray();
+ getArray(thing=this) {
+    super.getArray(thing);
   }
  
-};//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
+}//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
 
 class SVTFHeader_71 extends SVTFHeader_70 {
     constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
   }
- getArray() {
-    super.getArray();
+ getArray(thing=this) {
+    super.getArray(thing);
   }
-};
+}
 
 class SVTFHeader_72 extends SVTFHeader_71 {
     constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
       this.Depth = byte(Depth);                          //!< Depth of the largest image
   }
- getArray() {
-    super.getArray();
+ getArray(thing=this) {
+    super.getArray(thing);
   }
-};
+}
 
 class SVTFHeader_73 extends SVTFHeader_72 {
     constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
@@ -396,26 +395,26 @@ class SVTFHeader_73 extends SVTFHeader_72 {
       this.padding2 = byte(0,3);
       this.ResourceCount = uint(ResourceCount);                          //!< Number of image resources
    }
- getArray() {
-    super.getArray();
+ getArray(thing=this) {
+    super.getArray(thing);
   }
-};
+}
 
 class SVTFHeader_74 extends SVTFHeader_73 {
     constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
   }
- getArray() {
-    super.getArray();
+ getArray(thing=this) {
+    super.getArray(thing);
   }
-};
+}
 
 class SVTFHeader_75 extends SVTFHeader_74 {
     constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
   }
- getArray() {
-    super.getArray();
+ getArray(thing=this) {
+    super.getArray(thing);
   }
 }
 
