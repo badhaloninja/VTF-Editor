@@ -361,7 +361,7 @@ this->Header = new SVTFHeader;
 class SVTFFileHeader {
     constructor({Version=[7,1],HeaderSize=64} = {}) {
       this.signature = char("VTF\0");
-      this.Version = [uint(Version[0]),uint(Version[1])];
+      this.Version = uint(Version);
       this.HeaderSize = uint(HeaderSize);
  }
  getArray() {
@@ -401,7 +401,7 @@ class SVTFHeader_70 extends SVTFFileHeader {
       this.Frames = short(Frames);
       this.StartFrame = short(StartFrame);
       this.padding0 = byte(0,4);
-      this.reflectivity = [float(reflectivity[0]),float(reflectivity[1]),float(reflectivity[2])];
+      this.reflectivity = float(reflectivity);
       this.padding1 = byte(0,4);
       this.BumpScale = float(BumpScale);
       this.ImageFormat = uint(ImageFormat);
