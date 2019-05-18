@@ -100,20 +100,10 @@ const TextureFlags = {
     TEXTUREFLAGS_DEPRECATED_SPECVAR_RED        : 0x40000000,
     TEXTUREFLAGS_DEPRECATED_SPECVAR_ALPHA      : 0x80000000,
     TEXTUREFLAGS_LAST                          : 0x20000000,
-    TEXTUREFLAGS_COUNT                         : 30,
-    getflags: function() {
-        var tmp=0
-        VTFOptions.selectedFlags.forEach(function(entry) {
-          tmp = (parseInt(tmp, 16) + TextureFlags[entry]).toString(16);
-          while (tmp.length < 8) { tmp = '0' + tmp;} // Zero pad.
-       });
-        return fromHexString(tmp.toString()).reverse(); //.toString()
-   }
+    TEXTUREFLAGS_COUNT                         : 30
     // key: function(n){return this[Object.keys(this)[n]]}
 };
-Object.defineProperty(TextureFlags, 'getflags', {
-  enumerable: false
-});
+
 const VTFEnabledFlags = {
     POINTSAMPLE:"Point Sample",
     TRILINEAR:"Trilinear",
@@ -159,15 +149,25 @@ let VTFOptions = {
     reflectivity: [1.0,1.0,1.0],
     BumpScale: 1.0,
     ImageFormat: 0,
-    MipCount: 1,
+    MipCount: 0,
     LowResImageFormat: -1,
     LowResImageWidth: 0,
     lowResImageHeight: 0,
     Depth: 1,
     ResourceCount: 0,
     lumaWeights: [0.213,0.715,0.072],//[0.2126,0.7152,0.0722] ITU-R BT.709
+    getflags: function(flags=this.selectedFlags) {
+        var tmp=0
+        flags.forEach(function(entry) {
+          tmp = (parseInt(tmp, 16) + TextureFlags[entry]).toString(16);
+          while (tmp.length < 8) { tmp = '0' + tmp;} // Zero pad.
+       });
+        return fromHexString(tmp.toString()).reverse(); //.toString()
+   }
 }
-
+Object.defineProperty(VTFOptions, 'getflags', {
+  enumerable: false
+});
 const VTFConst = {
     signature: "VTF\0",
     headerSize: "64",
@@ -248,7 +248,7 @@ const uint = number => {
   } else {
     console.log("Unknown: "+type+"\nValue: "+number);
   }
-};
+}
 
 /*var buffer = new ArrayBuffer(24);
 
@@ -371,10 +371,10 @@ this->Header = new SVTFHeader;
 */
 
 class SVTFFileHeader {
-    constructor({Version=[7,1],HeaderSize=64} = {}) {
-      this.signature = char("VTF\0");
-      this.Version = uint(Version);
-      this.HeaderSize = uint(HeaderSize);
+    constructor({Version=[7,0],HeaderSize=16} = {}) {
+      this.signature = char("VTF\0");//4
+      this.Version = uint(Version);//8
+      this.HeaderSize = uint(HeaderSize);//4
  }
  getArray() {
   var flat = new Uint8Array();
@@ -398,58 +398,65 @@ class SVTFFileHeader {
 }
 }
 class SVTFHeader_70 extends SVTFFileHeader {
-    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0} = {}){
-      super({Version,HeaderSize});
-      this.Width = short(Width);
-      this.Height = short(Height);
-      this.FlagArray = FlagArray;
-      this.Frames = short(Frames);
-      this.StartFrame = short(StartFrame);
-      this.padding0 = byte(0,4);
-      this.reflectivity = float(reflectivity);
-      this.padding1 = byte(0,4);
-      this.BumpScale = float(BumpScale);
-      this.ImageFormat = uint(ImageFormat);
-      this.MipCount = byte(MipCount);
-      this.LowResImageFormat = uint(LowResImageFormat);
-      this.LowResImageWidth = byte(LowResImageWidth);
-      this.lowResImageHeight = byte(lowResImageHeight);
+    constructor({Version=[7,0],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
+      super({Version,HeaderSize});//12
+      this.Width = short(Width);//2
+      this.Height = short(Height);//2
+      this.FlagArray = VTFOptions.getflags(FlagArray);//4
+      this.Frames = short(Frames);//2
+      this.StartFrame = short(StartFrame);//2
+      this.padding0 = byte(0,4);//4
+      this.reflectivity = float(reflectivity);//12
+      this.padding1 = byte(0,4);//4
+      this.BumpScale = float(BumpScale);//4
+      this.ImageFormat = uint(ImageFormat);//4
+      this.MipCount = byte(MipCount);//1
+      this.LowResImageFormat = uint(LowResImageFormat);//4
+      this.LowResImageWidth = byte(LowResImageWidth);//1
+      this.lowResImageHeight = byte(lowResImageHeight);//1
+      this.placeholder = new Uint8Array(1);
  }
 }//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
 
 class SVTFHeader_71 extends SVTFHeader_70 {
-    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0} = {}){
+    constructor({Version=[7,1],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
   }
 }
 
 class SVTFHeader_72 extends SVTFHeader_71 {
-    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1} = {}){
+    constructor({Version=[7,2],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
-      this.Depth = byte(Depth);                          //!< Depth of the largest image
+      this.placeholder = new Uint8Array();
+      this.Depth = byte(Depth);//1                          //!< Depth of the largest image
   }
 }
 
 class SVTFHeader_73 extends SVTFHeader_72 {
-    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
+    constructor({Version=[7,3],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth});
-      this.padding2 = byte(0,3);
-      this.ResourceCount = uint(ResourceCount);                          //!< Number of image resources
+      this.padding2 = byte(0,4);//4 - should be 3
+      this.ResourceCount = uint(ResourceCount);//4                          //!< Number of image resources
+      this.padding3 = byte(0,8);//Most likely will never add resource support
     }
 }
 
 class SVTFHeader_74 extends SVTFHeader_73 {
-    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
+    constructor({Version=[7,4],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
   }
 }
 
 class SVTFHeader_75 extends SVTFHeader_74 {
-    constructor({Version=[7,1],HeaderSize=64,Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0} = {}){
+    constructor({Version=[7,5],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
       super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
   }
-}
-
+}//       |  -  -  - |       -       |        |   |   |        |   |   |       |          -          -          |       |          |       | |               | | | |       |1 2 3 4|1 2 3 4 5 6 7 8| 1 2 3 4  5 6 7 8|  
+var foo = [86,84,70,0,7,0,0,0,3,0,0,0,88,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,88,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+var bar = [86,84,70,0,7,0,0,0,2,0,0,0,80,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+var baz = [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+var qux = [86,84,70,0,7,0,0,0,3,0,0,0,96,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,96,0,0,0,75,86,68,0,112,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0,38,0,0,0,34,73,110,102,111,114,109,97,116,105,111,110,34,13,10,123,13,10,9,34,65,117,116,104,111,114,34,32,34,98,104,110,34,13,10,125,13,10];
+/*
 function objLength(obj){
   var out=0;
   var type="";
@@ -476,7 +483,7 @@ function mergeTypedArrays(a, b) {
     c.set(b, a.length);
 
     return c;
-}
+}*/
 /*let SVTFFileHeader = {
     Signature: char("VTF\0"),                  //!< "Magic number" identifier- "VTF\0".
     Version: [uint(7),uint(2)],                    //!< Version[0].version[1] (currently 7.2)
@@ -543,7 +550,7 @@ export const VTFHEADER {
 }
 */
 
-const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badhaloninja/vtfedit/blob/master/VTFLib/VMTFile.cpp
+const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badhaloninja/vtfedit/blob/master/VTFLib/VTFFile.cpp
 //[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
      0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_RGBA8888,
      1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ABGR8888, 
@@ -591,148 +598,3 @@ Object.defineProperty(VTFImageFormatInfo, 'getSupported', {
 Object.defineProperty(VTFImageFormatInfo, 'getInfo', {
   enumerable: false
 });
-
-/*
-typedef struct tagSVTFImageFormatInfo
-{
-    vlChar *lpName;                    //!< Enumeration text equivalent.
-    vlUInt    uiBitsPerPixel;            //!< Format bits per pixel.
-    vlUInt    uiBytesPerPixel;        //!< Format bytes per pixel.
-    vlUInt    uiRedBitsPerPixel;        //!< Format red bits per pixel.  0 for N/A.
-    vlUInt    uiGreenBitsPerPixel;    //!< Format green bits per pixel.  0 for N/A.
-    vlUInt    uiBlueBitsPerPixel;        //!< Format blue bits per pixel.  0 for N/A.
-    vlUInt    uiAlphaBitsPerPixel;    //!< Format alpha bits per pixel.  0 for N/A.
-    vlBool    bIsCompressed;            //!< Format is compressed (DXT).
-    vlBool    bIsSupported;            //!< Format is supported by VTFLib.
-} SVTFImageFormatInfo;
-
-*/
-/*
-class Test0 {
-    constructor({Version=[7,1],HeaderSize=64} = {}) {
-      this.signature = char("VTF\0");
-      this.Version = [uint(Version[0]),uint(Version[1])];
-      this.HeaderSize = uint(HeaderSize);
-    }
-    getArray() {
-        var thing = this;
-        var flat = new Uint8Array();
-        var item;
-        var type = Object.prototype.toString.call(thing);
-        console.log(type);
-        for (var key in thing) {
-          item = thing[key];
-          type = Object.prototype.toString.call(item);
-          console.log("Item: "+item+", \nType: "+type);
-          if (type == "[object Object]" || type == "[object Array]"){
-            flat = mergeTypedArrays(flat,thing.getArray(item));
-          } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-            flat = mergeTypedArrays(flat,thing[key]);
-          } else {
-            console.log("Unknown: "+type+"\nValue: "+obj[entry]);
-          }
-        }
-        return flat;
-    }
-}
-class Test1 extends Test0 {
- constructor({Version=[7,1],HeaderSize=64} = {}){
-  super({Version,HeaderSize});
-  this.oof = new Uint8Array(4);
-}
-getArray() {
-  super.getArray();
-}
-}
-
-function flat(thing) {
-
-var flat = new Uint8Array();
-var item;
-var type = Object.prototype.toString.call(thing)
-console.log(type)
-for (var key in thing) {
-    item = thing[key];
-    type = Object.prototype.toString.call(item)
-    console.log("Item: "+item+", \nType: "+type)
-    if (type == "[object Object]" || type == "[object Array]"){
-      flat = mergeTypedArrays(flat,combine(item));
-    } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-     flat = mergeTypedArrays(flat,thing[key]);
-      } else {
-         console.log("Unknown: "+type+"\nValue: "+obj[entry]);
-      }
-}
-return flat 
-}*/
-/*for (var key in thing) {
-    item = thing[key];
-    type = Object.prototype.toString.call(item)
-    console.log("Item: "+item+", \nType: "+type)
-}*/
-//type == "[object Array]"
-//type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]"
-
-
-// if (type == "[object Object]" || type == "[object Array]"){
-//    out += objLength(obj[entry])[0];
-//    array = mergeTypedArrays(array,objLength(obj[entry])[1]);
-//   } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-//      out += obj[entry].length;
-//      array = mergeTypedArrays(array,obj[entry]);
-
-//   } else {
-//      console.log("Unknown: "+type+"\nValue: "+obj[entry]);
-//   }
-// see if the thing passed into the function is an object?
-/*if (!Array.isArray(thing) && typeof thing === 'object') {
-  //step into the object
-  //loop through the object,
-  //adding all primitive values to the flattened, and
-  //checking to see if other values or objects or arrays, if so, call this action again:
-  for (var key in thing) {
-    item = thing[key];
-    type = Object.prototype.toString.call(item)
-    console.log("Item: "+item+", \nType: "+type)
-    if (typeof item === 'object') {
-      flat = flat.concat(combine(item));
-    } else {
-      flat = flat.concat(item);
-    }
-  }
-  // see if the item is an array?
-  if (Array.isArray(thing)) {
-    //step into the array
-    //loop through the array,
-    //adding all primitive values to the flattened, and
-    //checking to see if other values or objects or arrays, if so, call this action:
-    for (var i = 0 ; i < thing.length ; i++){
-      item = thing[i];
-      if (typeof item === 'object' ) {
-        flat = flat.concat(combine(item));
-      } else {
-        console.log("Unknown: "+type)
-        flat = flat.concat(item);
-      }
-    }
-  }
-  
-  return flat;
-}*/
-/*
-console.log(this);
-    var array=new Uint8Array();
-   Object.keys(this).forEach(function(entry) {
-   if (entry == "getArray") {return}
-   type = Object.prototype.toString.call(this[entry])
-   if (type == "[object Array]"){
-   array = mergeTypedArrays(array,getArray(this[entry]))
-  } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-     array = mergeTypedArrays(array,this[entry])
-
-  } else {
-     console.log("Unknown: "+type+"\nValue: "+this[entry])
-  }
- })
- return array*/
-
