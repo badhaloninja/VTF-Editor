@@ -137,6 +137,7 @@ const VTFEnabledFlags = {
     BORDER:"Clamp All"
 };
 
+//(VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel == 1 ? TextureFlags.ONEBITALPHA : 0) | (VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel > 1 ? TextureFlags.EIGHTBITALPHA : 0)
 let VTFOptions = {
    //{Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0}
     HeaderSize: 64,
@@ -148,7 +149,7 @@ let VTFOptions = {
     StartFrame: 0,
     reflectivity: [1.0,1.0,1.0],
     BumpScale: 1.0,
-    ImageFormat: 0,
+    ImageFormat: VTFImageFormats.RGBA8888,
     MipCount: 0,
     LowResImageFormat: -1,
     LowResImageWidth: 0,
@@ -168,14 +169,14 @@ let VTFOptions = {
 Object.defineProperty(VTFOptions, 'getflags', {
   enumerable: false
 });
-const VTFConst = {
-    signature: "VTF\0",
-    headerSize: "64",
-    padding: "00000000",
-    reflectivity: "3f800000",
-    bumpmapScale: "3f800000"
+// const VTFConst = {
+//     signature: "VTF\0",
+//     headerSize: "64",
+//     padding: "00000000",
+//     reflectivity: "3f800000",
+//     bumpmapScale: "3f800000"
 
-}
+// }
 
 let merge = (a, b) => {
   var c = new a.constructor(a.length + b.length);
