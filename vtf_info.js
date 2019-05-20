@@ -1,273 +1,397 @@
-  // module "vtf_info.js"
+// module "vtf_info.js"
 const VTFImageFormats = {
-	'-1': 'NONE',
-    0: 'RGBA8888',
-    1: 'ABGR8888',
-    2: 'RGB888',
-    3: 'BGR888',
-    4: 'RGB565',
-    5: 'I8',
-    6: 'IA88',
-    7: 'P8',
-    8: 'A8',
-    9: 'RGB888_BLUESCREEN',
-    10: 'BGR888_BLUESCREEN',
-    11: 'ARGB8888',
-    12: 'BGRA8888',
-    13: 'DXT1',
-    14: 'DXT3',
-    15: 'DXT5',
-    16: 'BGRX8888',
-    17: 'BGR565',
-    18: 'BGRX5551',
-    19: 'BGRA4444',
-    20: 'DXT1_ONEBITALPHA',
-    21: 'BGRA5551',
-    22: 'UV88',
-    23: 'UVWQ8888',
-    24: 'RGBA16161616F',
-    25: 'RGBA16161616',
-    26: 'UVLX8888',
-	NONE:-1,
-    RGBA8888:0,        //!<  = Red, Green, Blue, Alpha - 32 bpp
-    ABGR8888:1,        //!<  = Alpha, Blue, Green, Red - 32 bpp
-    RGB888:2,        //!<  = Red, Green, Blue - 24 bpp
-    BGR888:3,        //!<  = Blue, Green, Red - 24 bpp
-    RGB565:4,        //!<  = Red, Green, Blue - 16 bpp
-    I8:5,        //!<  = Luminance - 8 bpp
-    IA88:6,        //!<  = Luminance, Alpha - 16 bpp
-    P8:7,        //!<  = Paletted - 8 bpp
-    A8:8,        //!<  = Alpha- 8 bpp
-    RGB888_BLUESCREEN:9,        //!<  = Red, Green, Blue, "BlueScreen" Alpha - 24 bpp
-    BGR888_BLUESCREEN:10,        //!<  = Red, Green, Blue, "BlueScreen" Alpha - 24 bpp
-    ARGB8888:11,        //!<  = Alpha, Red, Green, Blue - 32 bpp
-    BGRA8888:12,        //!<  = Blue, Green, Red, Alpha - 32 bpp
-    DXT1:13,        //!<  = DXT1 compressed format - 4 bpp
-    DXT3:14,        //!<  = DXT3 compressed format - 8 bpp
-    DXT5:15,        //!<  = DXT5 compressed format - 8 bpp
-    BGRX8888:16,        //!<  = Blue, Green, Red, Unused - 32 bpp
-    BGR565:17,        //!<  = Blue, Green, Red - 16 bpp
-    BGRX5551:18,        //!<  = Blue, Green, Red, Unused - 16 bpp
-    BGRA4444:19,        //!<  = Red, Green, Blue, Alpha - 16 bpp
-    DXT1_ONEBITALPHA:20,        //!<  = DXT1 compressed format with 1-bit alpha - 4 bpp
-    BGRA5551:21,        //!<  = Blue, Green, Red, Alpha - 16 bpp
-    UV88:22,        //!<  = 2 channel format for DuDv/Normal maps - 16 bpp
-    UVWQ8888:23,        //!<  = 4 channel format for DuDv/Normal maps - 32 bpp
-    RGBA16161616F:24,        //!<  = Red, Green, Blue, Alpha - 64 bpp
-    RGBA16161616:25,        //!<  = Red, Green, Blue, Alpha signed with mantissa - 64 bpp
-    UVLX8888:26        //!<  = 4 channel format for DuDv/Normal maps - 32 bpp
+  '-1': 'NONE',
+  0: 'RGBA8888',
+  1: 'ABGR8888',
+  2: 'RGB888',
+  3: 'BGR888',
+  4: 'RGB565',
+  5: 'I8',
+  6: 'IA88',
+  7: 'P8',
+  8: 'A8',
+  9: 'RGB888_BLUESCREEN',
+  10: 'BGR888_BLUESCREEN',
+  11: 'ARGB8888',
+  12: 'BGRA8888',
+  13: 'DXT1',
+  14: 'DXT3',
+  15: 'DXT5',
+  16: 'BGRX8888',
+  17: 'BGR565',
+  18: 'BGRX5551',
+  19: 'BGRA4444',
+  20: 'DXT1_ONEBITALPHA',
+  21: 'BGRA5551',
+  22: 'UV88',
+  23: 'UVWQ8888',
+  24: 'RGBA16161616F',
+  25: 'RGBA16161616',
+  26: 'UVLX8888',
+  NONE:-1,
+  RGBA8888:0,        //!<  = Red, Green, Blue, Alpha - 32 bpp
+  ABGR8888:1,        //!<  = Alpha, Blue, Green, Red - 32 bpp
+  RGB888:2,        //!<  = Red, Green, Blue - 24 bpp
+  BGR888:3,        //!<  = Blue, Green, Red - 24 bpp
+  RGB565:4,        //!<  = Red, Green, Blue - 16 bpp
+  I8:5,        //!<  = Luminance - 8 bpp
+  IA88:6,        //!<  = Luminance, Alpha - 16 bpp
+  P8:7,        //!<  = Paletted - 8 bpp
+  A8:8,        //!<  = Alpha- 8 bpp
+  RGB888_BLUESCREEN:9,        //!<  = Red, Green, Blue, "BlueScreen" Alpha - 24 bpp
+  BGR888_BLUESCREEN:10,        //!<  = Red, Green, Blue, "BlueScreen" Alpha - 24 bpp
+  ARGB8888:11,        //!<  = Alpha, Red, Green, Blue - 32 bpp
+  BGRA8888:12,        //!<  = Blue, Green, Red, Alpha - 32 bpp
+  DXT1:13,        //!<  = DXT1 compressed format - 4 bpp
+  DXT3:14,        //!<  = DXT3 compressed format - 8 bpp
+  DXT5:15,        //!<  = DXT5 compressed format - 8 bpp
+  BGRX8888:16,        //!<  = Blue, Green, Red, Unused - 32 bpp
+  BGR565:17,        //!<  = Blue, Green, Red - 16 bpp
+  BGRX5551:18,        //!<  = Blue, Green, Red, Unused - 16 bpp
+  BGRA4444:19,        //!<  = Red, Green, Blue, Alpha - 16 bpp
+  DXT1_ONEBITALPHA:20,        //!<  = DXT1 compressed format with 1-bit alpha - 4 bpp
+  BGRA5551:21,        //!<  = Blue, Green, Red, Alpha - 16 bpp
+  UV88:22,        //!<  = 2 channel format for DuDv/Normal maps - 16 bpp
+  UVWQ8888:23,        //!<  = 4 channel format for DuDv/Normal maps - 32 bpp
+  RGBA16161616F:24,        //!<  = Red, Green, Blue, Alpha - 64 bpp
+  RGBA16161616:25,        //!<  = Red, Green, Blue, Alpha signed with mantissa - 64 bpp
+  UVLX8888:26        //!<  = 4 channel format for DuDv/Normal maps - 32 bpp
 };
 
 
 const TextureFlags = {
-    POINTSAMPLE                                : 0x00000001,
-    TRILINEAR                                  : 0x00000002,
-    CLAMPS                                     : 0x00000004,
-    CLAMPT                                     : 0x00000008,
-    ANISOTROPIC                                : 0x00000010,
-    HINT_DXT5                                  : 0x00000020,
-    SRGB                                       : 0x00000040, // Originally internal to VTex as NOCOMPRESS.
-    DEPRECATED_NOCOMPRESS                      : 0x00000040,
-    NORMAL                                     : 0x00000080,
-    NOMIP                                      : 0x00000100,
-    NOLOD                                      : 0x00000200,
-    MINMIP                                     : 0x00000400,
-    PROCEDURAL                                 : 0x00000800,
-    ONEBITALPHA                                : 0x00001000, //!< Automatically generated by VTex.
-    EIGHTBITALPHA                              : 0x00002000, //!< Automatically generated by VTex.
-    ENVMAP                                     : 0x00004000,
-    RENDERTARGET                               : 0x00008000,
-    DEPTHRENDERTARGET                          : 0x00010000,
-    NODEBUGOVERRIDE                            : 0x00020000,
-    SINGLECOPY                                 : 0x00040000,
-    UNUSED0                                    : 0x00080000, //!< Originally internal to VTex as ONEOVERMIPLEVELINALPHA.
-    DEPRECATED_ONEOVERMIPLEVELINALPHA          : 0x00080000,
-    UNUSED1                                    : 0x00100000, //!< Originally internal to VTex as PREMULTCOLORBYONEOVERMIPLEVEL.
-    DEPRECATED_PREMULTCOLORBYONEOVERMIPLEVEL   : 0x00100000,
-    UNUSED2                                    : 0x00200000, //!< Originally internal to VTex as NORMALTODUDV.
-    DEPRECATED_NORMALTODUDV                    : 0x00200000,
-    UNUSED3                                    : 0x00400000, //!< Originally internal to VTex as ALPHATESTMIPGENERATION.
-    DEPRECATED_ALPHATESTMIPGENERATION          : 0x00400000,
-    NODEPTHBUFFER                              : 0x00800000,
-    UNUSED4                                    : 0x01000000, //!< Originally internal to VTex as NICEFILTERED.
-    DEPRECATED_NICEFILTERED                    : 0x01000000,
-    CLAMPU                                     : 0x02000000,
-    VERTEXTEXTURE                              : 0x04000000,
-    SSBUMP                                     : 0x08000000,
-    UNUSED5                                    : 0x10000000, //!< Originally UNFILTERABLE_OK.
-    DEPRECATED_UNFILTERABLE_OK                 : 0x10000000,
-    BORDER                                     : 0x20000000,
-    TEXTUREFLAGS_DEPRECATED_SPECVAR_RED        : 0x40000000,
-    TEXTUREFLAGS_DEPRECATED_SPECVAR_ALPHA      : 0x80000000,
-    TEXTUREFLAGS_LAST                          : 0x20000000,
-    TEXTUREFLAGS_COUNT                         : 30
-    // key: function(n){return this[Object.keys(this)[n]]}
+  POINTSAMPLE                                : 0x00000001,
+  TRILINEAR                                  : 0x00000002,
+  CLAMPS                                     : 0x00000004,
+  CLAMPT                                     : 0x00000008,
+  ANISOTROPIC                                : 0x00000010,
+  HINT_DXT5                                  : 0x00000020,
+  SRGB                                       : 0x00000040, // Originally internal to VTex as NOCOMPRESS.
+  DEPRECATED_NOCOMPRESS                      : 0x00000040,
+  NORMAL                                     : 0x00000080,
+  NOMIP                                      : 0x00000100,
+  NOLOD                                      : 0x00000200,
+  MINMIP                                     : 0x00000400,
+  PROCEDURAL                                 : 0x00000800,
+  ONEBITALPHA                                : 0x00001000, //!< Automatically generated by VTex.
+  EIGHTBITALPHA                              : 0x00002000, //!< Automatically generated by VTex.
+  ENVMAP                                     : 0x00004000,
+  RENDERTARGET                               : 0x00008000,
+  DEPTHRENDERTARGET                          : 0x00010000,
+  NODEBUGOVERRIDE                            : 0x00020000,
+  SINGLECOPY                                 : 0x00040000,
+  UNUSED0                                    : 0x00080000, //!< Originally internal to VTex as ONEOVERMIPLEVELINALPHA.
+  DEPRECATED_ONEOVERMIPLEVELINALPHA          : 0x00080000,
+  UNUSED1                                    : 0x00100000, //!< Originally internal to VTex as PREMULTCOLORBYONEOVERMIPLEVEL.
+  DEPRECATED_PREMULTCOLORBYONEOVERMIPLEVEL   : 0x00100000,
+  UNUSED2                                    : 0x00200000, //!< Originally internal to VTex as NORMALTODUDV.
+  DEPRECATED_NORMALTODUDV                    : 0x00200000,
+  UNUSED3                                    : 0x00400000, //!< Originally internal to VTex as ALPHATESTMIPGENERATION.
+  DEPRECATED_ALPHATESTMIPGENERATION          : 0x00400000,
+  NODEPTHBUFFER                              : 0x00800000,
+  UNUSED4                                    : 0x01000000, //!< Originally internal to VTex as NICEFILTERED.
+  DEPRECATED_NICEFILTERED                    : 0x01000000,
+  CLAMPU                                     : 0x02000000,
+  VERTEXTEXTURE                              : 0x04000000,
+  SSBUMP                                     : 0x08000000,
+  UNUSED5                                    : 0x10000000, //!< Originally UNFILTERABLE_OK.
+  DEPRECATED_UNFILTERABLE_OK                 : 0x10000000,
+  BORDER                                     : 0x20000000,
+  TEXTUREFLAGS_DEPRECATED_SPECVAR_RED        : 0x40000000,
+  TEXTUREFLAGS_DEPRECATED_SPECVAR_ALPHA      : 0x80000000,
+  TEXTUREFLAGS_LAST                          : 0x20000000,
+  TEXTUREFLAGS_COUNT                         : 30
+  // key: function(n){return this[Object.keys(this)[n]]}
 };
-
-const VTFEnabledFlags = {
-    POINTSAMPLE:"Point Sample",
-    TRILINEAR:"Trilinear",
-    CLAMPS:"Clamp S",
-    CLAMPT:"Clamp T",
-    ANISOTROPIC:"Anisotropic",
-    HINT_DXT5:"Hint DXT5",
-    SRGB:"SRGB",
-    NORMAL:"Normal Map",
-    NOMIP:"No Mipmap",
-    NOLOD:"No Level Of Detail",
-    MINMIP:"No Minimum Mipmap",
-    PROCEDURAL:"Procedural",
-    ONEBITALPHA:"One Bit Alpha (Format Specific)",
-    EIGHTBITALPHA:"Eight Bit Alpha (Format Specific)",
-    ENVMAP:"Enviroment Map (Format Specific)",
-    RENDERTARGET:"Render Target",
-    DEPTHRENDERTARGET:"Depth Render Target",
-    NODEBUGOVERRIDE:"No Debug Override",
-    SINGLECOPY:"Single Copy",
-    UNUSED0:"Unused",
-    UNUSED1:"Unused",
-    UNUSED2:"Unused",
-    UNUSED3:"Unused",
-    NODEPTHBUFFER:"No Depth Buffer",
-    UNUSED4:"Unused",
-    CLAMPU:"Clamp U",
-    VERTEXTEXTURE:"Vertex Texture",
-    SSBUMP:"SSBump",
-    UNUSED5:"Unused",
-    BORDER:"Clamp All"
-};
-
-//(VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel == 1 ? TextureFlags.ONEBITALPHA : 0) | (VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel > 1 ? TextureFlags.EIGHTBITALPHA : 0)
-let VTFOptions = {
-   //{Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0}
-    HeaderSize: 64,
-    version: [7,2],
-    width: 2,
-    height: 2,
-    selectedFlags: ["CLAMPT","ANISOTROPIC","HINT_DXT5","SRGB","NOMIP","NOLOD","EIGHTBITALPHA"], //0x00000008, 0x00000010, 0x00000020, 0x00000040, 0x00000100, 0x00000200, 0x00002000
-    Frames: 1,
-    StartFrame: 0,
-    reflectivity: [1.0,1.0,1.0],
-    BumpScale: 1.0,
-    ImageFormat: VTFImageFormats.RGBA8888,
-    MipCount: 0,
-    LowResImageFormat: -1,
-    LowResImageWidth: 0,
-    lowResImageHeight: 0,
-    Depth: 1,
-    ResourceCount: 0,
-    lumaWeights: [0.213,0.715,0.072],//[0.2126,0.7152,0.0722] ITU-R BT.709
-    getflags: function(flags=this.selectedFlags) {
-        var tmp=0
-        flags.forEach(function(entry) {
-          tmp = (parseInt(tmp, 16) + TextureFlags[entry]).toString(16);
-          while (tmp.length < 8) { tmp = '0' + tmp;} // Zero pad.
-       });
-        return fromHexString(tmp.toString()).reverse(); //.toString()
-   }
-}
-Object.defineProperty(VTFOptions, 'getflags', {
-  enumerable: false
-});
-// const VTFConst = {
-//     signature: "VTF\0",
-//     headerSize: "64",
-//     padding: "00000000",
-//     reflectivity: "3f800000",
-//     bumpmapScale: "3f800000"
-
-// }
-
-let merge = (a, b) => {
-  var c = new a.constructor(a.length + b.length);
-  c.set(a);
-  c.set(b, a.length);
-  return c;
-}
-
-let byte = (value,length=1) => {return new Uint8Array(length).map((_, i) => [value][i])};
-
-let short = number => new Uint8Array([number & 0xFF,(number >>> 8) & 0xff]);
-
-const char = s =>{//uint8array
-  var escstr = encodeURIComponent(s);
-  var binstr = escstr.replace(/%([0-9A-F]{2})/g, function(match, p1) {
-    return String.fromCharCode('0x' + p1);
-  });
-  var ua = new Uint8Array(binstr.length);
-  Array.prototype.forEach.call(binstr, function (ch, i) {
-    ua[i] = ch.charCodeAt(0);
-  });
-  return ua;
-}
-
-const float = (floatnum) => {
-  const getHex = i => ('00' + i.toString(16)).slice(-2);
-  var type = Object.prototype.toString.call(floatnum);
-  if (type == "[object Object]" || type == "[object Array]"){
-    var out = new Uint8Array()
-    for (var key in floatnum) {
-      //console.log("Float")
-      //console.log("Item: "+floatnum[key]+", \nType: "+type);
-      var view = new DataView(new ArrayBuffer(4)),
-        result;
-      view.setFloat32(0, floatnum[key]);
-      result = Array
-        .apply(null, { length: 4})
-        .map((_, i) => getHex(view.getUint8(i)))
-        .join('');
-      out = merge(out, fromHexString(result).reverse())
-    }
-    return out;
-    //console.log("Disabled: "+type+"\nValue: "+thing[key]);
-  } else if (type == "[object Number]") {
-    var view = new DataView(new ArrayBuffer(4)),
-      result;
-    view.setFloat32(0, floatnum);
-    result = Array
-      .apply(null, { length: 4})
-      .map((_, i) => getHex(view.getUint8(i)))
-      .join('');
-    return fromHexString(result).reverse();
-  } else {
-    console.log("Unknown: "+type+"\nValue: "+floatnum);
-  }
-}
-
-const uint = number => {
-  var type = Object.prototype.toString.call(number);
-  if (type == "[object Object]" || type == "[object Array]"){
-    var out = new Uint8Array()
-    for (var key in number) {
-      //console.log("Item: "+number[key]+", \nType: "+type);
-      out = merge(out,(number[key]!=-1)?(new Uint8Array({0:number[key]>>>0,length:4})):(new Uint8Array([255,255,255,255])));
-    }
-    return out;
-    //console.log("Disabled: "+type+"\nValue: "+thing[key]);
-  } else if (type == "[object Number]") {
-    return (number!=-1)?(new Uint8Array({0:number>>>0,length:4})):(new Uint8Array([255,255,255,255]))
-  } else {
-    console.log("Unknown: "+type+"\nValue: "+number);
-  }
-}
-
-/*var buffer = new ArrayBuffer(24);
+Point Sampling	0x0001
+Trilinear Sampling	0x0002
+Clamp S	0x0004	Clamp
+Clamp T	0x0008	Clamp T coordinates.
+  Anisotropic Sampling	0x0010
+Hint DXT5	0x0020
+PWL Corrected	0x0040	Purpose unknown.
+  SRGB	n/a
+No Compress	0x0040	No DXT compression used. Deprecated
+Normal Map	0x0080
+No Mipmaps	0x0100
+No Level Of Detail	0x0200
+No Minimum Mipmap	0x0400
+Procedural	0x0800
+One Bit Alpha	0x1000
+Eight Bit Alpha	0x2000
+Environment Map	0x4000
+Render Target	0x8000
+Depth Render Target	0x10000
+No Debug Override	0x20000
+Single Copy	0x40000
+Pre SRGB	0x80000	SRGB correction has already been applied
+One Over Mipmap Level In Alpha	0x80000	Fill the alpha channel with 1/Mipmap Level. Deprecated (Internal to VTEX?)
+  Premultiply Color By One Over Mipmap Level	0x100000	(Internal to VTEX?)
+    Normal To DuDv	0x200000	Texture is a DuDv map. (Internal to VTEX?)
+      Alpha Test Mipmap Generation	0x400000	(Internal to VTEX?)
+        No Depth Buffer	0x800000
+        Nice Filtered	0x1000000	Use NICE filtering to generate mipmaps. (Internal to VTEX?)
+          Clamp U	0x2000000
+          Vertex Texture	0x4000000	Usable as a vertex texture
+          SSBump	0x8000000	Texture is a SSBump. (SSB)
+          Border	0x20000000	Clamp to border colour on all texture coordinates
+          const VTFEnabledFlags = {
+            POINTSAMPLE: {
+              Name:"Point Sample",
+              Comment:"Low quality, 'pixel art' texture filtering."
+            },
+            TRILINEAR: {
+              Name:"Trilinear",
+              Comment:"Medium quality texture filtering."
+            },
+            CLAMPS: {
+              Name:"Clamp S",
+              Comment:"S coordinates."
+            },
+            CLAMPT: {
+              Name:"Clamp T",
+              Comment:"T coordinates."
+            },
+            ANISOTROPIC: {
+              Name:"Anisotropic",
+              Comment:"High quality texture filtering."
+            },
+            HINT_DXT5: {
+              Name:"Hint DXT5",
+              Comment:"Used in skyboxes. Makes sure edges are seamless."
+            },
+            SRGB: {
+              Name:"SRGB",
+              Comment:"Uses space RGB. Useful for High Gamuts. Deprecated in 7.5."
+            },
+            NORMAL: {
+              Name:"Normal Map",
+              Comment:"Texture is a normal map."
+            },
+            NOMIP: {
+              Name:"No Mipmap",
+              Comment:"Render largest mipmap only. (Does not delete existing mipmaps, just disables them.)"
+            },
+            NOLOD: {
+              Name:"No Level Of Detail",
+              Comment:"Not affected by texture resolution settings."
+            },
+            MINMIP: {
+              Name:"No Minimum Mipmap",
+              Comment:"If set, load mipmaps below 32x32 pixels."
+            },
+            PROCEDURAL: {
+              Name:"Procedural",
+              Comment:"Texture is an procedural texture (code can modify it)."
+            },
+            ONEBITALPHA: {
+              Name:"One Bit Alpha (Format Specific)",
+              Comment:"One bit alpha channel used."
+            },
+            EIGHTBITALPHA: {
+              Name:"Eight Bit Alpha (Format Specific)",
+              Comment:"Eight bit alpha channel used."
+            },
+            ENVMAP: {
+              Name:"Enviroment Map (Format Specific)",
+              Comment:"Texture is an environment map."
+            },
+            RENDERTARGET: {
+              Name:"Render Target",
+              Comment:"Texture is a render target."
+            },
+            DEPTHRENDERTARGET: {
+              Name:"Depth Render Target",
+              Comment:"Texture is a depth render target."
+            },
+            NODEBUGOVERRIDE: {
+              Name:"No Debug Override",
+              Comment:""
+            },
+            SINGLECOPY: {
+              Name:"Single Copy",
+              Comment:""
+            },
+            UNUSED0: {
+              Name:"Unused",
+              Comment:""
+            },
+            UNUSED1: {
+              Name:"Unused",
+              Comment:""
+            },
+            UNUSED2: {
+              Name:"Unused",
+              Comment:""
+            },
+            UNUSED3: {
+              Name:"Unused",
+              Comment:""
+            },
+            NODEPTHBUFFER: {
+              Name:"No Depth Buffer",
+              Comment:"Do not buffer for Video Processing, generally render distance."
+            },
+            UNUSED4: {
+              Name:"Unused",
+              Comment:""
+            },
+            CLAMPU: {
+              Name:"Clamp U",
+              Comment:""
+            },
+            VERTEXTEXTURE: {
+              Name:"Vertex Texture",
+              Comment:""
+            },
+            SSBUMP: {
+              Name:"SSBump",
+              Comment:""
+            },
+            UNUSED5: {
+              Name:"Unused",
+              Comment:""
+            },
+            BORDER: {
+              Name:"Clamp All",
+              Comment:""
+            }
+          };
+        
+        //(VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel == 1 ? TextureFlags.ONEBITALPHA : 0) | (VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel > 1 ? TextureFlags.EIGHTBITALPHA : 0) | (this->GetImageFormatInfo(ImageFormat).uiAlphaBitsPerPixel > 1 ? TEXTUREFLAGS_EIGHTBITALPHA : 0)
+        //| (uiFaces == 1 ? 0 : TEXTUREFLAGS_ENVMAP)
+        //| (bMipmaps ? 0 : TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD);
+        let VTFOptions = {
+          //{Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0}
+          HeaderSize: 64,
+          version: [7,2],
+          width: 2,
+          height: 2,
+          selectedFlags: ["CLAMPT","ANISOTROPIC","HINT_DXT5","SRGB","NOMIP","NOLOD","EIGHTBITALPHA"], //0x00000008, 0x00000010, 0x00000020, 0x00000040, 0x00000100, 0x00000200, 0x00002000
+          Frames: 1,
+          StartFrame: 0,
+          reflectivity: [1.0,1.0,1.0],
+          BumpScale: 1.0,
+          ImageFormat: VTFImageFormats.RGBA8888,
+          hasMipmaps: false,
+          MipCount: 0,
+          LowResImageFormat: -1,
+          LowResImageWidth: 0,
+          lowResImageHeight: 0,
+          Depth: 1,
+          ResourceCount: 0,
+          lumaWeights: [0.213,0.715,0.072],//[0.2126,0.7152,0.0722] ITU-R BT.709
+          getflags: function(flags=this.selectedFlags) {
+            var tmp=0
+            flags.forEach(function(entry) {
+              tmp = (parseInt(tmp, 16) + TextureFlags[entry]).toString(16);
+              while (tmp.length < 8) { tmp = '0' + tmp;} // Zero pad.
+            });
+            return fromHexString(tmp.toString()).reverse(); //.toString()
+          }
+        }
+        Object.defineProperty(VTFOptions, 'getflags', {
+          enumerable: false
+        });
+        // const VTFConst = {
+        //     signature: "VTF\0",
+        //     headerSize: "64",
+        //     padding: "00000000",
+        //     reflectivity: "3f800000",
+        //     bumpmapScale: "3f800000"
+        
+        // }
+        
+        let merge = (a, b) => {
+          var c = new a.constructor(a.length + b.length);
+          c.set(a);
+          c.set(b, a.length);
+          return c;
+        }
+        
+        let byte = (value,length=1) => {return new Uint8Array(length).map((_, i) => [value][i])};
+        
+        let short = number => new Uint8Array([number & 0xFF,(number >>> 8) & 0xff]);
+        
+        const char = s =>{//uint8array
+          var escstr = encodeURIComponent(s);
+          var binstr = escstr.replace(/%([0-9A-F]{2})/g, function(match, p1) {
+            return String.fromCharCode('0x' + p1);
+          });
+          var ua = new Uint8Array(binstr.length);
+          Array.prototype.forEach.call(binstr, function (ch, i) {
+            ua[i] = ch.charCodeAt(0);
+          });
+          return ua;
+        }
+        
+        const float = (floatnum) => {
+          const getHex = i => ('00' + i.toString(16)).slice(-2);
+          var type = Object.prototype.toString.call(floatnum);
+          if (type == "[object Object]" || type == "[object Array]"){
+            var out = new Uint8Array()
+            for (var key in floatnum) {
+              //console.log("Float")
+              //console.log("Item: "+floatnum[key]+", \nType: "+type);
+              var view = new DataView(new ArrayBuffer(4)),
+                result;
+              view.setFloat32(0, floatnum[key]);
+              result = Array
+                .apply(null, { length: 4})
+                .map((_, i) => getHex(view.getUint8(i)))
+                .join('');
+              out = merge(out, fromHexString(result).reverse())
+            }
+            return out;
+            //console.log("Disabled: "+type+"\nValue: "+thing[key]);
+          } else if (type == "[object Number]") {
+            var view = new DataView(new ArrayBuffer(4)),
+              result;
+            view.setFloat32(0, floatnum);
+            result = Array
+              .apply(null, { length: 4})
+              .map((_, i) => getHex(view.getUint8(i)))
+              .join('');
+            return fromHexString(result).reverse();
+          } else {
+            console.log("Unknown: "+type+"\nValue: "+floatnum);
+          }
+        }
+        
+        const uint = number => {
+          var type = Object.prototype.toString.call(number);
+          if (type == "[object Object]" || type == "[object Array]"){
+            var out = new Uint8Array()
+            for (var key in number) {
+              //console.log("Item: "+number[key]+", \nType: "+type);
+              out = merge(out,(number[key]!=-1)?(new Uint8Array({0:number[key]>>>0,length:4})):(new Uint8Array([255,255,255,255])));
+            }
+            return out;
+            //console.log("Disabled: "+type+"\nValue: "+thing[key]);
+          } else if (type == "[object Number]") {
+            return (number!=-1)?(new Uint8Array({0:number>>>0,length:4})):(new Uint8Array([255,255,255,255]))
+          } else {
+            console.log("Unknown: "+type+"\nValue: "+number);
+          }
+        }
+        
+        /*var buffer = new ArrayBuffer(24);
 
 // ... read the data into the buffer ...
 
 var idView = new Uint32Array(buffer, 0, 1);
 var usernameView = new Uint8Array(buffer, 4, 16);
-var amountDueView = new Float32Array(buffer, 20, 1);*/
-
-/*
+        var amountDueView = new Float32Array(buffer, 20, 1);*/
+        
+        /*
 if(entry in TextureFlags){
 console.log(entry+" exists")
 }else{
 console.log(entry+" missing")
 }
 
-*/
-    /* char        signature[4];        // File signature ("VTF\0"). (or as little-endian integer, 0x00465456)
+        */
+        /* char        signature[4];        // File signature ("VTF\0"). (or as little-endian integer, 0x00465456)
     // unsigned int    version[2];        // version[0].version[1] (currently 7.2).
     // unsigned int    headerSize;        // Size of the header struct  (16 byte aligned; currently 80 bytes) + size of the resources dictionary (7.3+).
     // unsigned short    width;            // Width of the largest mipmap in pixels. Must be a power of 2.
@@ -283,16 +407,16 @@ console.log(entry+" missing")
     // unsigned char    mipmapCount;        // Number of mipmaps.
     // unsigned int    lowResImageFormat;    // Low resolution image format (always DXT1).
     // unsigned char    lowResImageWidth;    // Low resolution image width.
-    // unsigned char    lowResImageHeight;    // Low resolution image height.*/
-/*#define VTF_MAJOR_VERSION					7		//!< VTF major version number
+        // unsigned char    lowResImageHeight;    // Low resolution image height.*/
+        /*#define VTF_MAJOR_VERSION					7		//!< VTF major version number
 #define VTF_MINOR_VERSION					5		//!< VTF minor version number
 #define VTF_MINOR_VERSION_DEFAULT			3
 
 #define VTF_MINOR_VERSION_MIN_SPHERE_MAP	1
 #define VTF_MINOR_VERSION_MIN_VOLUME		2
 #define VTF_MINOR_VERSION_MIN_RESOURCE		3
-#define VTF_MINOR_VERSION_MIN_NO_SPHERE_MAP	5*/
-/*
+        #define VTF_MINOR_VERSION_MIN_NO_SPHERE_MAP	5*/
+        /*
 this->Header = new SVTFHeader;
     memset(this->Header, 0, sizeof(SVTFHeader));
 
@@ -369,95 +493,95 @@ this->Header = new SVTFHeader;
         this->uiThumbnailBufferSize = 0;
         this->lpThumbnailImageData = 0;
 
-*/
-
-class SVTFFileHeader {
-    constructor({Version=[7,0],HeaderSize=16} = {}) {
-      this.signature = char("VTF\0");//4
-      this.Version = uint(Version);//8
-      this.HeaderSize = uint(HeaderSize);//4
- }
- getArray() {
-  var flat = new Uint8Array();
-  var type = Object.prototype.toString.call(this);
-  
-  for (var key in this) {
-    type = Object.prototype.toString.call(this[key]);
-    if (type == "[object Object]" || type == "[object Array]"){
-      
-      //flat = merge(flat,thing.getArray(thing[key]));
-      console.log("Disabled: "+type+"\nValue: "+this[key]);
-    } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-      flat = merge(flat,this[key]);
-    } else {
-      flat = new Uint8Array([255]);
-      console.log("Unknown: "+type+"\nValue: "+this[key]);
-    }
-  }
-  return flat;
-  
-}
-}
-class SVTFHeader_70 extends SVTFFileHeader {
-    constructor({Version=[7,0],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
-      super({Version,HeaderSize});//12
-      this.Width = short(Width);//2
-      this.Height = short(Height);//2
-      this.FlagArray = VTFOptions.getflags(FlagArray);//4
-      this.Frames = short(Frames);//2
-      this.StartFrame = short(StartFrame);//2
-      this.padding0 = byte(0,4);//4
-      this.reflectivity = float(reflectivity);//12
-      this.padding1 = byte(0,4);//4
-      this.BumpScale = float(BumpScale);//4
-      this.ImageFormat = uint(ImageFormat);//4
-      this.MipCount = byte(MipCount);//1
-      this.LowResImageFormat = uint(LowResImageFormat);//4
-      this.LowResImageWidth = byte(LowResImageWidth);//1
-      this.lowResImageHeight = byte(lowResImageHeight);//1
-      this.placeholder = new Uint8Array(1);
- }
-}//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
-
-class SVTFHeader_71 extends SVTFHeader_70 {
-    constructor({Version=[7,1],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
-      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
-  }
-}
-
-class SVTFHeader_72 extends SVTFHeader_71 {
-    constructor({Version=[7,2],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth} = {}){
-      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
-      this.placeholder = new Uint8Array();
-      this.Depth = byte(Depth);//1                          //!< Depth of the largest image
-  }
-}
-
-class SVTFHeader_73 extends SVTFHeader_72 {
-    constructor({Version=[7,3],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
-      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth});
-      this.padding2 = byte(0,4);//4 - should be 3
-      this.ResourceCount = uint(ResourceCount);//4                          //!< Number of image resources
-      this.padding3 = byte(0,8);//Most likely will never add resource support
-    }
-}
-
-class SVTFHeader_74 extends SVTFHeader_73 {
-    constructor({Version=[7,4],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
-      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
-  }
-}
-
-class SVTFHeader_75 extends SVTFHeader_74 {
-    constructor({Version=[7,5],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
-      super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
-  }
-}//       |  -  -  - |       -       |        |   |   |        |   |   |       |          -          -          |       |          |       | |               | | | |       |1 2 3 4|1 2 3 4 5 6 7 8| 1 2 3 4  5 6 7 8|  
-var foo = [86,84,70,0,7,0,0,0,3,0,0,0,88,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,88,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
-var bar = [86,84,70,0,7,0,0,0,2,0,0,0,80,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
-var baz = [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
-var qux = [86,84,70,0,7,0,0,0,3,0,0,0,96,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,96,0,0,0,75,86,68,0,112,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0,38,0,0,0,34,73,110,102,111,114,109,97,116,105,111,110,34,13,10,123,13,10,9,34,65,117,116,104,111,114,34,32,34,98,104,110,34,13,10,125,13,10];
-/*
+        */
+        
+        class SVTFFileHeader {
+          constructor({Version=[7,0],HeaderSize=16} = {}) {
+            this.signature = char("VTF\0");//4
+            this.Version = uint(Version);//8
+            this.HeaderSize = uint(HeaderSize);//4
+          }
+          getArray() {
+            var flat = new Uint8Array();
+            var type = Object.prototype.toString.call(this);
+            
+            for (var key in this) {
+              type = Object.prototype.toString.call(this[key]);
+              if (type == "[object Object]" || type == "[object Array]"){
+                
+                //flat = merge(flat,thing.getArray(thing[key]));
+                console.log("Disabled: "+type+"\nValue: "+this[key]);
+              } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+                flat = merge(flat,this[key]);
+              } else {
+                flat = new Uint8Array([255]);
+                console.log("Unknown: "+type+"\nValue: "+this[key]);
+              }
+            }
+            return flat;
+            
+          }
+        }
+        class SVTFHeader_70 extends SVTFFileHeader {
+          constructor({Version=[7,0],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
+            super({Version,HeaderSize});//12
+            this.Width = short(Width);//2
+            this.Height = short(Height);//2
+            this.FlagArray = VTFOptions.getflags(FlagArray);//4
+            this.Frames = short(Frames);//2
+            this.StartFrame = short(StartFrame);//2
+            this.padding0 = byte(0,4);//4
+            this.reflectivity = float(reflectivity);//12
+            this.padding1 = byte(0,4);//4
+            this.BumpScale = float(BumpScale);//4
+            this.ImageFormat = uint(ImageFormat);//4
+            this.MipCount = byte(MipCount);//1
+            this.LowResImageFormat = uint(LowResImageFormat);//4
+            this.LowResImageWidth = byte(LowResImageWidth);//1
+            this.lowResImageHeight = byte(lowResImageHeight);//1
+            this.placeholder = new Uint8Array(1);
+          }
+        }//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
+        
+        class SVTFHeader_71 extends SVTFHeader_70 {
+          constructor({Version=[7,1],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
+            super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
+          }
+        }
+        
+        class SVTFHeader_72 extends SVTFHeader_71 {
+          constructor({Version=[7,2],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth} = {}){
+            super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight});
+            this.placeholder = new Uint8Array();
+            this.Depth = byte(Depth);//1                          //!< Depth of the largest image
+          }
+        }
+        
+        class SVTFHeader_73 extends SVTFHeader_72 {
+          constructor({Version=[7,3],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
+            super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth});
+            this.padding2 = byte(0,4);//4 - should be 3
+            this.ResourceCount = uint(ResourceCount);//4                          //!< Number of image resources
+            this.padding3 = byte(0,8);//Most likely will never add resource support
+          }
+        }
+        
+        class SVTFHeader_74 extends SVTFHeader_73 {
+          constructor({Version=[7,4],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
+            super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
+          }
+        }
+        
+        class SVTFHeader_75 extends SVTFHeader_74 {
+          constructor({Version=[7,5],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.bumpmapScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
+            super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,lowResImageHeight,Depth,ResourceCount});
+          }
+        }//       |  -  -  - |       -       |        |   |   |        |   |   |       |          -          -          |       |          |       | |               | | | |       |1 2 3 4|1 2 3 4 5 6 7 8| 1 2 3 4  5 6 7 8|
+        var foo = [86,84,70,0,7,0,0,0,3,0,0,0,88,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,88,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+        var bar = [86,84,70,0,7,0,0,0,2,0,0,0,80,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+        var baz = [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+        var qux = [86,84,70,0,7,0,0,0,3,0,0,0,96,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,96,0,0,0,75,86,68,0,112,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0,38,0,0,0,34,73,110,102,111,114,109,97,116,105,111,110,34,13,10,123,13,10,9,34,65,117,116,104,111,114,34,32,34,98,104,110,34,13,10,125,13,10];
+        /*
 function objLength(obj){
   var out=0;
   var type="";
@@ -484,13 +608,13 @@ function mergeTypedArrays(a, b) {
     c.set(b, a.length);
 
     return c;
-}*/
-/*let SVTFFileHeader = {
+        }*/
+        /*let SVTFFileHeader = {
     Signature: char("VTF\0"),                  //!< "Magic number" identifier- "VTF\0".
     Version: [uint(7),uint(2)],                    //!< Version[0].version[1] (currently 7.2)
     HeaderSize: uint(64)                     //!< Size of the header struct (currently 80 bytes)             
-};*/
-/*
+        };*/
+        /*
 let SVTFHeader_70 : public SVTFFileHeader
 {
     vlUShort        Width;                          //!< Width of the largest image
@@ -507,21 +631,21 @@ let SVTFHeader_70 : public SVTFFileHeader
     VTFImageFormat  LowResImageFormat;              //!< Image format of the thumbnail image
     vlByte          LowResImageWidth;               //!< Thumbnail image width
     vlByte          LowResImageHeight;              //!< Thumbnail image height
-};*/
-
-
-
-// function concatTypedArrays(a, b) { // a, b TypedArray of same type
-//     var c = new (a.constructor)(a.length + b.length);
-//     c.set(a, 0);
-//     c.set(b, a.length);
-//     return c;
-//]
-  //this.lowResImageFormat
-
-//[86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0 ,0,0,0,0 ,0,0,128,63 ,0,0,128,63 ,0,0,128,63 ,0,0,0,0 ,0,0,128,63,outputType,0,0,0,1,255,255,255,255,0,0,1];
-// signature[4],version[8],size[4],width[2],height[2],flags[4],frames[2],firstframe[2],padding[4],
-/*
+        };*/
+        
+        
+        
+        // function concatTypedArrays(a, b) { // a, b TypedArray of same type
+        //     var c = new (a.constructor)(a.length + b.length);
+        //     c.set(a, 0);
+        //     c.set(b, a.length);
+        //     return c;
+        //]
+        //this.lowResImageFormat
+        
+        //[86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0 ,0,0,0,0 ,0,0,128,63 ,0,0,128,63 ,0,0,128,63 ,0,0,0,0 ,0,0,128,63,outputType,0,0,0,1,255,255,255,255,0,0,1];
+        // signature[4],version[8],size[4],width[2],height[2],flags[4],frames[2],firstframe[2],padding[4],
+        /*
 export const VTFHEADER {
     char        signature[4];        // File signature ("VTF\0"). (or as little-endian integer, 0x00465456)
     unsigned int    version[2];        // version[0].version[1] (currently 7.2).
@@ -549,53 +673,53 @@ export const VTFHEADER {
     unsigned char    padding2[3];        // depth padding (4 byte alignment).
     unsigned int    numResources;        // Number of resources this vtf has
 }
-*/
-
-const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badhaloninja/vtfedit/blob/master/VTFLib/VTFFile.cpp
-//[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
-     0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_RGBA8888,
-     1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ABGR8888, 
-     2 : ["RGB888"            , 24,  3,  8,  8,  8,  0, false,  true],        // IMAGE_FORMAT_RGB888,
-     3 : ["BGR888"            , 24,  3,  8,  8,  8,  0, false,  true],        // IMAGE_FORMAT_BGR888,
-     4 : ["RGB565"            , 16,  2,  5,  6,  5,  0, false,  true],        // IMAGE_FORMAT_RGB565, 
-     5 : ["I8"                ,  8,  1,  0,  0,  0,  0, false, false],        // IMAGE_FORMAT_I8,
-     6 : ["IA88"              , 16,  2,  0,  0,  0,  8, false, false],        // IMAGE_FORMAT_IA88
-     7 : ["P8"                ,  8,  1,  0,  0,  0,  0, false, false],        // IMAGE_FORMAT_P8
-     8 : ["A8"                ,  8,  1,  0,  0,  0,  8, false, false],        // IMAGE_FORMAT_A8
-     9 : ["RGB888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_RGB888_BLUESCREEN
-    10 : ["BGR888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_BGR888_BLUESCREEN
-    11 : ["ARGB8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ARGB8888
-    12 : ["BGRA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_BGRA8888
-    13 : ["DXT1"              ,  4,  0,  0,  0,  0,  0,  true,  true],        // IMAGE_FORMAT_DXT1
-    14 : ["DXT3"              ,  8,  0,  0,  0,  0,  8,  true, false],        // IMAGE_FORMAT_DXT3
-    15 : ["DXT5"              ,  8,  0,  0,  0,  0,  8,  true,  true],        // IMAGE_FORMAT_DXT5
-    16 : ["BGRX8888"          , 32,  4,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_BGRX8888
-    17 : ["BGR565"            , 16,  2,  5,  6,  5,  0, false, false],        // IMAGE_FORMAT_BGR565
-    18 : ["BGRX5551"          , 16,  2,  5,  5,  5,  0, false, false],        // IMAGE_FORMAT_BGRX5551
-    19 : ["BGRA4444"          , 16,  2,  4,  4,  4,  4, false,  true],        // IMAGE_FORMAT_BGRA4444
-    20 : ["DXT1 One Bit Alpha",  4,  0,  0,  0,  0,  1,  true, false],        // IMAGE_FORMAT_DXT1_ONEBITALPHA
-    21 : ["BGRA5551"          , 16,  2,  5,  5,  5,  1, false,  true],        // IMAGE_FORMAT_BGRA5551
-    22 : ["UV88"              , 16,  2,  8,  8,  0,  0, false, false],        // IMAGE_FORMAT_UV88
-    23 : ["UVWQ8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_UVWQ8899
-    24 : ["RGBA16161616F"     , 64,  8, 16, 16, 16, 16, false, false],        // IMAGE_FORMAT_RGBA16161616F
-    25 : ["RGBA16161616"      , 64,  8, 16, 16, 16, 16, false, false],        // IMAGE_FORMAT_RGBA16161616
-    26 : ["UVLX8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_UVLX8888
-    getSupported: function() {
-    var tmp=[]
-    Object.values(VTFImageFormatInfo).forEach(function(entry,i){
-        entry[8] ? tmp.push(i) : null;
-      })
-    return tmp
-    },
-    getInfo: function(Format) {
-    var info=this[Format]
-    var tmp={Name:info[0], BitsPerPixel:info[1], BytesPerPixel:info[2], RedBitsPerPixel:info[3], GreenBitsPerPixel:info[4], BlueBitsPerPixel:info[5], AlphaBitsPerPixel:info[6], IsCompressed:info[7], IsSupported:info[8]}
-    return tmp
-   }
-};
-Object.defineProperty(VTFImageFormatInfo, 'getSupported', {
-  enumerable: false
-});
-Object.defineProperty(VTFImageFormatInfo, 'getInfo', {
-  enumerable: false
-});
+        */
+        
+        const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badhaloninja/vtfedit/blob/master/VTFLib/VTFFile.cpp
+          //[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
+          0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_RGBA8888,
+          1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ABGR8888,
+          2 : ["RGB888"            , 24,  3,  8,  8,  8,  0, false,  true],        // IMAGE_FORMAT_RGB888,
+          3 : ["BGR888"            , 24,  3,  8,  8,  8,  0, false,  true],        // IMAGE_FORMAT_BGR888,
+          4 : ["RGB565"            , 16,  2,  5,  6,  5,  0, false,  true],        // IMAGE_FORMAT_RGB565,
+          5 : ["I8"                ,  8,  1,  0,  0,  0,  0, false, false],        // IMAGE_FORMAT_I8,
+          6 : ["IA88"              , 16,  2,  0,  0,  0,  8, false, false],        // IMAGE_FORMAT_IA88
+          7 : ["P8"                ,  8,  1,  0,  0,  0,  0, false, false],        // IMAGE_FORMAT_P8
+          8 : ["A8"                ,  8,  1,  0,  0,  0,  8, false, false],        // IMAGE_FORMAT_A8
+          9 : ["RGB888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_RGB888_BLUESCREEN
+          10 : ["BGR888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_BGR888_BLUESCREEN
+          11 : ["ARGB8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ARGB8888
+          12 : ["BGRA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_BGRA8888
+          13 : ["DXT1"              ,  4,  0,  0,  0,  0,  0,  true,  true],        // IMAGE_FORMAT_DXT1
+          14 : ["DXT3"              ,  8,  0,  0,  0,  0,  8,  true, false],        // IMAGE_FORMAT_DXT3
+          15 : ["DXT5"              ,  8,  0,  0,  0,  0,  8,  true,  true],        // IMAGE_FORMAT_DXT5
+          16 : ["BGRX8888"          , 32,  4,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_BGRX8888
+          17 : ["BGR565"            , 16,  2,  5,  6,  5,  0, false, false],        // IMAGE_FORMAT_BGR565
+          18 : ["BGRX5551"          , 16,  2,  5,  5,  5,  0, false, false],        // IMAGE_FORMAT_BGRX5551
+          19 : ["BGRA4444"          , 16,  2,  4,  4,  4,  4, false,  true],        // IMAGE_FORMAT_BGRA4444
+          20 : ["DXT1 One Bit Alpha",  4,  0,  0,  0,  0,  1,  true, false],        // IMAGE_FORMAT_DXT1_ONEBITALPHA
+          21 : ["BGRA5551"          , 16,  2,  5,  5,  5,  1, false,  true],        // IMAGE_FORMAT_BGRA5551
+          22 : ["UV88"              , 16,  2,  8,  8,  0,  0, false, false],        // IMAGE_FORMAT_UV88
+          23 : ["UVWQ8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_UVWQ8899
+          24 : ["RGBA16161616F"     , 64,  8, 16, 16, 16, 16, false, false],        // IMAGE_FORMAT_RGBA16161616F
+          25 : ["RGBA16161616"      , 64,  8, 16, 16, 16, 16, false, false],        // IMAGE_FORMAT_RGBA16161616
+          26 : ["UVLX8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_UVLX8888
+          getSupported: function() {
+            var tmp=[]
+            Object.values(VTFImageFormatInfo).forEach(function(entry,i){
+              entry[8] ? tmp.push(i) : null;
+            })
+            return tmp
+          },
+          getInfo: function(Format) {
+            var info=this[Format]
+            var tmp={Name:info[0], BitsPerPixel:info[1], BytesPerPixel:info[2], RedBitsPerPixel:info[3], GreenBitsPerPixel:info[4], BlueBitsPerPixel:info[5], AlphaBitsPerPixel:info[6], IsCompressed:info[7], IsSupported:info[8]}
+            return tmp
+          }
+        };
+        Object.defineProperty(VTFImageFormatInfo, 'getSupported', {
+          enumerable: false
+        });
+        Object.defineProperty(VTFImageFormatInfo, 'getInfo', {
+          enumerable: false
+        });
