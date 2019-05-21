@@ -755,33 +755,33 @@ export const VTFHEADER {
 
 const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badhaloninja/vtfedit/blob/master/VTFLib/VTFFile.cpp
   //[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
-  0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_RGBA8888,
-  1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ABGR8888,
-  2 : ["RGB888"            , 24,  3,  8,  8,  8,  0, false,  true],        // IMAGE_FORMAT_RGB888,
-  3 : ["BGR888"            , 24,  3,  8,  8,  8,  0, false,  true],        // IMAGE_FORMAT_BGR888,
-  4 : ["RGB565"            , 16,  2,  5,  6,  5,  0, false,  true],        // IMAGE_FORMAT_RGB565,
-  5 : ["I8"                ,  8,  1,  0,  0,  0,  0, false, false],        // IMAGE_FORMAT_I8,
-  6 : ["IA88"              , 16,  2,  0,  0,  0,  8, false, false],        // IMAGE_FORMAT_IA88
-  7 : ["P8"                ,  8,  1,  0,  0,  0,  0, false, false],        // IMAGE_FORMAT_P8
-  8 : ["A8"                ,  8,  1,  0,  0,  0,  8, false, false],        // IMAGE_FORMAT_A8
-  9 : ["RGB888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_RGB888_BLUESCREEN
-  10 : ["BGR888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_BGR888_BLUESCREEN
-  11 : ["ARGB8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_ARGB8888
-  12 : ["BGRA8888"          , 32,  4,  8,  8,  8,  8, false,  true],        // IMAGE_FORMAT_BGRA8888
-  13 : ["DXT1"              ,  4,  0,  0,  0,  0,  0,  true,  true],        // IMAGE_FORMAT_DXT1
-  14 : ["DXT3"              ,  8,  0,  0,  0,  0,  8,  true, false],        // IMAGE_FORMAT_DXT3
-  15 : ["DXT5"              ,  8,  0,  0,  0,  0,  8,  true,  true],        // IMAGE_FORMAT_DXT5
-  16 : ["BGRX8888"          , 32,  4,  8,  8,  8,  0, false, false],        // IMAGE_FORMAT_BGRX8888
-  17 : ["BGR565"            , 16,  2,  5,  6,  5,  0, false, false],        // IMAGE_FORMAT_BGR565
-  18 : ["BGRX5551"          , 16,  2,  5,  5,  5,  0, false, false],        // IMAGE_FORMAT_BGRX5551
-  19 : ["BGRA4444"          , 16,  2,  4,  4,  4,  4, false,  true],        // IMAGE_FORMAT_BGRA4444
-  20 : ["DXT1 One Bit Alpha",  4,  0,  0,  0,  0,  1,  true, false],        // IMAGE_FORMAT_DXT1_ONEBITALPHA
-  21 : ["BGRA5551"          , 16,  2,  5,  5,  5,  1, false,  true],        // IMAGE_FORMAT_BGRA5551
-  22 : ["UV88"              , 16,  2,  8,  8,  0,  0, false, false],        // IMAGE_FORMAT_UV88
-  23 : ["UVWQ8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_UVWQ8899
-  24 : ["RGBA16161616F"     , 64,  8, 16, 16, 16, 16, false, false],        // IMAGE_FORMAT_RGBA16161616F
-  25 : ["RGBA16161616"      , 64,  8, 16, 16, 16, 16, false, false],        // IMAGE_FORMAT_RGBA16161616
-  26 : ["UVLX8888"          , 32,  4,  8,  8,  8,  8, false, false],        // IMAGE_FORMAT_UVLX8888
+   0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, false,  true, [        null,           null]],        // IMAGE_FORMAT_RGBA8888,
+   1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, false, false, [        null,           null]],        // IMAGE_FORMAT_ABGR8888,
+   2 : ["RGB888"            , 24,  3,  8,  8,  8,  0, false,  true, [        null,           null]],        // IMAGE_FORMAT_RGB888,
+   3 : ["BGR888"            , 24,  3,  8,  8,  8,  0, false,  true, [        null,           null]],        // IMAGE_FORMAT_BGR888,
+   4 : ["RGB565"            , 16,  2,  5,  6,  5,  0, false,  true, [        null,           null]],        // IMAGE_FORMAT_RGB565,
+   5 : ["I8"                ,  8,  1,  0,  0,  0,  0, false, false, [ ToLuminance,  FromLuminance]],        // IMAGE_FORMAT_I8,
+   6 : ["IA88"              , 16,  2,  0,  0,  0,  8, false, false, [ ToLuminance,  FromLuminance]],        // IMAGE_FORMAT_IA88
+   7 : ["P8"                ,  8,  1,  0,  0,  0,  0, false, false, [        null,           null]],        // IMAGE_FORMAT_P8
+   8 : ["A8"                ,  8,  1,  0,  0,  0,  8, false, false, [        null,           null]],        // IMAGE_FORMAT_A8
+   9 : ["RGB888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false, [ToBlueScreen, FromBlueScreen]],        // IMAGE_FORMAT_RGB888_BLUESCREEN
+  10 : ["BGR888 Bluescreen" , 24,  3,  8,  8,  8,  0, false, false, [ToBlueScreen, FromBlueScreen]],        // IMAGE_FORMAT_BGR888_BLUESCREEN
+  11 : ["ARGB8888"          , 32,  4,  8,  8,  8,  8, false, false, [        null,           null]],        // IMAGE_FORMAT_ARGB8888
+  12 : ["BGRA8888"          , 32,  4,  8,  8,  8,  8, false,  true, [        null,           null]],        // IMAGE_FORMAT_BGRA8888
+  13 : ["DXT1"              ,  4,  0,  0,  0,  0,  0,  true,  true, [        null,           null]],        // IMAGE_FORMAT_DXT1
+  14 : ["DXT3"              ,  8,  0,  0,  0,  0,  8,  true, false, [        null,           null]],        // IMAGE_FORMAT_DXT3
+  15 : ["DXT5"              ,  8,  0,  0,  0,  0,  8,  true,  true, [        null,           null]],        // IMAGE_FORMAT_DXT5
+  16 : ["BGRX8888"          , 32,  4,  8,  8,  8,  0, false, false, [        null,           null]],        // IMAGE_FORMAT_BGRX8888
+  17 : ["BGR565"            , 16,  2,  5,  6,  5,  0, false, false, [        null,           null]],        // IMAGE_FORMAT_BGR565
+  18 : ["BGRX5551"          , 16,  2,  5,  5,  5,  0, false, false, [        null,           null]],        // IMAGE_FORMAT_BGRX5551
+  19 : ["BGRA4444"          , 16,  2,  4,  4,  4,  4, false,  true, [        null,           null]],        // IMAGE_FORMAT_BGRA4444
+  20 : ["DXT1 One Bit Alpha",  4,  0,  0,  0,  0,  1,  true, false, [        null,           null]],        // IMAGE_FORMAT_DXT1_ONEBITALPHA
+  21 : ["BGRA5551"          , 16,  2,  5,  5,  5,  1, false,  true, [        null,           null]],        // IMAGE_FORMAT_BGRA5551
+  22 : ["UV88"              , 16,  2,  8,  8,  0,  0, false, false, [        null,           null]],        // IMAGE_FORMAT_UV88
+  23 : ["UVWQ8888"          , 32,  4,  8,  8,  8,  8, false, false, [        null,           null]],        // IMAGE_FORMAT_UVWQ8899
+  24 : ["RGBA16161616F"     , 64,  8, 16, 16, 16, 16, false, false, [      ToFP16,       FromFP16]],        // IMAGE_FORMAT_RGBA16161616F
+  25 : ["RGBA16161616"      , 64,  8, 16, 16, 16, 16, false, false, [        null,           null]],        // IMAGE_FORMAT_RGBA16161616
+  26 : ["UVLX8888"          , 32,  4,  8,  8,  8,  8, false, false, [        null,           null]],        // IMAGE_FORMAT_UVLX8888
   getSupported: function() {
     var tmp=[]
     Object.values(VTFImageFormatInfo).forEach(function(entry,i){
@@ -791,7 +791,7 @@ const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badh
   },
   getInfo: function(Format) {
     var info=this[Format]
-    var tmp={Name:info[0], BitsPerPixel:info[1], BytesPerPixel:info[2], RedBitsPerPixel:info[3], GreenBitsPerPixel:info[4], BlueBitsPerPixel:info[5], AlphaBitsPerPixel:info[6], IsCompressed:info[7], IsSupported:info[8]}
+    var tmp={Name:info[0], BitsPerPixel:info[1], BytesPerPixel:info[2], RedBitsPerPixel:info[3], GreenBitsPerPixel:info[4], BlueBitsPerPixel:info[5], AlphaBitsPerPixel:info[6], IsCompressed:info[7], IsSupported:info[8], TransformProc:info[9]}
     return tmp
   }
 };
@@ -823,7 +823,7 @@ typedef struct tagSVTFImageConvertInfo
 } SVTFImageConvertInfo;
 
 static SVTFImageConvertInfo VTFImageConvertInfo[] =
-{
+{ 
 	{	 32,  4,  8,  8,  8,  8,	 0,	 1,	 2,	 3,	vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_RGBA8888},
 	{	 32,  4,  8,  8,  8,  8,	 3,	 2,	 1,	 0, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_ABGR8888},
 	{	 24,  3,  8,  8,  8,  0,	 0,	 1,	 2,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_RGB888},
@@ -878,3 +878,32 @@ static SVTFImageConvertInfo VTFImageConvertInfo[] =
 	//{	 64,  8, 16, 16, 16, 16,	 0,	 1,	 2,	 3, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_RGBA16161616}
 };
 */
+
+
+/*  0,  1,  2,  3
+  3,  2,  1,  0
+  0,  1,  2, -1
+  2,  1,  0, -1
+  0,  1,  2, -1
+  0, -1, -1, -1
+  0, -1, -1,  1
+  -1, -1, -1, -1
+  -1, -1, -1,  0
+  0,  1,  2, -1
+  2,  1,  0, -1
+  3,  0,  1,  2
+  2,  1,  0,  3
+  -1, -1, -1, -1
+  -1, -1, -1, -1
+  -1, -1, -1, -1
+  2,  1,  0, -1
+  2,  1,  0, -1
+  2,  1,  0, -1
+  2,  1,  0,  3
+  -1, -1, -1, -1
+  2,  1,  0,  3
+  0,  1, -1, -1
+  0,  1,  2,  3
+  0,  1,  2,  3
+  0,  1,  2,  3
+  0,  1,  2,  3*/
