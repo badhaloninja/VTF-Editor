@@ -826,19 +826,20 @@ function createVTF() {
 		console.log("blockCount: "+blockCount);
 		console.log("size: "+size);
 	}
-	var file = new Uint8Array(size+64);
+	var file = new Uint8Array(size+VTFOptions.HeaderSize);
 	console.log("save: "+width+" "+height+" "+ size);
  //var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1]; 	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + document.getElementById("sampling").value,35-hasMipmaps,0,0,frameCount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,hasMipmaps ? getReducedMipmapCount()+1 : 1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1];
-	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,outputType,0,0,0,1,255,255,255,255,0,0,1];
+	var header = getHeader().Array
+	//var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,outputType,0,0,0,1,255,255,255,255,0,0,1];
 // signature[4],version[8],size[4],width[2],height[2],flags[4],frames[?],firstframe[?],padding[4],
-writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bool ? then : else); (n,16,2)
-	writeShort(header,18, height);
+/* writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bool ? then : else); (n,16,2)
+	writeShort(header,18, height);*/
 	for (var i=0; i<header.length; i++) {
 		file[i] = header[i];
 	}
 	if (outputType == VTFImageFormats.DXT1) {//DXT1
-		for (var i=64; i<file.length; i+=8) {
-			var blockNum = (i-64)/4;
+		for (var i=VTFOptions.HeaderSize; i<file.length; i+=8) {
+			var blockNum = (i-VTFOptions.HeaderSize)/4;
 			writeShort(file, i, colorTable[blockNum]);
 			writeShort(file, i+2, colorTable[blockNum+1]);
 			writeShort(file, i+4, pixelTable[blockNum]);
@@ -847,8 +848,8 @@ writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bo
 		}
 	}
 	else if (outputType == VTFImageFormats.DXT5) {//DXT5
-		for (var i=64; i<file.length; i+=16) {
-			var blockNum = (i-64)/8;
+		for (var i=VTFOptions.HeaderSize; i<file.length; i+=16) {
+			var blockNum = (i-VTFOptions.HeaderSize)/8;
 
 			file[i] = alphaValueTable[blockNum];
 			file[i+1] = alphaValueTable[blockNum+1];
@@ -863,7 +864,7 @@ writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bo
 		}
 	}
 	else if (outputType == VTFImageFormats.RGBA8888){//RGBA8888; 0
-		var pos = 64;
+		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
 			for (var j = 0; j < data.length; j++){
@@ -873,7 +874,7 @@ writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bo
 		}
 	}
 	else if (outputType == VTFImageFormats.RGB888){//RGB888; 2
-		var pos = 64;
+		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
 			for (var j = 0; j < data.length; j+=4){
@@ -885,7 +886,7 @@ writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bo
 		}
 	}
 	else if (outputType == VTFImageFormats.BGR888){//BGR888; 3 --test
-		var pos = 64;
+		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
 			for (var j = 0; j < data.length; j+=4){
@@ -897,7 +898,7 @@ writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bo
 		}
 	}
 	else if (outputType == VTFImageFormats.RGB565){//RGB565; 4
-		var pos = 64;
+		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
 			for (var j = 0; j < outputImage[i].length; j+=4){
@@ -907,7 +908,7 @@ writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bo
 		}
 	}
 	else if (outputType == VTFImageFormats.BGRA8888){//BGRA8888; 12 --test
-		var pos = 64;
+		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
 			for (var j = 0; j < data.length; j+=4){
@@ -921,7 +922,7 @@ writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bo
 		}
 	}
 	else if (outputType == VTFImageFormats.BGRA4444){//BGRA4444; 19
-		var pos = 64;
+		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
 			for (var j = 0; j < outputImage[i].length; j+=4){
@@ -931,7 +932,7 @@ writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bo
 		}
 	}
 	else if (outputType == VTFImageFormats.BGRA5551){//BGRA5551; 21
-		var pos = 64;
+		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
 			for (var j = 0; j < outputImage[i].length; j+=4){
@@ -966,7 +967,7 @@ function getEstFileSize(cmipmaps) {
 		else
 			mult *= 1+ (1/3);
 	}*/
-	return (shortened ? width - 4 : width) * getTotalImageHeight() * mult + 64;
+	return (shortened ? width - 4 : width) * getTotalImageHeight() * mult + VTFOptions.HeaderSize;
 }
 
 function getTotalImageHeight() {
