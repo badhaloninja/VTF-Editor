@@ -338,7 +338,7 @@ let VTFOptions = {
   return (this.version < [7,3]) ? 64 : 80
   },
   getflags: function(flags=this.selectedFlags) {
-    var tmp=0
+    var tmp=0;
     flags.forEach(function(entry) {
       tmp = (parseInt(tmp, 16) + TextureFlags[entry]).toString(16);
       while (tmp.length < 8) { tmp = '0' + tmp;} // Zero pad.
@@ -525,7 +525,7 @@ this->Header = new SVTFHeader;
 
             uiThumbnailWidth >>= 1;
             uiThumbnailHeight >>= 1;
-            
+
             if(uiThumbnailWidth < 1)
                 uiThumbnailWidth = 1;
 
@@ -561,11 +561,11 @@ class SVTFFileHeader {
   get Array (){
     var flat = new Uint8Array();
     var type = Object.prototype.toString.call(this);
-    
+
     for (var key in this) {
       type = Object.prototype.toString.call(this[key]);
       if (type == "[object Object]" || type == "[object Array]"){
-        
+
         //flat = merge(flat,thing.getArray(thing[key]));
         console.log("Disabled: "+type+"\nValue: "+this[key]);
       } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
@@ -576,7 +576,7 @@ class SVTFFileHeader {
       }
     }
     return flat;
-    
+
   }
 }
 class SVTFHeader_70 extends SVTFFileHeader {
@@ -690,7 +690,7 @@ function mergeTypedArrays(a, b) {
 /*let SVTFFileHeader = {
     Signature: char("VTF\0"),                  //!< "Magic number" identifier- "VTF\0".
     Version: [uint(7),uint(2)],                    //!< Version[0].version[1] (currently 7.2)
-    HeaderSize: uint(64)                     //!< Size of the header struct (currently 80 bytes)             
+    HeaderSize: uint(64)                     //!< Size of the header struct (currently 80 bytes)
 };*/
 /*
 let SVTFHeader_70 : public SVTFFileHeader
@@ -801,3 +801,80 @@ Object.defineProperty(VTFImageFormatInfo, 'getSupported', {
 Object.defineProperty(VTFImageFormatInfo, 'getInfo', {
   enumerable: false
 });
+
+/*
+typedef struct tagSVTFImageConvertInfo
+{
+	vlUInt	uiBitsPerPixel;			// Format bytes per pixel.
+	vlUInt	uiBytesPerPixel;		// Format bytes per pixel.
+	vlUInt	uiRBitsPerPixel;		// Format conversion red bits per pixel.  0 for N/A.
+	vlUInt	uiGBitsPerPixel;		// Format conversion green bits per pixel.  0 for N/A.
+	vlUInt	uiBBitsPerPixel;		// Format conversion blue bits per pixel.  0 for N/A.
+	vlUInt	uiABitsPerPixel;		// Format conversion alpha bits per pixel.  0 for N/A.
+	vlInt	iR;						// "Red" index.
+	vlInt	iG;						// "Green" index.
+	vlInt	iB;						// "Blue" index.
+	vlInt	iA;						// "Alpha" index.
+	vlBool	bIsCompressed;			// Format is compressed (DXT).
+	vlBool	bIsSupported;			// Format is supported by VTFLib.
+	TransformProc pToTransform;		// Custom transform to function.
+	TransformProc pFromTransform;	// Custom transform from function.
+	VTFImageFormat Format;
+} SVTFImageConvertInfo;
+
+static SVTFImageConvertInfo VTFImageConvertInfo[] =
+{
+	{	 32,  4,  8,  8,  8,  8,	 0,	 1,	 2,	 3,	vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_RGBA8888},
+	{	 32,  4,  8,  8,  8,  8,	 3,	 2,	 1,	 0, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_ABGR8888},
+	{	 24,  3,  8,  8,  8,  0,	 0,	 1,	 2,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_RGB888},
+	{	 24,  3,  8,  8,  8,  0,	 2,	 1,	 0,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_BGR888},
+	{	 16,  2,  5,  6,  5,  0,	 0,	 1,	 2,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_RGB565},
+	{	  8,  1,  8,  8,  8,  0,	 0,	-1,	-1,	-1, vlFalse,  vlTrue,	ToLuminance,	FromLuminance,	IMAGE_FORMAT_I8},
+	{	 16,  2,  8,  8,  8,  8,	 0,	-1,	-1,	 1, vlFalse,  vlTrue,	ToLuminance,	FromLuminance,	IMAGE_FORMAT_IA88},
+	{	  8,  1,  0,  0,  0,  0,	-1,	-1,	-1,	-1, vlFalse, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_P8},
+	{ 	  8,  1,  0,  0,  0,  8,	-1,	-1,	-1,	 0, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_A8},
+	{ 	 24,  3,  8,  8,  8,  8,	 0,	 1,	 2,	-1, vlFalse,  vlTrue,	ToBlueScreen,	FromBlueScreen,	IMAGE_FORMAT_RGB888_BLUESCREEN},
+	{ 	 24,  3,  8,  8,  8,  8,	 2,	 1,	 0,	-1, vlFalse,  vlTrue,	ToBlueScreen,	FromBlueScreen,	IMAGE_FORMAT_BGR888_BLUESCREEN},
+	{ 	 32,  4,  8,  8,  8,  8,	 3,	 0,	 1,	 2, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_ARGB8888},
+	{ 	 32,  4,  8,  8,  8,  8,	 2,	 1,	 0,	 3, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_BGRA8888},
+	{ 	  4,  0,  0,  0,  0,  0,	-1,	-1,	-1,	-1,  vlTrue,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_DXT1},
+	{ 	  8,  0,  0,  0,  0,  8,	-1,	-1,	-1,	-1,  vlTrue,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_DXT3},
+	{ 	  8,  0,  0,  0,  0,  8,	-1,	-1,	-1,	-1,  vlTrue,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_DXT5},
+	{ 	 32,  4,  8,  8,  8,  0,	 2,	 1,	 0,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_BGRX8888},
+	{ 	 16,  2,  5,  6,  5,  0,	 2,	 1,	 0,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_BGR565},
+	{ 	 16,  2,  5,  5,  5,  0,	 2,	 1,	 0,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_BGRX5551},
+	{ 	 16,  2,  4,  4,  4,  4,	 2,	 1,	 0,	 3, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_BGRA4444},
+	{ 	  4,  0,  0,  0,  0,  1,	-1,	-1,	-1,	-1,  vlTrue,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_DXT1_ONEBITALPHA},
+	{ 	 16,  2,  5,  5,  5,  1,	 2,	 1,	 0,	 3, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_BGRA5551},
+	{ 	 16,  2,  8,  8,  0,  0,	 0,	 1,	-1,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_UV88},
+	{ 	 32,  4,  8,  8,  8,  8,	 0,	 1,	 2,	 3, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_UVWQ8888},
+	{    64,  8, 16, 16, 16, 16,	 0,	 1,	 2,	 3, vlFalse,  vlTrue,	ToFP16,	FromFP16,	IMAGE_FORMAT_RGBA16161616F},
+	{	 64,  8, 16, 16, 16, 16,	 0,	 1,	 2,	 3, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_RGBA16161616},
+	{ 	 32,  4,  8,  8,  8,  8,	 0,	 1,	 2,	 3, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_UVLX8888},
+	{ 	 32,  4, 32,  0,  0,  0,	 0,	-1,	-1,	-1, vlFalse, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_R32F},
+	{ 	 96, 12, 32, 32, 32,  0,	 0,	 1,	 2,	-1, vlFalse, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_RGB323232F},
+	{	128, 16, 32, 32, 32, 32,	 0,	 1,	 2,	 3, vlFalse, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_RGBA32323232F},
+	{    16,  2, 16,  0,  0,  0,	 0,	-1,	-1,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_NV_DST16},
+	{	 24,  3, 24,  0,  0,  0,	 0,	-1,	-1,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_NV_DST24},
+	{	 32,  4,  0,  0,  0,  0,	-1,	-1,	-1,	-1, vlFalse, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_NV_INTZ},
+	{	 24,  3,  0,  0,  0,  0,    -1,	-1,	-1,	-1, vlFalse, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_NV_RAWZ},
+	{	 16,  2, 16,  0,  0,  0,	 0,	-1,	-1,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_ATI_DST16},
+	{	 24,  3, 24,  0,  0,  0,	 0,	-1,	-1,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_ATI_DST24},
+	{	 32,  4,  0,  0,  0,  0,	-1,	-1,	-1,	-1, vlFalse, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_NV_NULL},
+	{	  4,  0,  0,  0,  0,  0,	-1, -1, -1, -1,  vlTrue, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_ATI1N},
+	{     8,  0,  0,  0,  0,  0,	-1, -1, -1, -1,  vlTrue, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_ATI2N},
+	//{	 16,  2, 16,  0,  0,  0,	 0, -1, -1, -1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_X360_DST16},
+	//{	 24,  3, 24,  0,  0,  0,	 0, -1, -1, -1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_X360_DST24},
+	//{	 24,  3,  0,  0,  0,  0,	-1, -1, -1, -1, vlFalse, vlFalse,	NULL,	NULL,		IMAGE_FORMAT_X360_DST24F},
+	//{ 	 32,  4,  8,  8,  8,  0,	 2,	 1,	 0,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_BGRX8888},
+	//{	 32,  4,  8,  8,  8,  8,	 0,	 1,	 2,	 3,	vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_RGBA8888},
+	//{	 32,  4,  8,  8,  8,  8,	 3,	 2,	 1,	 0, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_ABGR8888},
+	//{ 	 32,  4,  8,  8,  8,  8,	 3,	 0,	 1,	 2, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_ARGB8888},
+	//{ 	 32,  4,  8,  8,  8,  8,	 2,	 1,	 0,	 3, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_BGRA8888},
+	//{	 32,  4,  8,  8,  8,  8,	 0,	 1,	 2,	-1,	vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_RGB888},
+	//{	 32,  4,  8,  8,  8,  8,	 2,	 1,	 0,	-1,	vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_BGR888},
+	//{ 	 16,  2,  5,  5,  5,  0,	 2,	 1,	 0,	-1, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_BGRX5551},
+	//{	  8,  1,  8,  8,  8,  0,	 0,	-1,	-1,	-1, vlFalse,  vlTrue,	ToLuminance,	FromLuminance,	IMAGE_FORMAT_LINEAR_I8},
+	//{	 64,  8, 16, 16, 16, 16,	 0,	 1,	 2,	 3, vlFalse,  vlTrue,	NULL,	NULL,		IMAGE_FORMAT_LINEAR_RGBA16161616}
+};
+*/
