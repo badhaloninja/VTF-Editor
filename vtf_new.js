@@ -776,9 +776,12 @@ function convertPixels(canvas, fwidth, fheight) {
 				}
 				blockPosition += 2; // block number*2 (for double arrays)
 			}
-		}
+		}//BM-Data
 	}
 	else if(outputType == VTFImageFormats.RGBA8888) { // RGBA8888; 0
+		outputImage[canvas] = pix.data;
+	}
+	else if(outputType == VTFImageFormats.ABGR8888) { // ABGR8888; 1
 		outputImage[canvas] = pix.data;
 	}
 	else if (outputType == VTFImageFormats.RGB888) {// RGB888; 2
@@ -798,6 +801,9 @@ function convertPixels(canvas, fwidth, fheight) {
 			pix.data[i+3] = 255;
 		}
 		reduceColors(pix, 5, 6, 5, 8, document.getElementById('ditherCheck').checked);
+		outputImage[canvas] = pix.data;
+	}
+	else if(outputType == VTFImageFormats.ARGB8888) { // ARGB8888; 11
 		outputImage[canvas] = pix.data;
 	}
 	else if(outputType == VTFImageFormats.BGRA8888) { // BGRA8888; 12
@@ -844,7 +850,7 @@ function createVTF() {
 	writeShort(header,18, height);*/
 	for (var i=0; i<header.length; i++) {
 		file[i] = header[i];
-	}
+	}//BM-Header
 	if (outputType == VTFImageFormats.DXT1) {//DXT1
 		for (var i=VTFOptions.HeaderSize; i<file.length; i+=8) {
 			var blockNum = (i-VTFOptions.HeaderSize)/4;
@@ -878,6 +884,19 @@ function createVTF() {
 			for (var j = 0; j < data.length; j++){
 				file[pos] = data[j];
 				pos++;
+			}
+		}
+	}
+	else if (outputType == VTFImageFormats.ABGR8888){//ABGR8888; 1 --test
+		var pos = VTFOptions.HeaderSize;
+		for (var i = outputImage.length-1; i >= 0; i--){
+			var data = outputImage[i];
+			for (var j = 0; j < data.length; j+=4){
+				file[pos] = data[j+3];
+				file[pos+1] = data[j+2];
+				file[pos+2] = data[j+1];
+				file[pos+3] = data[j];
+				pos+=4;
 			}
 		}
 	}
@@ -915,6 +934,19 @@ function createVTF() {
 			}
 		}
 	}
+	else if (outputType == VTFImageFormats.ARGB8888){//ARGB8888; 11 --test
+		var pos = VTFOptions.HeaderSize;
+		for (var i = outputImage.length-1; i >= 0; i--){
+			var data = outputImage[i];
+			for (var j = 0; j < data.length; j+=4){
+				file[pos] = data[j+3];
+				file[pos+1] = data[j];
+				file[pos+2] = data[j+1];
+				file[pos+3] = data[j+2];
+				pos+=4;
+			}
+		}
+	}
 	else if (outputType == VTFImageFormats.BGRA8888){//BGRA8888; 12 --test
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
@@ -926,7 +958,16 @@ function createVTF() {
 				file[pos+3] = data[j+3];
 				pos+=4;
 			}
-			
+		}
+	}
+	else if (outputType == VTFImageFormats.BGR565){//BGR565; 17 --inprogress
+		var pos = VTFOptions.HeaderSize;
+		for (var i = outputImage.length-1; i >= 0; i--){
+			var data = outputImage[i];
+			for (var j = 0; j < outputImage[i].length; j+=4){
+				writeShort(file,pos, ((data[j]>>3)) + ((data[j+1]>>2) << 5) + ((data[j+2]>>3 )<< 11)); //16
+				pos+=2;
+			}
 		}
 	}
 	else if (outputType == VTFImageFormats.BGRA4444){//BGRA4444; 19
@@ -954,18 +995,18 @@ function createVTF() {
 }
 
 //Utils
-function getEstFileSize(cmipmaps) {
+function getEstFileSize(cmipmaps) {//BM-Size
 	var mult = 1;
-	if (outputType == VTFImageFormats.RGBA8888){ // RGBA8888
+	if (outputType == VTFImageFormats.RGBA8888 || outputType == VTFImageFormats.ABGR8888 || outputType == VTFImageFormats.ARGB8888 || outputType == VTFImageFormats.BGRA8888){ // RGBA8888
 		mult = 4;
 	}
 	else if (outputType == VTFImageFormats.DXT1){ // DXT1
 		mult = 0.5;
 	}
-	else if (outputType == VTFImageFormats.RGB888){ // RGB888
+	else if (outputType == VTFImageFormats.RGB888 || outputType == VTFImageFormats.BGR888){ // RGB888, BGR888
 		mult = 3;
 	}
-	else if (outputType == VTFImageFormats.RGB565 || outputType == VTFImageFormats.BGRA5551 || outputType == VTFImageFormats.BGRA4444){ // RGB565; BGRA5551; BGRA4444
+	else if (outputType == VTFImageFormats.RGB565 || outputType == VTFImageFormats.BGR565 || outputType == VTFImageFormats.BGRA5551 || outputType == VTFImageFormats.BGRA4444){ // RGB565; BGRA5551; BGRA4444
 		mult = 2;
 	}
 	mult *= 1+ (1/3);
