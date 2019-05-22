@@ -317,23 +317,23 @@ function powerOfTwo(x) { return Math.log2(x) % 1 === 0; }
 //| (bMipmaps ? 0 : TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD);
 let VTFOptions = {
   //{Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0}
-  version: [7,2],
+  version: [7,1],
   width: 2,
   height: 2,
-  selectedFlags: ["CLAMPT","ANISOTROPIC","HINT_DXT5","SRGB","NOMIP","NOLOD","EIGHTBITALPHA"], //0x00000008, 0x00000010, 0x00000020, 0x00000040, 0x00000100, 0x00000200, 0x00002000
+  selectedFlags: ["CLAMPT","ANISOTROPIC","HINT_DXT5","SRGB","NOMIP","NOLOD"], //,"EIGHTBITALPHA" 0x00000008, 0x00000010, 0x00000020, 0x00000040, 0x00000100, 0x00000200, 0x00002000
   Frames: 1,
   StartFrame: 0,
   reflectivity: [1.0,1.0,1.0],
   BumpScale: 1.0,
-  ImageFormat: VTFImageFormats.RGBA8888,
+  ImageFormat: VTFImageFormats.RGB565,
   hasMipmaps: false,
-  MipCount: 0,
+  MipCount: 1,
   LowResImageFormat: -1,
   LowResImageWidth: 0,
   LowResImageHeight: 0,
   Depth: 1,
   ResourceCount: 0,
-  lumaWeights: [0.213,0.715,0.072],//[0.2126,0.7152,0.0722] ITU-R BT.709
+  lumaWeights: [0.213,0.715,0.072],//[0.2126,0.7152,0.0722], [0.299,0.587,0.114] ITU-R BT.709
   get HeaderSize() {
   return (this.version < [7,3]) ? 64 : 80
   },
@@ -752,7 +752,12 @@ export const VTFHEADER {
     unsigned int    numResources;        // Number of resources this vtf has
 }
 */
-
+let ToLuminance = null;
+let FromLuminance = null;
+let ToBlueScreen = null;
+let FromBlueScreen = null;
+let ToFP16 = null;
+let FromFP16 = null;
 const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badhaloninja/vtfedit/blob/master/VTFLib/VTFFile.cpp
   //[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
    0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, [ 0,  1,  2,  3], false,  true, [        null,           null]],        // IMAGE_FORMAT_RGBA8888,
@@ -822,5 +827,11 @@ typedef struct tagSVTFImageConvertInfo
 } SVTFImageConvertInfo;
 
 static SVTFImageConvertInfo VTFImageConvertInfo[] =
+<<<<<<< HEAD
 { 
 	*/
+=======
+{
+*/
+//[255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 0, 0, 0, 0] 
+>>>>>>> branch 'beta' of https://github.com/badhaloninja/VTF-Editor.git
