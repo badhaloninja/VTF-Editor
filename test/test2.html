@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="test.js"></script>
+<style>
+#FlagBox { width:320px;  }
+#FlagBoxContainer {height: 128px; overflow-y: scroll;}
+</style>
+</head>
+<body>
+<fieldset id="FlagBox">  
+<legend>Flags: </legend>  
+<div id="FlagBoxContainer">
+<input type="checkbox" class="GroupFoo" name="flagCheckBox" value="foo1">foo1<br>  
+<input type="checkbox" class="GroupBar"  name="flagCheckBox" value="bar1">bar1<br>  
+<input type="checkbox"  name="flagCheckBox" value="qar1">qar1<br>  
+<input type="checkbox" class="GroupPar"  name="flagCheckBox" value="par1">Par1<br>  
+<input type="checkbox" class="GroupFoo"  name="flagCheckBox" value="foo2">foo2<br>
+<input type="checkbox" class="GroupBar"  name="flagCheckBox" value="bar3">bar3<br>  
+<input type="checkbox" class="GroupPoo"  name="flagCheckBox" value="par2">par2<br>  
+<input type="checkbox" class="GroupBar"  name="flagCheckBox" value="bar4">bar4<br>  
+<input type="checkbox" class="GroupFoo"  name="flagCheckBox" value="foo4">foo4<br>    
+</div>
+</fieldset>  
+<br>  
+<div id="out"></div>
+</body>
+</html>
