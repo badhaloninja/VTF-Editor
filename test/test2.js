@@ -1,16 +1,22 @@
 var selected = [];
 $(document).ready(function(){
-$("input[name=flagCheckBox]").change(function()
-{
+	//document.getElementById("out").innerHTML = "apple"
+	Object.keys(TextureFlags).forEach(function(ImageFlag){
+	var classname = false
+     //(ImageFlag == "ONEBITALPHA" || ImageFlag == "EIGHTBITALPHA" || ImageFlag == "ENVMAP")? classname="formatsp":null;
+     //(ImageFlag == "POINTSAMPLE" || ImageFlag == "TRILINEAR" || ImageFlag == "ANISOTROPIC")? classname="sampling":null;
+     $("#FlagBoxContainer").append("<input type='checkbox'"+((classname != false)? "class='"+classname+"'": null)+"value='"+ImageFlag.toString()+"'>"+TextureFlags[ImageFlag].name+"<br> ")
+    })
+	
+$("#FlagBoxContainer").on( 'change', 'input', function(){
   console.log(this.className)
-  if (this.className == "GroupFoo"){
-    console.log("oof")
-  $(".GroupFoo").prop('checked',false);
+  if (this.className == "sampling"){
+  $(". sampling").prop('checked',false);
   $(this).prop('checked',true);
-  $(".GroupFoo").not(this).prop('checked', false);
+  $(".sampling").not(this).prop('checked', false);
   }
    selected = [];
-   $('input[name=flagCheckBox]:checked').each(function() {
+   $('#FlagBoxContainer input').each(function() {
    selected.push($(this).attr('value'));
    });
   document.getElementById("out").innerHTML = "\n"
@@ -19,6 +25,18 @@ $("input[name=flagCheckBox]").change(function()
   });
 });
 });
+/*
+<input type="checkbox" class="GroupFoo" name="flagCheckBox" value="foo1">foo1<br>  
+<input type="checkbox" class="GroupBar"  name="flagCheckBox" value="bar1">bar1<br>  
+<input type="checkbox"  name="flagCheckBox" value="qar1">qar1<br>  
+<input type="checkbox" class="GroupPar"  name="flagCheckBox" value="par1">Par1<br>  
+<input type="checkbox" class="GroupFoo"  name="flagCheckBox" value="foo2">foo2<br>
+<input type="checkbox" class="GroupBar"  name="flagCheckBox" value="bar3">bar3<br>  
+<input type="checkbox" class="GroupPoo"  name="flagCheckBox" value="par2">par2<br>  
+<input type="checkbox" class="GroupBar"  name="flagCheckBox" value="bar4">bar4<br>  
+<input type="checkbox" class="GroupFoo"  name="flagCheckBox" value="foo4">foo4<br>    
+*/
+
 /*//#FlagBox { border:2px solid #ccc; width:320px; height: 128px; overflow-y: scroll; }
   $(".GroupFoo").prop('checked',false);
   $(this).prop('checked',true);*/
