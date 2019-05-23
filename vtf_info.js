@@ -314,7 +314,7 @@ const TextureFlags = {
 function powerOfTwo(x) { return Math.log2(x) % 1 === 0; }
 //(VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel == 1 ? TextureFlags.ONEBITALPHA : 0) | (VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel > 1 ? TextureFlags.EIGHTBITALPHA : 0) | (this->GetImageFormatInfo(ImageFormat).uiAlphaBitsPerPixel > 1 ? TEXTUREFLAGS_EIGHTBITALPHA : 0)
 //| (uiFaces == 1 ? 0 : TEXTUREFLAGS_ENVMAP)
-//| (bMipmaps ? 0 : TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD);
+//| (bMipmaps ? 0 : TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD);/
 let VTFOptions = {
   //{Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0}
   version: [7,1],
@@ -790,20 +790,20 @@ const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badh
   get Supported(){
     var tmp=[]
     Object.values(VTFImageFormatInfo).forEach(function(entry,i){
-      entry[8] ? tmp.push(i) : null;
+      entry[9] ? tmp.push(i) : null;
     })
     return tmp
   },
-  getInfo: function(Format) {
-    var info=this[Format]
+  getInfo(format=VTFOptions.ImageFormat) {
+    var info=this[format]
     var tmp={Name:info[0], BitsPerPixel:info[1], BytesPerPixel:info[2], RedBitsPerPixel:info[3], GreenBitsPerPixel:info[4], BlueBitsPerPixel:info[5], AlphaBitsPerPixel:info[6], RGBAIndex:info[7], IsCompressed:info[8], IsSupported:info[9], TransformProc:info[10]}
     return tmp
   }
 };
-Object.defineProperty(VTFImageFormatInfo, 'getSupported', {
+Object.defineProperty(VTFImageFormatInfo, 'Supported', {
   enumerable: false
 });
-Object.defineProperty(VTFImageFormatInfo, 'getInfo', {
+Object.defineProperty(VTFImageFormatInfo, 'Info', {
   enumerable: false
 });
 /*
@@ -830,8 +830,13 @@ static SVTFImageConvertInfo VTFImageConvertInfo[] =
 <<<<<<< HEAD
 { 
 	*/
-=======
-{
-*/
 //[255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 0, 0, 0, 0] 
->>>>>>> branch 'beta' of https://github.com/badhaloninja/VTF-Editor.git
+var content = {
+      0:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0]",
+    2:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,2,0,0,0,1,255,255,255,255,0,0,1,255,0,0,0,255,0,0,0,255,0,0,0]",
+    12:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,12,0,0,0,1,255,255,255,255,0,0,1,0,0,255,255,0,255,0,255,255,0,0,255,0,0,0,0]",
+    17:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,17,0,0,0,1,255,255,255,255,0,0,1,0,248,224,7,31,0,0,0];"
+  }
+
+
+

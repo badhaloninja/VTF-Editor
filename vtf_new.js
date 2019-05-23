@@ -1,119 +1,45 @@
-//import { VTFImageFormats, ImageFormatInfo, TextureFlags } from './vtf_info.js';
 var colorTable = [];
 var pixelTable = [];
 var alphaValueTable = [];
 var alphaLookupTable = [];
 var blockCount = 65280;
-var width = 2;
-var height = 2;
-var hasMipmaps = false;
-var mipmapCount = 0;
 var blockPosition = 0;
-var frameCount = 1;
 var frames = [];
 var currFrame = 0;
 var imagesLoaded = 0;
 var singleImageAnim = false;
 var mipmaps = [document.createElement('canvas')];
 var converted = false;
-var outputType = 0;
 var outputImage = [];
 var shortened = false;
 var colorSqrt = false;
 var forceDither = false;
 var colorDifference = 0;
-var version = [7,1];
-var lumaWeights = [0.213,0.715,0.072];//[0.2126,0.7152,0.0722] ITU-R BT.709
 var sampling = "0";
-var flags = "35";
-var content = {
-	    0:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0]",
-		2:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,2,0,0,0,1,255,255,255,255,0,0,1,255,0,0,0,255,0,0,0,255,0,0,0]",
-		12:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,12,0,0,0,1,255,255,255,255,0,0,1,0,0,255,255,0,255,0,255,255,0,0,255,0,0,0,0]",
-		17:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,17,0,0,0,1,255,255,255,255,0,0,1,0,248,224,7,31,0,0,0];"
-	}
-
-var selectedFlags = ["CLAMPT","ANISOTROPIC","HINT_DXT5","SRGB","NOMIP","NOLOD","EIGHTBITALPHA"]
-/*
-const VTFImageFormats = {
-	'-1': 'NONE',
-    0: 'RGBA8888',
-    1: 'ABGR8888',
-    2: 'RGB888',
-    3: 'BGR888',
-    4: 'RGB565',
-    5: 'I8',
-    6: 'IA88',
-    7: 'P8',
-    8: 'A8',
-    9: 'RGB888_BLUESCREEN',
-    10: 'BGR888_BLUESCREEN',
-    11: 'ARGB8888',
-    12: 'BGRA8888',
-    13: 'DXT1',
-    14: 'DXT3',
-    15: 'DXT5',
-    16: 'BGRX8888',
-    17: 'BGR565',
-    18: 'BGRX5551',
-    19: 'BGRA4444',
-    20: 'DXT1_ONEBITALPHA',
-    21: 'BGRA5551',
-    22: 'UV88',
-    23: 'UVWQ8888',
-    24: 'RGBA16161616F',
-    25: 'RGBA16161616',
-    26: 'UVLX8888',
-	NONE:-1,
-    RGBA8888:0,
-    ABGR8888:1,
-    RGB888:2,
-    BGR888:3,
-    RGB565:4,
-    I8:5,
-    IA88:6,
-    P8:7,
-    A8:8,
-    RGB888_BLUESCREEN:9,
-    BGR888_BLUESCREEN:10,
-    ARGB8888:11,
-    BGRA8888:12,
-    DXT1:13,
-    DXT3:14,
-    DXT5:15,
-    BGRX8888:16,
-    BGR565:17,
-    BGRX5551:18,
-    BGRA4444:19,
-    DXT1_ONEBITALPHA:20,
-    BGRA5551:21,
-    UV88:22,
-    UVWQ8888:23,
-    RGBA16161616F:24,
-    RGBA16161616:25,
-    UVLX8888:26
-};*/
 setResolution();
 $(document).ready(function(){
+	VTFImageFormatInfo.Supported.forEach(function(entry,i){
+	document.getElementById('format').innerHTML = ((i==0)? "" : document.getElementById('format').innerHTML)+"<option value="+entry+((i==0)?" selected" : "")+">"+VTFImageFormatInfo.getInfo(entry).Name+"</option>\n"
+	})
   $('#widthSetting').change(function(){
-    width = (this).value;
+    VTFOptions.width = (this).value;
     setResolution()
   });
   $('#heightSetting').change(function(){
-    height = (this).value;
+    VTFOptions.height = (this).value;
     setResolution()
   });
   $('#versonSetting').change(function(){
-  	version = (this).value.split(".");
+  	VTFOptions.version = (this).value.split(".");
   });
   $('#format').change(function(){
-  	outputType = (this).value;
-	if ((this).value != VTFImageFormats.RGBA8888 && (this).value != VTFImageFormats.RGBA8888)
+  	VTFOptions.ImageFormat = +(this).value;
+	if (VTFOptions.ImageFormat != VTFImageFormats.RGBA8888 && VTFOptions.ImageFormat != VTFImageFormats.RGBA8888)
 		document.getElementById('ditherBlock').style.display = "block";
 	else {
 		document.getElementById('ditherBlock').style.display = "none";
     }
-	if ((this).value == VTFImageFormats.DXT1 || (this).value == VTFImageFormats.DXT5){
+	if (VTFOptions.ImageFormat == VTFImageFormats.DXT1 || VTFOptions.ImageFormat == VTFImageFormats.DXT5){
 		document.getElementById('dxtSettings').style.display = "block";
 	}
 	else {
@@ -136,7 +62,7 @@ function setResolution() {
 	alphaValueTable = [];
 	alphaLookupTable = [];
 	blockCount = 65280;
-	mipmapCount = 0;
+	VTFOptions.MipCount = 0;
 	blockPosition = 0;
 	currFrame = 0;
 	//imagesLoaded = 0;
@@ -158,13 +84,13 @@ function setResolution() {
 		document.getElementById("mipmapsCheck").disabled = false;
 	}*/
 	check();
-	mipmaps[0].width = width;
-	mipmaps[0].height = height;
-	document.getElementById('preview').getContext("2d").clearRect(0,0,width,height);
-	document.getElementById("contentWrapper").style.width = width+"px";
-	document.getElementById("contentWrapper").style.height = height+"px";
+	mipmaps[0].width = VTFOptions.width;
+	mipmaps[0].height = VTFOptions.height;
+	document.getElementById('preview').getContext("2d").clearRect(0,0,512,512);
+	document.getElementById("contentWrapper").style.width = 512+"px";
+	document.getElementById("contentWrapper").style.height = 512+"px";
 	document.getElementById("files").value = "";
-	mipmaps[0].getContext("2d").clearRect(0,0,width,height);
+	mipmaps[0].getContext("2d").clearRect(0,0,VTFOptions.width,VTFOptions.height);
 	if (frames.length > 0){
 		createCanvas();
 		document.getElementById('convertButton').disabled = false;
@@ -180,10 +106,10 @@ function setResolution() {
 function check() {
 	if (getEstFileSize(false)/1024 >= 512 && getEstFileSize(false)/1024 < 513){
 		shortened = true;
-		document.getElementById("resolutionNotice").innerHTML = "Changed to "+(width-4)+"x"+height;
+		document.getElementById("resolutionNotice").innerHTML = "Changed to "+(VTFOptions.width-4)+"x"+VTFOptions.height;
 		document.getElementById("resolutionNotice").style.visibility = "visible";
 	}
-	else if (shortened && getEstFileSize(false)/1024 < ((width - 4) / width) * 512 - 1){
+	else if (shortened && getEstFileSize(false)/1024 < ((VTFOptions.width - 4) / VTFOptions.width) * 512 - 1){
 		shortened = false;
 		document.getElementById("resolutionNotice").innerHTML = "";
 		document.getElementById("resolutionNotice").style.visibility = "hidden";
@@ -199,13 +125,13 @@ function check() {
 	/*showMipmap(document.getElementById("mipmapsCheck"));*/
 }
 setInterval(function(){
-	if (frameCount > 1 && (imagesLoaded == frameCount || singleImageAnim)) {
+	if (VTFOptions.Frames > 1 && (imagesLoaded == VTFOptions.Frames || singleImageAnim)) {
 		//console.log("ffd")
-		if (++currFrame >= frameCount)
+		if (++currFrame >= VTFOptions.Frames)
 			currFrame = 0;
-			var mipwidth = width;
-			var mipheight = height;
-		for(var i = 0; i <= mipmapCount; i++) {
+			var mipwidth = VTFOptions.width;
+			var mipheight = VTFOptions.height;
+		for(var i = 0; i <= VTFOptions.MipCount; i++) {
 
 			generatePreview(i, mipwidth, mipheight);
 			mipwidth /= 2;
@@ -214,7 +140,11 @@ setInterval(function(){
 	}
 	var filesize = getEstFileSize(true)/1024;
 	if (filesize < 512)
+		if (filesize > 1){
 		document.getElementById('filesizee').innerHTML = "Estimated file size: <span style='color:green'>"+filesize+"</span> [KB]";
+		} else {
+		document.getElementById('filesizee').innerHTML = "Estimated file size: <span style='color:green'>"+filesize*1000+"</span> [B]";
+		}
 	else
 		document.getElementById('filesizee').innerHTML = "Estimated file size: <span style='color:red'>"+filesize+"</span> [KB]";
 
@@ -240,7 +170,7 @@ function handleFileSelect(evt) {
 	document.getElementById('files0').disabled = true;
 
 
-	frameCount = files.length;
+	VTFOptions.Frames = files.length;
 	frames = [];
 	frames[0] = [];
 
@@ -252,10 +182,10 @@ function handleFileSelect(evt) {
 			reader.fileType = files[i].type;
 
 			reader.onload = (function(e) {
-					console.log(this.fileType);
+					//console.log(this.fileType);
 					var img = new Image();
 					if (this.fileType == "image/gif"){
-						frameCount = 0;
+						VTFOptions.Frames = 0;
 						var gif = new SuperGif( {gif: img, auto_play: false});
 						gif.load_raw(new Uint8Array(e.target.result), function (el) {handleGifLoad(gif, frames[0]); check(); createCanvas();});
 					}
@@ -263,10 +193,10 @@ function handleFileSelect(evt) {
 						var tga = new TGA();
 						tga.load(new Uint8Array(e.target.result));
 						if (singleImageAnim)
-							frameCount = img.height / height;
+							VTFOptions.Frames = img.height / VTFOptions.height;
 						imagesLoaded += 1;
 						frames[0].push(tga.getCanvas());
-						if (imagesLoaded == frameCount) {
+						if (imagesLoaded == VTFOptions.Frames) {
 							check();
 							createCanvas();
 						}
@@ -276,10 +206,10 @@ function handleFileSelect(evt) {
 
 						img.onload = function () {
 							if (singleImageAnim)
-								frameCount = img.height / height;
+								VTFOptions.Frames = img.height / VTFOptions.height;
 							imagesLoaded += 1;
 							frames[0].push(img);
-							if (imagesLoaded == frameCount) {
+							if (imagesLoaded == VTFOptions.Frames) {
 								check();
 								createCanvas();
 							}
@@ -298,7 +228,7 @@ function handleFileSelect(evt) {
 
 		}
 	}
-	mipmaps[0].getContext("2d").clearRect(0,0,width,height);
+	mipmaps[0].getContext("2d").clearRect(0,0,VTFOptions.width,VTFOptions.height);
 }
 
 
@@ -329,10 +259,10 @@ function generatePreview(index, cwidth, cheight) {
 function setSingleFrame() {
 	singleImageAnim = document.getElementById('singleFrame').checked;
 	if (singleImageAnim && frames[0]) {
-		frameCount = frames[0].height / height;
+		VTFOptions.Frames = frames[0].height / VTFOptions.height;
 	}
 	else {
-		frameCount = frames.length;
+		VTFOptions.Frames = frames.length;
 	}
 }
 
@@ -340,7 +270,7 @@ function generateCanvas(ccanvas, cwidth, cheight) {
 
 	var canvas = mipmaps[ccanvas];
 	canvas.width = cwidth;
-	canvas.height = cheight * frameCount;
+	canvas.height = cheight * VTFOptions.Frames;
 
 	if (singleImageAnim) {
 		var fimg = frames[ccanvas][0];
@@ -349,7 +279,7 @@ function generateCanvas(ccanvas, cwidth, cheight) {
 		canvas.getContext('2d').drawImage(fimg, cwidth/2-fimg.width * scale /2, 0, fimg.width * scale, fimg.height * scale);
 	}
 	else {
-		for (var frame = 0; frame < frameCount; frame++ ){
+		for (var frame = 0; frame < VTFOptions.Frames; frame++ ){
 			var fimg = frames[ccanvas][frame];
 			var scale = 1;
 			if (document.getElementById("rescaleCheck").checked)
@@ -363,31 +293,31 @@ function generateCanvas(ccanvas, cwidth, cheight) {
 function createCanvas() { // put centered image on canvas
 	if (frames.length == 0)
 		return;
-	mipmapCount = 0;
-	generateCanvas(0, width, height);
-	generatePreview(0, width, height);
-	var mipwidth = width;
+	VTFOptions.MipCount = 0;
+	generateCanvas(0, VTFOptions.width, VTFOptions.height);
+	generatePreview(0, VTFOptions.width, VTFOptions.height);
+	var mipwidth = VTFOptions.width;
 	var mipheight = getTotalImageHeight();
 	var mipmapsHTML = "";
 	//hasMipmaps = 1;
-	for (var i=2; (width/i>=4) && (height/i>=4); i*=2) {
-		mipmapCount++;
+	for (var i=2; (VTFOptions.width/i>=4) && (VTFOptions.height/i>=4); i*=2) {
+		VTFOptions.MipCount++;
 		mipmaps.push(document.createElement('canvas'));
-		mipmapsHTML += "<div id=\"inputWrapper"+mipmapCount+"\"></div>\n<canvas class=\"mipmapElement\" id=\"canvasMipmap"+mipmapCount+"\"></canvas><br /><input type=\"file\" id=\"files"+mipmapCount+"\" name=\"files[]\" accept=\"image/*\" onchange=\"changeMipmap(event,"+mipmapCount+")\" multiple/>\n";
+		mipmapsHTML += "<div id=\"inputWrapper"+VTFOptions.MipCount+"\"></div>\n<canvas class=\"mipmapElement\" id=\"canvasMipmap"+VTFOptions.MipCount+"\"></canvas><br /><input type=\"file\" id=\"files"+VTFOptions.MipCount+"\" name=\"files[]\" accept=\"image/*\" onchange=\"changeMipmap(event,"+VTFOptions.MipCount+")\" multiple/>\n";
 	}
 	document.getElementById("mipmaps").innerHTML = mipmapsHTML;
-	for (var i=1; i<=mipmapCount; i++) {
+	for (var i=1; i<=VTFOptions.MipCount; i++) {
 		mipwidth /= 2;
 		mipheight /= 2;
 		mipmaps[i].width = mipwidth;
 		mipmaps[i].height = mipheight;
 		document.getElementById('canvasMipmap'+i).width = mipwidth;
-		document.getElementById('canvasMipmap'+i).height = mipheight / frameCount;
+		document.getElementById('canvasMipmap'+i).height = mipheight / VTFOptions.Frames;
 		if (!frames[i])
 			mipmaps[i].getContext('2d').drawImage(mipmaps[(i-1)],0, 0, mipwidth, mipheight);
 		else
-			generateCanvas(i, mipwidth, mipheight / frameCount);
-		generatePreview(i, mipwidth, mipheight / frameCount);
+			generateCanvas(i, mipwidth, mipheight / VTFOptions.Frames);
+		generatePreview(i, mipwidth, mipheight / VTFOptions.Frames);
 	}
 }
 
@@ -396,15 +326,15 @@ function convert() {
 	document.body.style.cursor = "wait";
 	createCanvas();
 	blockCount = 0;
-	if (hasMipmaps)
-		for (var i=0; i>0; i--) convertPixels(i,width/(Math.pow(2,i)),getTotalImageHeight()/(Math.pow(2,i)));
-	convertPixels(0, width, getTotalImageHeight());
+	if (VTFOptions.hasMipmaps)
+		for (var i=0; i>0; i--) convertPixels(i,VTFOptions.width/(Math.pow(2,i)),getTotalImageHeight()/(Math.pow(2,i)));
+	convertPixels(0, VTFOptions.width, getTotalImageHeight());
 	converted = true;
 	//document.getElementById('inputWrapper').style.display = "none";
 	document.getElementById('saveButton').disabled = false;
 	document.getElementById('files0').disabled = false;
 	document.body.style.cursor = "auto";
-	generatePreview(0,width, height);
+	generatePreview(0,VTFOptions.width, VTFOptions.height);
 }
 
 
@@ -418,8 +348,8 @@ function changeMipmap(evt,mipmapNumber) { // this code, it scares me
 	document.getElementById('saveButton').disabled = true;
 
 	var mipimages = 0;
-	var cwidth = width/(Math.pow(2,mipmapNumber));
-	var cheight = height/(Math.pow(2,mipmapNumber));
+	var cwidth = VTFOptions.width/(Math.pow(2,mipmapNumber));
+	var cheight = VTFOptions.height/(Math.pow(2,mipmapNumber));
 	frames[mipmapNumber] = [];
 	for (var i = 0; i < files.length && i < imagesLoaded; i++ ) {
 		if (files[i] && files[i].type.match('image.*')) {
@@ -478,7 +408,7 @@ function loadMipmaps(mipmapNumber, cwidth, cheight) {
 			frames[mipmapNumber].push(frames[mipmapNumber][j % init]);
 		}
 	}
-	mipmaps[mipmapNumber].getContext("2d").clearRect(0,0,cwidth,cheight * frameCount);
+	mipmaps[mipmapNumber].getContext("2d").clearRect(0,0,cwidth,cheight * VTFOptions.Frames);
 	generateCanvas(mipmapNumber, cwidth, cheight);
 	generatePreview(mipmapNumber, cwidth, cheight);
 
@@ -493,28 +423,28 @@ function loadMipmaps(mipmapNumber, cwidth, cheight) {
 	}
 	return mipmapCount;
 }*/
-function setOutputType(el){
-	outputType = el.value;
-	if (el.value != 0 && el.value != 2)
+/*function setOutputType(el){
+	VTFOptions.ImageFormat = +el.value;
+	if (+el.value != 0 && +el.value != 2)
 		document.getElementById('ditherBlock').style.display = "block";
 	else
 		document.getElementById('ditherBlock').style.display = "none";
 
-	if (el.value == 13 || el.value == 15){
+	if (+el.value == 13 || +el.value == 15){
 		document.getElementById('dxtSettings').style.display = "block";
 	}
 	else
 		document.getElementById('dxtSettings').style.display = "none";
 	check();
 	createCanvas();
-}
+}*/
 
 function convertPixels(canvas, fwidth, fheight) {
 	if (shortened)
 		fwidth = fwidth - 4;
 	var pix = mipmaps[canvas].getContext("2d").getImageData(mipmaps[canvas].width/2 - fwidth/2, 0, fwidth, fheight);
-	console.log(pix)
-	if (outputType == VTFImageFormats.DXT1 || outputType == VTFImageFormats.DXT5) { // DXT1; DXT5
+	//console.log(pix)
+	if (VTFOptions.ImageFormat == VTFImageFormats.DXT1 || VTFOptions.ImageFormat == VTFImageFormats.DXT5) { // DXT1; DXT5
 		for (var b=0; b<=2; b++) {
 			if (document.getElementById("brightnessform")[b].checked) var brightness = b;
 		}
@@ -543,8 +473,8 @@ function convertPixels(canvas, fwidth, fheight) {
 				for (var y=0; y<4; y++) { // pixel rows in block
 					for (var x=0; x<16; x+=4) { // pixel columns in block
 						position = x+(fwidth*4*y)+(16*i)+(fwidth*16*j); // position of a pixel in canvas
-						var luma = (lumaWeights[0]*pix.data[position])+(lumaweights[1]*pix.data[position+1])+(lumaweights[2]*pix.data[position+2]); // ITU-R BT.709
-						if (pix.data[position+3] > 127 || outputType == VTFImageFormats.DXT5) { // find most different colors, unless transparent; DXT5
+						var luma = (VTFOptions.lumaWeights[0]*pix.data[position])+(VTFOptions.lumaWeights[1]*pix.data[position+1])+(VTFOptions.lumaWeights[2]*pix.data[position+2]); // ITU-R BT.709
+						if (pix.data[position+3] > 127 || VTFOptions.ImageFormat == VTFImageFormats.DXT5) { // find most different colors, unless transparent; DXT5
 							if (luma > lumaMax) {
 								lumaMax = luma;
 								pixelMax[0] = pix.data[position];
@@ -654,7 +584,7 @@ function convertPixels(canvas, fwidth, fheight) {
 								pix.data[position+2] = palette[trans][2];
 							}
 							else{
-								var luma = (lumaWeights[0]*pix.data[position])+(lumaweights[1]*pix.data[position+1])+(lumaweights[2]*pix.data[position+2]); // ITU-R BT.709
+								var luma = (VTFOptions.lumaWeights[0]*pix.data[position])+(VTFOptions.lumaWeights[1]*pix.data[position+1])+(VTFOptions.lumaWeights[2]*pix.data[position+2]); // ITU-R BT.709
 								if (luma < lumaBelow) {
 									pix.data[position] = pixelMin[0];
 									pix.data[position+1] = pixelMin[1];
@@ -684,7 +614,7 @@ function convertPixels(canvas, fwidth, fheight) {
 									else pixelTable[blockPosition+1] += pixelOrder[3] << 2*((x/4)+(4*(y-2)));
 								}
 							}
-							if (outputType == VTFImageFormats.DXT1) // DXT1
+							if (VTFOptions.ImageFormat == VTFImageFormats.DXT1) // DXT1
 								pix.data[position+3] = 255;
 							else {
 								var alphanum = 0;
@@ -719,7 +649,7 @@ function convertPixels(canvas, fwidth, fheight) {
 					for (var y=0; y<4; y++) {
 						for (var x=0; x<16; x+=4) {
 							position = x+(fwidth*4*y)+(16*i)+(fwidth*16*j);
-							var luma = (lumaWeights[0]*pix.data[position])+(lumaweights[1]*pix.data[position+1])+(lumaweights[2]*pix.data[position+2]); // ITU-R BT.709
+							var luma = (VTFOptions.lumaWeights[0]*pix.data[position])+(VTFOptions.lumaWeights[1]*pix.data[position+1])+(VTFOptions.lumaWeights[2]*pix.data[position+2]); // ITU-R BT.709
 							if (pix.data[position+3] < 128) {
 								pix.data[position+3] = 0;
 								if (y<2) pixelTable[blockPosition] += pixelOrder[3] << 2*((x/4)+(4*y));
@@ -778,49 +708,49 @@ function convertPixels(canvas, fwidth, fheight) {
 			}
 		}//BM-Data
 	}
-	else if(outputType == VTFImageFormats.RGBA8888) { // RGBA8888; 0
+	else if(VTFOptions.ImageFormat == VTFImageFormats.RGBA8888) { // RGBA8888; 0
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == VTFImageFormats.ABGR8888) { // ABGR8888; 1
+	else if(VTFOptions.ImageFormat == VTFImageFormats.ABGR8888) { // ABGR8888; 1
 		outputImage[canvas] = pix.data;
 	}
-	else if (outputType == VTFImageFormats.RGB888) {// RGB888; 2
+	else if (VTFOptions.ImageFormat == VTFImageFormats.RGB888) {// RGB888; 2
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		outputImage[canvas] = pix.data;
 	}
-	else if (outputType == VTFImageFormats.BGR888) {// BGR888; 3
+	else if (VTFOptions.ImageFormat == VTFImageFormats.BGR888) {// BGR888; 3
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == VTFImageFormats.RGB565) { // RGB565; 4
-		for (var i = 0; i < pix.data.length; i += 4){
-			pix.data[i+3] = 255;
-		}
-		reduceColors(pix, 5, 6, 5, 8, document.getElementById('ditherCheck').checked);
-		outputImage[canvas] = pix.data;
-	}
-	else if(outputType == VTFImageFormats.ARGB8888) { // ARGB8888; 11
-		outputImage[canvas] = pix.data;
-	}
-	else if(outputType == VTFImageFormats.BGRA8888) { // BGRA8888; 12
-		outputImage[canvas] = pix.data;
-	}
-	else if(outputType == VTFImageFormats.BGR565) { // BGR565; 17
+	else if(VTFOptions.ImageFormat == VTFImageFormats.RGB565) { // RGB565; 4
 		for (var i = 0; i < pix.data.length; i += 4){
 			pix.data[i+3] = 255;
 		}
 		reduceColors(pix, 5, 6, 5, 8, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == VTFImageFormats.BGRA4444) { // BGRA4444; 19
+	else if(VTFOptions.ImageFormat == VTFImageFormats.ARGB8888) { // ARGB8888; 11
+		outputImage[canvas] = pix.data;
+	}
+	else if(VTFOptions.ImageFormat == VTFImageFormats.BGRA8888) { // BGRA8888; 12
+		outputImage[canvas] = pix.data;
+	}
+	else if(VTFOptions.ImageFormat == VTFImageFormats.BGR565) { // BGR565; 17
+		for (var i = 0; i < pix.data.length; i += 4){
+			pix.data[i+3] = 255;
+		}
+		reduceColors(pix, 5, 6, 5, 8, document.getElementById('ditherCheck').checked);
+		outputImage[canvas] = pix.data;
+	}
+	else if(VTFOptions.ImageFormat == VTFImageFormats.BGRA4444) { // BGRA4444; 19
 		reduceColors(pix, 4, 4, 4, 4, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
-	else if(outputType == VTFImageFormats.BGRA5551) { //BGRA5551; 21
+	else if(VTFOptions.ImageFormat == VTFImageFormats.BGRA5551) { //BGRA5551; 21
 		reduceColors(pix, 5, 5, 5, 1, document.getElementById('ditherCheck').checked);
 		outputImage[canvas] = pix.data;
 	}
@@ -829,21 +759,23 @@ function convertPixels(canvas, fwidth, fheight) {
 
 function createVTF() {
 	var size = 0;
-	if (outputType == VTFImageFormats.DXT1) // DXT1
+	if (VTFOptions.ImageFormat == VTFImageFormats.DXT1) // DXT1
 		size = (blockCount*8);
-	if (outputType == VTFImageFormats.DXT5) //DXT5
+	if (VTFOptions.ImageFormat == VTFImageFormats.DXT5) //DXT5
 		size = (blockCount*16);
 	else {
 		for (var i = 0; i < outputImage.length; i++){
 			size += outputImage[i].length;
 		}
-		console.log("blockCount: "+blockCount);
-		console.log("size: "+size);
-	}
-	var file = new Uint8Array(size+VTFOptions.HeaderSize);
-	console.log("save: "+width+" "+height+" "+ size);
+		//console.log("blockCount: "+blockCount);
+		//console.log("size: "+size);
+	} (2*2)*2
+	if (VTFOptions.ImageFormat == VTFImageFormats.RGB565 /*4*/|| VTFOptions.ImageFormat == VTFImageFormats.BGR565)
+
+	var file = new Uint8Array(size+VTFOptions.HeaderSize-((VTFImageFormatInfo.getInfo().AlphaBitsPerPixel==0) ? (VTFOptions.width*VTFOptions.height)*2 : 0));
+	//console.log("save: "+width+" "+height+" "+ size);
  //var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1]; 	var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + document.getElementById("sampling").value,35-hasMipmaps,0,0,frameCount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,outputType,0,0,0,hasMipmaps ? getReducedMipmapCount()+1 : 1,13,0,0,0,0,0,1]; // 64B (bare minimum) 13,0,0,0,0,0,1];
-	var header = getHeader().Array
+	var header = Array.from(getHeader().Array)
 	//var header = [86,84,70,0,version[0],0,0,0,version[1],0,0,0,64,0,0,0,0,0,0,0,12 + sampling,flags,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,outputType,0,0,0,1,255,255,255,255,0,0,1];
 // signature[4],version[8],size[4],width[2],height[2],flags[4],frames[?],firstframe[?],padding[4],
 /* writeShort(header,16, shortened ? width - 4 : width); //writeShort(header,16, bool ? then : else); (n,16,2)
@@ -851,7 +783,7 @@ function createVTF() {
 	for (var i=0; i<header.length; i++) {
 		file[i] = header[i];
 	}//BM-Header
-	if (outputType == VTFImageFormats.DXT1) {//DXT1
+	if (VTFOptions.ImageFormat == VTFImageFormats.DXT1) {//DXT1
 		for (var i=VTFOptions.HeaderSize; i<file.length; i+=8) {
 			var blockNum = (i-VTFOptions.HeaderSize)/4;
 			writeShort(file, i, colorTable[blockNum]);
@@ -861,7 +793,7 @@ function createVTF() {
 
 		}
 	}
-	else if (outputType == VTFImageFormats.DXT5) {//DXT5
+	else if (VTFOptions.ImageFormat == VTFImageFormats.DXT5) {//DXT5
 		for (var i=VTFOptions.HeaderSize; i<file.length; i+=16) {
 			var blockNum = (i-VTFOptions.HeaderSize)/8;
 
@@ -877,7 +809,7 @@ function createVTF() {
 			writeShort(file, i+14, pixelTable[blockNum+1]);
 		}
 	}
-	else if (outputType == VTFImageFormats.RGBA8888){//RGBA8888; 0
+	else if (VTFOptions.ImageFormat == VTFImageFormats.RGBA8888){//RGBA8888; 0
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -887,7 +819,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == VTFImageFormats.ABGR8888){//ABGR8888; 1 --test
+	else if (VTFOptions.ImageFormat == VTFImageFormats.ABGR8888){//ABGR8888; 1 --test
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -900,7 +832,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == VTFImageFormats.RGB888){//RGB888; 2
+	else if (VTFOptions.ImageFormat == VTFImageFormats.RGB888){//RGB888; 2
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -912,7 +844,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == VTFImageFormats.BGR888){//BGR888; 3 --test
+	else if (VTFOptions.ImageFormat == VTFImageFormats.BGR888){//BGR888; 3 --test
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -924,17 +856,19 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == VTFImageFormats.RGB565){//RGB565; 4
+	else if (VTFOptions.ImageFormat == VTFImageFormats.RGB565){//RGB565; 4
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
+			console.log(pos,i,j)
 			for (var j = 0; j < outputImage[i].length; j+=4){
 				writeShort(file,pos, ((data[j]>>3)) + ((data[j+1]>>2) << 5) + ((data[j+2]>>3 )<< 11));
 				pos+=2;
+				
 			}
 		}
 	}
-	else if (outputType == VTFImageFormats.ARGB8888){//ARGB8888; 11 --test
+	else if (VTFOptions.ImageFormat == VTFImageFormats.ARGB8888){//ARGB8888; 11 --test
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -947,7 +881,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == VTFImageFormats.BGRA8888){//BGRA8888; 12 --test
+	else if (VTFOptions.ImageFormat == VTFImageFormats.BGRA8888){//BGRA8888; 12 --test
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -960,17 +894,17 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == VTFImageFormats.BGR565){//BGR565; 17 --inprogress
+	else if (VTFOptions.ImageFormat == VTFImageFormats.BGR565){//BGR565; 17 --inprogress
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
 			for (var j = 0; j < outputImage[i].length; j+=4){
-				writeShort(file,pos, ((data[j]>>3)) + ((data[j+1]>>2) << 5) + ((data[j+2]>>3 )<< 11)); //16
+				writeShort(file,pos, ((data[j+2]>>3)) + ((data[j+1]>>2) << 5) + ((data[j]>>3 )<< 11)); //16
 				pos+=2;
 			}
 		}
 	}
-	else if (outputType == VTFImageFormats.BGRA4444){//BGRA4444; 19
+	else if (VTFOptions.ImageFormat == VTFImageFormats.BGRA4444){//BGRA4444; 19
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -980,7 +914,7 @@ function createVTF() {
 			}
 		}
 	}
-	else if (outputType == VTFImageFormats.BGRA5551){//BGRA5551; 21
+	else if (VTFOptions.ImageFormat == VTFImageFormats.BGRA5551){//BGRA5551; 21
 		var pos = VTFOptions.HeaderSize;
 		for (var i = outputImage.length-1; i >= 0; i--){
 			var data = outputImage[i];
@@ -997,17 +931,17 @@ function createVTF() {
 //Utils
 function getEstFileSize(cmipmaps) {//BM-Size
 	var mult = 1;
-	if (outputType == VTFImageFormats.RGBA8888 || outputType == VTFImageFormats.ABGR8888 || outputType == VTFImageFormats.ARGB8888 || outputType == VTFImageFormats.BGRA8888){ // RGBA8888
-		mult = 4;
+	if (VTFOptions.ImageFormat == VTFImageFormats.RGBA8888 || VTFOptions.ImageFormat == VTFImageFormats.ABGR8888 || VTFOptions.ImageFormat == VTFImageFormats.ARGB8888 || VTFOptions.ImageFormat == VTFImageFormats.BGRA8888){ // RGBA8888
+		mult = 3.36;//4
 	}
-	else if (outputType == VTFImageFormats.DXT1){ // DXT1
+	else if (VTFOptions.ImageFormat == VTFImageFormats.DXT1){ // DXT1
 		mult = 0.5;
 	}
-	else if (outputType == VTFImageFormats.RGB888 || outputType == VTFImageFormats.BGR888){ // RGB888, BGR888
-		mult = 3;
+	else if (VTFOptions.ImageFormat == VTFImageFormats.RGB888 || VTFOptions.ImageFormat == VTFImageFormats.BGR888){ // RGB888, BGR888
+		mult = 2.592;//3
 	}
-	else if (outputType == VTFImageFormats.RGB565 || outputType == VTFImageFormats.BGR565 || outputType == VTFImageFormats.BGRA5551 || outputType == VTFImageFormats.BGRA4444){ // RGB565; BGRA5551; BGRA4444
-		mult = 2;
+	else if (VTFOptions.ImageFormat == VTFImageFormats.RGB565 /*4*/|| VTFOptions.ImageFormat == VTFImageFormats.BGR565 /*17*/|| VTFOptions.ImageFormat == VTFImageFormats.BGRA5551 /*21*/|| VTFOptions.ImageFormat == VTFImageFormats.BGRA4444 /*19*/){ // RGB565; BGRA5551; BGRA4444
+		mult = 1.824; //2
 	}
 	mult *= 1+ (1/3);
 	/*if (cmipmaps && document.getElementById("mipmapsCheck").checked) {
@@ -1016,11 +950,11 @@ function getEstFileSize(cmipmaps) {//BM-Size
 		else
 			mult *= 1+ (1/3);
 	}*/
-	return (shortened ? width - 4 : width) * getTotalImageHeight() * mult + VTFOptions.HeaderSize;
+	return (shortened ? VTFOptions.width - 4 : VTFOptions.width) * getTotalImageHeight() * mult + VTFOptions.HeaderSize;
 }
 
 function getTotalImageHeight() {
-	return height * frameCount;
+	return VTFOptions.height * VTFOptions.Frames;
 }
 
 function getHueDiff(hue1, hue2){
@@ -1073,7 +1007,6 @@ function restoreAlpha(alpha1, alpha2, num){
 }
 
 function writeShort(data, pos, value){
-	console.log(value);
 	data[pos] = value & 0xFF;
 	data[pos + 1] = (value >>> 8) & 0xFF;
 }
@@ -1097,7 +1030,6 @@ function reduceColors(data, rb, gb, bb, ab, dith) {
 	var am = 255 / (255 >> as);
 	for (var x = 0; x < data.width; x += 1) {
         for (var y = 0; y < data.height; y += 1) {
-
             var pixel = (y * data.width * 4) + (x * 4);
 			var color = [d[pixel], d[pixel + 1], d[pixel + 2]];
 
