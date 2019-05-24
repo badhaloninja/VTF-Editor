@@ -1,30 +1,34 @@
 var selected = [];
+var safemode = true
 $(document).ready(function(){
-	//document.getElementById("out").innerHTML = "apple"
-	Object.keys(TextureFlags).forEach(function(ImageFlag){
-	var classname = false
-     //(ImageFlag == "ONEBITALPHA" || ImageFlag == "EIGHTBITALPHA" || ImageFlag == "ENVMAP")? classname="formatsp":null;
-     //(ImageFlag == "POINTSAMPLE" || ImageFlag == "TRILINEAR" || ImageFlag == "ANISOTROPIC")? classname="sampling":null;
-     $("#FlagBoxContainer").append("<input type='checkbox'"+((classname != false)? "class='"+classname+"'": null)+"value='"+ImageFlag.toString()+"'>"+TextureFlags[ImageFlag].name+"<br> ")
+  Object.keys(TextureFlags).forEach(function(imageFlag,i){
+  var classname = false;
+     classname = ((imageFlag == "ONEBITALPHA" || imageFlag == "EIGHTBITALPHA" || imageFlag == "ENVMAP")? "formatsp":false);
+     classname = ((imageFlag == "POINTSAMPLE" || imageFlag == "TRILINEAR" || imageFlag == "ANISOTROPIC")? "sampling":false);
+     $("#FlagBoxContainer").append("<input type=\"checkbox\""+((classname !=false)? "class=\""+classname+"\"": "")+"value=\""+imageFlag.toString()+"\" title=\""+TextureFlags[imageFlag].comment+"\" id=\"flag"+i+"\">"+"<label for=\"flag"+i+"\">"+TextureFlags[imageFlag].name+"</label><br> ")
     })
-	
+  $("#safemode").change(function(){
+      safemode=this.checked
+      $('.formatsp').attr('disabled',this.checked)
+  })
 $("#FlagBoxContainer").on( 'change', 'input', function(){
-  console.log(this.className)
-  if (this.className == "sampling"){
-  $(". sampling").prop('checked',false);
-  $(this).prop('checked',true);
+  //console.log(this.className)
+  if (this.className == "sampling" && safemode == true){
   $(".sampling").not(this).prop('checked', false);
   }
-   selected = [];
-   $('#FlagBoxContainer input').each(function() {
-   selected.push($(this).attr('value'));
-   });
+  console.log(this)
+  selected = [];
+  $('#FlagBoxContainer input').each(function() {
+  if (this.checked==true) {selected.push($(this).attr('value'))}
+  });
+  console.log(selected)
   document.getElementById("out").innerHTML = "\n"
   $(selected).each(function(){
   document.getElementById("out").innerHTML += this+"\n"
   });
 });
 });
+
 /*
 <input type="checkbox" class="GroupFoo" name="flagCheckBox" value="foo1">foo1<br>  
 <input type="checkbox" class="GroupBar"  name="flagCheckBox" value="bar1">bar1<br>  
