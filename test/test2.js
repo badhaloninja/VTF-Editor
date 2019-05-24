@@ -5,12 +5,25 @@ $(document).ready(function(){
   var classname = false;
      classname = ((imageFlag == "ONEBITALPHA" || imageFlag == "EIGHTBITALPHA" || imageFlag == "ENVMAP")? "formatsp":false);
      classname = ((imageFlag == "POINTSAMPLE" || imageFlag == "TRILINEAR" || imageFlag == "ANISOTROPIC")? "sampling":false);
-     $("#FlagBoxContainer").append("<input type=\"checkbox\""+((classname !=false)? "class=\""+classname+"\"": "")+"value=\""+imageFlag.toString()+"\" title=\""+TextureFlags[imageFlag].comment+"\" id=\"flag"+i+"\">"+"<label for=\"flag"+i+"\">"+TextureFlags[imageFlag].name+"</label><br> ")
+     $("#FlagBoxContainer").append("<input type=\"checkbox\""+((classname !=false)? "class=\""+classname+"\"": "")+"value=\""+imageFlag.toString()+"\" title=\""+TextureFlags[imageFlag].comment+"\" id=\"flag"+i+"\">"+"<label for=\"flag"+i+"\" title=\""+TextureFlags[imageFlag].comment+"\">"+TextureFlags[imageFlag].name+"</label><br> ")
     })
   $("#safemode").change(function(){
       safemode=this.checked
-      $('#FlagBoxContainer').find('input.formatsp').prop('disabled',true)
+      $('#FlagBoxContainer input').each(function() {
+       if (this.className == "sampling" && safemode == true){
+         $(".sampling").not(this).prop('disabled',true)
+       }
+       //document.getElementById("out").innerHTML += this+"\n"
+       //$(this).prop('disabled',true)
+      })
   })
+  $('#FlagBoxContainer input').each(function() {
+    var foople = false;
+    if (VTFOptions.selectedFlags.includes($(this).attr('value'))){
+        $(this).prop('checked', true);
+    }
+      //if (this.checked==true) {selected.push($(this).attr('value'))}
+      });
 $("#FlagBoxContainer").on( 'change', 'input', function(){
   //console.log(this.className)
   if (this.className == "sampling" && safemode == true){
