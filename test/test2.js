@@ -9,7 +9,7 @@ $(document).ready(function(){
     })
   $("#safemode").change(function(){
       safemode=this.checked
-      $('.formatsp').attr('disabled',this.checked)
+      $('#FlagBoxContainer').find('input.formatsp').prop('disabled',true)
   })
 $("#FlagBoxContainer").on( 'change', 'input', function(){
   //console.log(this.className)
