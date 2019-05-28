@@ -1,0 +1,10 @@
+#FlagBox { 
+	width:270px;  
+}
+#FlagBoxContainer {
+	height: 128px; 
+	overflow-y: scroll;
+}
+#FlagBoxContainer label {
+	user-select: none;
+}

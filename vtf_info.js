@@ -240,22 +240,12 @@ const TextureFlags = {
     valueOf: function(){ return this.value }
   }
 };
-/*[Symbol.toPrimitive] (hint) {
-    switch (hint){
-        case 'string':
-            return this.name;
-        case 'number':
-            return this.value;
-        default:
-            return this.value;
-    }
-}*/
+const VTFConst = {
+  maxVersion: [7,5],
+  maxSizePower: 12
+}
 function powerOfTwo(x) { return Math.log2(x) % 1 === 0; }
-//(VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel == 1 ? TextureFlags.ONEBITALPHA : 0) | (VTFImageFormatInfo.getInfo(VTFOptions.ImageFormat).AlphaBitsPerPixel > 1 ? TextureFlags.EIGHTBITALPHA : 0) | (this->GetImageFormatInfo(ImageFormat).uiAlphaBitsPerPixel > 1 ? TEXTUREFLAGS_EIGHTBITALPHA : 0)
-//| (uiFaces == 1 ? 0 : TEXTUREFLAGS_ENVMAP)
-//| (bMipmaps ? 0 : TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD);/
 let VTFOptions = {
-  //{Width=2048,Height=2048,FlagArray=[120,35,0,0],Frames=1,StartFrame=0,reflectivity=[1.0,1.0,1.0],BumpScale=1.0,ImageFormat=0,MipCount=1,LowResImageFormat=-1,LowResImageWidth=0,lowResImageHeight=0,Depth=1,ResourceCount=0}
   version: [7,1],
   width: 2,
   height: 2,
@@ -288,15 +278,6 @@ let VTFOptions = {
 Object.defineProperty(VTFOptions, 'getflags', {
   enumerable: false
 });
-
-// const VTFConst = {
-//     signature: "VTF\0",
-//     headerSize: "64",
-//     padding: "00000000",
-//     reflectivity: "3f800000",
-//     bumpmapScale: "3f800000"
-
-// }
 
 let merge = (a, b) => {
   var c = new a.constructor(a.length + b.length);

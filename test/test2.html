@@ -4,12 +4,34 @@
 <script src="jquery-3.4.1.js"></script>
 <script src="test2.js"></script>
 <script src="../vtf_info.js"></script>
-<style>
-#FlagBox { width:320px;  }
-#FlagBoxContainer {height: 128px; overflow-y: scroll;}
-</style>
+<link rel="stylesheet" href="test.css">
 </head>
 <body>
+<p id="filesizee"></p>
+<fieldset id="ImageOptionsBox">  
+<legend>Options: </legend>  
+<div id="ImageOptionsSizeContainer">
+<select class="sizeInput" value="2" id="widthSetting" title="Width">
+	<option value=0 selected>Something is wrong</option>
+</select>
+x
+<select class="sizeInput" value="2" id="heightSetting" title="Height">
+	<option value=0 selected>Something is wrong</option>
+</select>
+</div>
+Version: <select class="textInput" value="7.1" id="versonSetting">
+	<option value="7.0">7.0</option>
+	<option value="7.1" selected>7.1</option>
+	<option value="7.2">7.2</option>
+	<option value="7.3">7.3</option>
+	<option value="7.4">7.4</option>
+	<option value="7.5">7.5</option>
+</select><br/>
+Texture format: <select class="textInput" value=0 id="format">
+	<option value=0 selected>Something is wrong</option>
+</select><br/>
+</fieldset>  
+<br>
 <input type="checkbox" id="safemode" checked="true">
 <label for="safemode">Safe-mode</label>
 <br>  

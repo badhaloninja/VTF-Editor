@@ -1,6 +1,25 @@
 var selected = [];
 var safemode = true
 $(document).ready(function(){
+  for (var i = 0; i <= VTFConst.maxVersion[1]; i +=1){
+  if (i==VTFOptions.version[1]) {
+    $('.versonSetting').html("")
+  }
+  $('.versonSetting').append("<option value="+VTFConst.maxVersion[0]+"."+i+((i==VTFOptions.version[1])?" selected" : "")+">"+VTFConst.maxVersion[0]+"."+i+"</option>\n")
+  }
+  for (var i = 1; i <= VTFConst.maxSizePower; i +=1){
+  var entry = Math.pow(2,i)
+  if (i==0) {
+    $('.sizeInput').html("")
+  }
+  $('.sizeInput').append("<option value="+entry+((i==0)?" selected" : "")+">"+entry+"</option>\n")
+  }
+  VTFImageFormatInfo.Supported.forEach(function(entry,i){
+  if (i==0) {
+    $('#format').html("")
+  }
+  $('#format').append("<option value="+entry+((i==0)?" selected" : "")+">"+VTFImageFormatInfo.getInfo(entry).Name+"</option>\n")
+  })
   Object.keys(TextureFlags).forEach(function(imageFlag,i){
   var classname = false;
      classname = ((imageFlag == "ONEBITALPHA" || imageFlag == "EIGHTBITALPHA" || imageFlag == "ENVMAP")? "formatsp":false);
