@@ -3,10 +3,10 @@ var safemode = true
 $(document).ready(function(){
   for (var i = 0; i <= VTFConst.maxVersion[1]; i +=1){
   if (i==0) {
-    $('#versonSetting').html("")
+    $('#versionSetting').html("")
   }
   var entry = VTFConst.maxVersion[0]+"."+i
-  $('#versonSetting').append("<option value="+entry+((i==VTFOptions.version[1])?" selected" : "")+">"+entry+"</option>\n")
+  $('#versionSetting').append("<option value="+entry+((i==VTFOptions.version[1])?" selected" : "")+">"+entry+"</option>\n")
   }
   for (var i = 1; i <= VTFConst.maxSizePower; i +=1){
   if (i==1) {
@@ -17,9 +17,9 @@ $(document).ready(function(){
   }
   VTFImageFormatInfo.Supported.forEach(function(entry,i){
   if (i==0) {
-    $('#format').html("")
+    $('#formatSelect').html("")
   }
-  $('#format').append("<option value="+entry+((i==0)?" selected" : "")+">"+VTFImageFormatInfo.getInfo(entry).Name+"</option>\n")
+  $('#formatSelect').append("<option value="+entry+((i==0)?" selected" : "")+">"+VTFImageFormatInfo.getInfo(entry).Name+"</option>\n")
   })
   Object.keys(TextureFlags).forEach(function(imageFlag,i){
   var classname = false;
