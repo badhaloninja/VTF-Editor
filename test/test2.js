@@ -2,16 +2,17 @@ var selected = [];
 var safemode = true
 $(document).ready(function(){
   for (var i = 0; i <= VTFConst.maxVersion[1]; i +=1){
-  if (i==VTFOptions.version[1]) {
-    $('.versonSetting').html("")
+  if (i==0) {
+    $('#versonSetting').html("")
   }
-  $('.versonSetting').append("<option value="+VTFConst.maxVersion[0]+"."+i+((i==VTFOptions.version[1])?" selected" : "")+">"+VTFConst.maxVersion[0]+"."+i+"</option>\n")
+  var entry = VTFConst.maxVersion[0]+"."+i
+  $('#versonSetting').append("<option value="+entry+((i==VTFOptions.version[1])?" selected" : "")+">"+entry+"</option>\n")
   }
   for (var i = 1; i <= VTFConst.maxSizePower; i +=1){
-  var entry = Math.pow(2,i)
-  if (i==0) {
+  if (i==1) {
     $('.sizeInput').html("")
   }
+  var entry = Math.pow(2,i)
   $('.sizeInput').append("<option value="+entry+((i==0)?" selected" : "")+">"+entry+"</option>\n")
   }
   VTFImageFormatInfo.Supported.forEach(function(entry,i){
@@ -22,24 +23,25 @@ $(document).ready(function(){
   })
   Object.keys(TextureFlags).forEach(function(imageFlag,i){
   var classname = false;
-     classname = ((imageFlag == "ONEBITALPHA" || imageFlag == "EIGHTBITALPHA" || imageFlag == "ENVMAP")? "formatsp":false);
-     classname = ((imageFlag == "POINTSAMPLE" || imageFlag == "TRILINEAR" || imageFlag == "ANISOTROPIC")? "sampling":false);
+     classname = ((imageFlag == "ONEBITALPHA" || imageFlag == "EIGHTBITALPHA" || imageFlag == "ENVMAP")? "formatsp":((imageFlag == "POINTSAMPLE" || imageFlag == "TRILINEAR" || imageFlag == "ANISOTROPIC")? "sampling":false));
      $("#FlagBoxContainer").append("<input type=\"checkbox\""+((classname !=false)? "class=\""+classname+"\"": "")+"value=\""+imageFlag.toString()+"\" title=\""+TextureFlags[imageFlag].comment+"\" id=\"flag"+i+"\">"+"<label for=\"flag"+i+"\" title=\""+TextureFlags[imageFlag].comment+"\">"+TextureFlags[imageFlag].name+"</label><br> ")
     })
   $("#safemode").change(function(){
       safemode=this.checked
       $('#FlagBoxContainer input').each(function() {
-       if (this.className == "sampling" && safemode == true){
-         $(".sampling").not(this).prop('disabled',true)
+       if (this.className == "formatsp"){
+         $(".formatsp").prop('disabled',safemode)
        }
        //document.getElementById("out").innerHTML += this+"\n"
        //$(this).prop('disabled',true)
       })
   })
   $('#FlagBoxContainer input').each(function() {
-    var foople = false;
     if (VTFOptions.selectedFlags.includes($(this).attr('value'))){
         $(this).prop('checked', true);
+    }
+    if (this.className == "formatsp" && safemode == true){
+    $(".formatsp").prop('disabled',true)
     }
       //if (this.checked==true) {selected.push($(this).attr('value'))}
       });
