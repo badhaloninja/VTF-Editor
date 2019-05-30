@@ -1,22 +1,27 @@
+.nav-link {
+  border-radius: 0 !important;
+  color: var(--light);
+}
+.nav-link:hover {
+   border-radius: 0 !important;
+   color: var(--white);
+}
 #FlagBox { 
-	width:270px;  
+   width:270px;  
 }
 #FlagBoxContainer {
-	height: 128px; 
-	overflow-y: scroll;
+   height: 128px; 
+   overflow-y: scroll;
 }
 #FlagBoxContainer label {
-	user-select: none;
+   user-select: none;
 }
 #versionSetting {
-    width: 64px;
+   width: 64px;
 }
 .sizeInput {
-    width: 80px;
+   width: 80px;
 }
 #formatSelect {
-    width: 128px;
-}
-.text-primary {
-	color: var(--indigo) !important;
+   width: 128px;
 }
