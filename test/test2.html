@@ -11,54 +11,75 @@
 <link rel="stylesheet" href="test.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-sm bg-light">
+<!-- <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top nav-tabs" role="tablist">
+  <a class="navbar-brand" href="#">Logo</a>
   <ul class="navbar-nav">
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link 1</a>
+    <li class="nav-item tab-button">
+      <a class="nav-link" value="options">Options</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link 2</a>
+    <li class="nav-item tab-button">
+      <a class="nav-link" value="preview">Preview</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link 3</a>
+    <li class="nav-item tab-button">
+      <a class="nav-link" value="vmt">VMT Editor</a>
     </li>
   </ul>
+</nav> -->
+<ul class="nav nav-tabs mb-3 navbar-expand-sm bg-dark navbar-dark justify-content-center " role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="options-tab" href="#options" role="tab" data-toggle="tab" aria-controls="options" aria-selected="true">Options</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="preview-tab" href="#preview" role="tab" data-toggle="tab" aria-controls="preview" aria-selected="false">Preview</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="vmt-tab" href="#vmt" role="tab" data-toggle="tab" aria-controls="vmt" aria-selected="false">VMT Editor</a>
+  </li>
+</ul>
+<div class="container tab-content">
+<div role="tabpanel" class="tab-pane fade show active" id="options" aria-labelledby="options-tab">
+	<p id="filesizee"></p>
+	<fieldset id="ImageOptionsBox">  
+	<legend>Options: </legend>  
+	<div id="ImageOptionsSizeContainer">
+	Size: <select class="sizeInput custom-select" value="2" id="widthSetting" title="Width">
+		<option value=0 selected>Something is wrong</option>
+	</select>
+	x
+	<select class="sizeInput custom-select" value="2" id="heightSetting" title="Height">
+		<option value=0 selected>Something is wrong</option>
+	</select>
+	</div>
+	Version: <select class="custom-select" value="7.1" id="versionSetting">
+		<option value=0 selected>Something is wrong</option>
+	</select><br/>
+	Texture format: <select class="custom-select" value=0 id="formatSelect">
+		<option value=0 selected>Something is wrong</option>
+	</select><br/>
+	</fieldset>  
+	<br>
+	    <div class="custom-control custom-switch">
+	      <input type="checkbox" class="custom-control-input" id="safemode" checked="true">
+	      <label class="custom-control-label" for="safemode">Safe-mode</label>
+	    </div>
+	<br>  
+	<div class="card" style="width: 320px;">
+	<div class="card-header">Flags: </div>
+	<div class="card-body" id="FlagBoxContainer">
 
-</nav>
-<div class="container">
-<p id="filesizee"></p>
-<fieldset id="ImageOptionsBox">  
-<legend>Options: </legend>  
-<div id="ImageOptionsSizeContainer">
-Size: <select class="sizeInput custom-select" value="2" id="widthSetting" title="Width">
-	<option value=0 selected>Something is wrong</option>
-</select>
-x
-<select class="sizeInput custom-select" value="2" id="heightSetting" title="Height">
-	<option value=0 selected>Something is wrong</option>
-</select>
+	</div>
+	<div id="out" class="card-footer"></div> 
+	</div>
+	<br>
 </div>
-Version: <select class="custom-select" value="7.1" id="versionSetting">
-	<option value=0 selected>Something is wrong</option>
-</select><br/>
-Texture format: <select class="custom-select" value=0 id="formatSelect">
-	<option value=0 selected>Something is wrong</option>
-</select><br/>
-</fieldset>  
-<br>
-    <div class="custom-control custom-switch">
-      <input type="checkbox" class="custom-control-input" id="safemode" checked="true">
-      <label class="custom-control-label" for="safemode">Safe-mode</label>
-    </div>
-<br>  
-<div class="card" style="width: 320px;">
-<div class="card-header">Flags: </div>
-<div class="card-body" id="FlagBoxContainer">
 
+<div role="tabpanel" class="tab-pane fade" id="preview" aria-labelledby="preview-tab">
+	<p>Preview</p>
 </div>
-<div id="out" class="card-footer"></div> 
+
+<div role="tabpanel" class="tab-pane fade" id="vmt" aria-labelledby="vmt-tab">
+	<p>VMT Editor</p>
 </div>
-<br>
-    </div>
+</div>
 </body>
 </html>

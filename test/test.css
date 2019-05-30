@@ -17,3 +17,6 @@
 #formatSelect {
     width: 128px;
 }
+.text-primary {
+	color: var(--indigo) !important;
+}
