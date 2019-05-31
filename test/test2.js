@@ -62,7 +62,17 @@ $("#FlagBoxContainer").on( 'change', 'input', function(){
   });
 });
 });
-
+$(document).ready(function(){
+  
+});
+const keySequence = ['p','r','a','n','k'];
+let userInput = new Array( keySequence.length );
+window.addEventListener( 'keydown', ( { key } ) => {
+    userInput = [ ...userInput.slice( 1 ), key ];
+    if ( keySequence.every( ( v, k ) => v === userInput[ k ] ) ) {
+        $("#office-tab").prop('hidden',false)
+    }
+} );
 /*
 <input type="checkbox" class="GroupFoo" name="flagCheckBox" value="foo1">foo1<br>  
 <input type="checkbox" class="GroupBar"  name="flagCheckBox" value="bar1">bar1<br>  
