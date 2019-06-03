@@ -47,13 +47,15 @@ CodeMirror.defineMode("vmf", function() {
 });
 
 });*/
+//https://codemirror.net/demo/simplemode.html
+//https://github.com/TeamSpen210/SublimeSource/blob/master/SublimeSource/vmt.sublime-syntax
 CodeMirror.defineSimpleMode("vmf", {
   // The start state contains the rules that are intially used
   start: [
-    //{regex: /\/\//, token: "inc_comments"},
-    //{regex: /\n/, token: "comments"},
+    {regex: "//", token: "inc_comments", push: "comment"},
+    {regex: "\n", token: "comment", pop:true},
     {regex: /[a-zA-Z_]+/, token: "shader", push: "expect-start-brace"},
-    {regex: /"/, token: "keyvalues"},
+    {regex: '"', token: "string", push: "shader-name"},
     
     // The regex matches the token, the token property contains the type
     {regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string"},
