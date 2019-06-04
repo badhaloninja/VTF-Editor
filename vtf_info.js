@@ -246,6 +246,7 @@ const VTFConst = {
 }
 function powerOfTwo(x) { return Math.log2(x) % 1 === 0; }
 let VTFOptions = {
+  safemode: true,
   version: [7,1],
   width: 2,
   height: 2,
