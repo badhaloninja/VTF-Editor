@@ -63,7 +63,14 @@ $("#FlagBoxContainer").on( 'change', 'input', function(){
 });
 });
 $(document).ready(function(){
-  
+  var editor = CodeMirror(document.getElementById("vmt-editor"), {
+    value: "LightmappedGeneric\n{\n $basetexture coast\shingle_01\n $surfaceprop gravel\n}",
+    mode: "javascript",
+    theme: "neo",
+    lineNumbers: true,
+    styleActiveLine: true,
+    matchBrackets: true
+  })
 });
 const keySequence = ['p','r','a','n','k'];
 let userInput = new Array( keySequence.length );
