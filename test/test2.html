@@ -13,7 +13,7 @@
 <script src="https://codemirror.net/addon/display/autorefresh.js"></script>
 <script src="https://codemirror.net/addon/mode/simple.js"></script>
 <script src="vmt-syntax.js"></script>
-<script src="https://rawgit.com/melanke/Watch.JS/master/src/watch.js></script>
+<!--<script src="https://rawgit.com/melanke/Watch.JS/master/src/watch.js></script>-->
 <style>
       .CodeMirror {border: 1px solid black; font-size:13px}
     </style>
@@ -35,6 +35,9 @@
   </li>
   <li class="nav-item">
     <a class="nav-link" id="vmt-tab" href="#vmt" role="tab" data-toggle="tab" aria-controls="vmt" aria-selected="false" onclick="editor.refresh()">VMT Editor</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="about-tab" href="#about" role="tab" data-toggle="tab" aria-controls="about" aria-selected="false">About</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" id="office-tab" hidden href="#office" role="tab" data-toggle="tab" aria-controls="office" aria-selected="false">Office</a>
@@ -79,6 +82,9 @@
 <div role="tabpanel" class="tab-pane fade" id="vmt" aria-labelledby="vmt-tab">
 	<p>VMT Editor</p>
 	<div id="vmt-editor"></div>
+</div>
+<div role="tabpanel" class="tab-pane fade" id="about" aria-labelledby="about-tab">
+	<p>About</p>
 </div>
 <div role="tabpanel" class="tab-pane fade" id="office" aria-labelledby="office-tab">
 	<p>Office</p>

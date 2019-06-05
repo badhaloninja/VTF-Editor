@@ -1,7 +1,10 @@
 //var selected = [];
 //var safemode = true
 $(document).ready(function(){
- /* if (!localStorage.VTFOptions) {
+	if (!('indexedDB' in window)) {
+  alert('This browser doesn\'t support IndexedDB');
+  }
+ /* if (!('VTFOptions' in localStorage)) {
   alert("TRUE")
   localStorage.VTFOptions = VTFOptions;
   } else {
