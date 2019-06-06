@@ -1,14 +1,15 @@
 //var selected = [];
 //var safemode = true
 $(document).ready(function(){
+	//localStorage.removeItem('VTFOptions');
  if (localStorage){
  if (!(localStorage.getItem('VTFOptions'))) {
   alert("VTFOptions does not exists in localStorage")
-  localStorage.VTFOptions = VTFOptions;
+  localStorage.setItem('VTFOptions', VTFOptions) ;
   } else {
   	alert("VTFOptions exists in localStorage")
  // localStorage.removeItem('VTFOptions');
-  VTFOptions = localStorage.VTFOptions
+  VTFOptions = localStorage.getItem('VTFOptions')
   }} else {
   alert('Your browser does not support localStorage')
   }
