@@ -4,15 +4,17 @@ $(document).ready(function(){
 	if (!('indexedDB' in window)) {
   alert('This browser doesn\'t support IndexedDB');
   }
- /* if (!('VTFOptions' in localStorage)) {
+ if (!('VTFOptions' in localStorage)) {
   alert("TRUE")
   localStorage.VTFOptions = VTFOptions;
   } else {
+  	alert("FALSE")
+ // localStorage.removeItem('VTFOptions');
   VTFOptions = localStorage.VTFOptions
   }
   watch(VTFOptions, function(prop){
     localStorage.VTFOptions[prop] = VTFOptions[prop];
-  });*/
+  });
   for (var i = 0; i <= VTFConst.maxVersion[1]; i +=1){
   if (i==0) {
     $('#versionSetting').html("")
@@ -80,9 +82,7 @@ $(document).ready(function(){
    // mode: "vmt",
     theme: "material",
     autoRefresh: true,
-    lineNumbers: true,
-    styleActiveLine: true,
-    matchBrackets: true
+    lineNumbers: true
   })
   editor.on('change',function(cMirror){
   // get value right from instance
