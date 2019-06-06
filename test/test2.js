@@ -1,16 +1,16 @@
 //var selected = [];
 //var safemode = true
 $(document).ready(function(){
-	if (!('indexedDB' in window)) {
-  alert('This browser doesn\'t support IndexedDB');
-  }
- if (!('VTFOptions' in localStorage)) {
-  alert("TRUE")
+ if (localStorage){
+ if (!(localStorage.getItem('VTFOptions'))) {
+  alert("VTFOptions does not exists in localStorage")
   localStorage.VTFOptions = VTFOptions;
   } else {
-  	alert("FALSE")
+  	alert("VTFOptions exists in localStorage")
  // localStorage.removeItem('VTFOptions');
   VTFOptions = localStorage.VTFOptions
+  }} else {
+  alert('Your browser does not support localStorage')
   }
   watch(VTFOptions, function(prop){
     localStorage.VTFOptions[prop] = VTFOptions[prop];
