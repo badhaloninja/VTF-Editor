@@ -4,17 +4,19 @@ $(document).ready(function(){
 	//localStorage.removeItem('VTFOptions');
  if (localStorage){
  if (!(localStorage.getItem('VTFOptions'))) {
-  alert("VTFOptions does not exists in localStorage")
-  localStorage.setItem('VTFOptions', VTFOptions) ;
+  //alert("VTFOptions does not exists in localStorage")
+  localStorage.setItem('VTFOptions', JSON.stringify(VTFOptions));
   } else {
-  	alert("VTFOptions exists in localStorage")
+  	//alert("VTFOptions exists in localStorage")
  // localStorage.removeItem('VTFOptions');
-  VTFOptions = localStorage.getItem('VTFOptions')
+  VTFOptions = JSON.parse( localStorage.getItem('VTFOptions') ) || {};
   }} else {
   alert('Your browser does not support localStorage')
   }
-  watch(VTFOptions, function(prop){
-    localStorage.VTFOptions[prop] = VTFOptions[prop];
+  watch(VTFOptions, function(){
+   //console.log(prop)
+    //localStorage.VTFOptions[prop] = VTFOptions[prop];
+    localStorage.setItem('VTFOptions', JSON.stringify(VTFOptions));
   });
   for (var i = 0; i <= VTFConst.maxVersion[1]; i +=1){
   if (i==0) {
