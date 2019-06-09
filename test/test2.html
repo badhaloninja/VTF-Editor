@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="eruda.min.js"></script>
-<script>eruda.init();</script>
+<!-- <script src="eruda.min.js"></script>
+<script>eruda.init();</script> -->
 <script src="jquery-3.4.1.js"></script>
 <script src="test2.js"></script>
 <script src="../vtf_info.js"></script>
@@ -11,7 +11,7 @@
 <script src="https://codemirror.net/addon/display/autorefresh.js"></script>
 <script src="https://codemirror.net/addon/mode/simple.js"></script>
 <!--<script src="vmt-syntax.js"></script>-->
-<script src="https://rawgit.com/melanke/Watch.JS/master/src/watch.js"></script>
+<!--<script src="https://rawgit.com/melanke/Watch.JS/master/src/watch.js"></script>-->
 <style>
       .CodeMirror {border: 1px solid black; font-size:13px}
     </style>
@@ -26,17 +26,18 @@
 <body>
 <ul class="nav nav-tabs mb-3 navbar-expand-sm bg-dark navbar-dark justify-content-center " role="tablist">
   <li class="nav-item">
+    <a class="nav-link" id="about-tab" href="#about" role="tab" data-toggle="tab" aria-controls="about" aria-selected="false">About</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="vmt-tab" href="#vmt" role="tab" data-toggle="tab" aria-controls="vmt" aria-selected="false">VMT Editor</a>
+  </li>
+  <li class="nav-item">
     <a class="nav-link active" id="options-tab" href="#options" role="tab" data-toggle="tab" aria-controls="options" aria-selected="true">Options</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" id="preview-tab" href="#preview" role="tab" data-toggle="tab" aria-controls="preview" aria-selected="false">Preview</a>
   </li>
-  <li class="nav-item">
-    <a class="nav-link" id="vmt-tab" href="#vmt" role="tab" data-toggle="tab" aria-controls="vmt" aria-selected="false" onclick="editor.refresh()">VMT Editor</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="about-tab" href="#about" role="tab" data-toggle="tab" aria-controls="about" aria-selected="false">About</a>
-  </li>
+  
   <li class="nav-item">
     <a class="nav-link" id="office-tab" hidden href="#office" role="tab" data-toggle="tab" aria-controls="office" aria-selected="false">Office</a>
   </li>
@@ -44,8 +45,7 @@
 <div class="container tab-content">
 <div role="tabpanel" class="tab-pane fade show active" id="options" aria-labelledby="options-tab">
 	<p id="filesizee"></p>
-	<fieldset id="ImageOptionsBox">  
-	<legend>Options: </legend>  
+	<form id="ImageOptionsBox">  
 	<div id="ImageOptionsSizeContainer">
 	Size: <select class="sizeInput custom-select" value="2" id="widthSetting" title="Width">
 		<option value=0 selected>Something is wrong</option>
@@ -61,8 +61,8 @@
 	Texture format: <select class="custom-select" value=0 id="formatSelect">
 		<option value=0 selected>Something is wrong</option>
 	</select><br/>
-	</fieldset>  
-	<br>
+	</form>  
+	<br/>
 	<div class="card" style="width: 320px;">
 	<div class="card-header">Flags: </div>
 	<div class="card-body" id="FlagBoxContainer">
@@ -71,6 +71,28 @@
 	<div id="out" class="card-footer"></div> 
 	</div>
 	<br>
+	<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Avatar</th>
+      <th scope="col">Name</th>
+      <th scope="col">Title</th>
+      <th scope="col">Message</th>
+      <th scope="col">Time</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr>
+      <th scope="row" name="mailAvatar">1</th>
+      <td name="mailSender"><input type="text" class="form-control" placeholder="Sender"></td>
+      <td name="mailTitle"><input type="text" class="form-control" placeholder="Title"></td>
+      <td name="mailMessage"><input type="text" class="form-control" placeholder="Message"></td>
+      <td name="mailTime"><input type='time' class="form-control"></td>
+      <td name="mailRemove"><button type="submit" class="btn btn-primary mb-2">Remove</button></td>
+    </tr>
+  </tbody>
+</table>
 </div>
 
 <div role="tabpanel" class="tab-pane fade" id="preview" aria-labelledby="preview-tab">
@@ -94,5 +116,16 @@
 	<br>  
 </div>
 </div>
+<template id="mailMsgTmp">
+  <tr>
+      <th scope="row" name="mailAvatar">1</th>
+      <td name="mailSender"><input type="text" class="form-control" placeholder="Sender"></td>
+      <td name="mailTitle"><input type="text" class="form-control" placeholder="Title"></td>
+      <td name="mailMessage"><input type="text" class="form-control" placeholder="Message"></td>
+      <td name="mailTime"><input type='text' class="form-control"></td>
+      <td name="mailRemove"><button type="submit" class="btn btn-primary mb-2">Remove</button></td>
+    </tr>
+</template>
 </body>
 </html>
+

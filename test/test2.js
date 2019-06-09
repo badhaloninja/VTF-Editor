@@ -1,7 +1,7 @@
 //var selected = [];
 //var safemode = true
 $(document).ready(function(){
-	//localStorage.removeItem('VTFOptions');
+/*	//localStorage.removeItem('VTFOptions');
  if (localStorage){
  if (!(localStorage.getItem('VTFOptions'))) {
   //alert("VTFOptions does not exists in localStorage")
@@ -17,7 +17,7 @@ $(document).ready(function(){
    //console.log(prop)
     //localStorage.VTFOptions[prop] = VTFOptions[prop];
     localStorage.setItem('VTFOptions', JSON.stringify(VTFOptions));
-  });
+  });*/
   for (var i = 0; i <= VTFConst.maxVersion[1]; i +=1){
   if (i==0) {
     $('#versionSetting').html("")
