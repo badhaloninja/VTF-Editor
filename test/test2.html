@@ -4,12 +4,14 @@
 <!-- <script src="eruda.min.js"></script>
 <script>eruda.init();</script> -->
 <script src="jquery-3.4.1.js"></script>
-<script src="test2.js"></script>
-<script src="../vtf_info.js"></script>
+
 <link rel="stylesheet" href="http://codemirror.net/lib/codemirror.css">
 <script src="http://codemirror.net/lib/codemirror.js"></script>
 <script src="https://codemirror.net/addon/display/autorefresh.js"></script>
 <script src="https://codemirror.net/addon/mode/simple.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/table-to-json@0.13.0/lib/jquery.tabletojson.min.js" integrity="sha256-AqDz23QC5g2yyhRaZcEGhMMZwQnp8fC6sCZpf+e7pnw=" crossorigin="anonymous"></script>
+<script src="test2.js"></script>
+<script src="../vtf_info.js"></script>
 <!--<script src="vmt-syntax.js"></script>-->
 <!--<script src="https://rawgit.com/melanke/Watch.JS/master/src/watch.js"></script>-->
 <style>
@@ -71,7 +73,7 @@
 	<div id="out" class="card-footer"></div> 
 	</div>
 	<br>
-	<table class="table">
+	<table class="table table-sm text-center table-fixed" id="mailTable">
   <thead>
     <tr>
       <th scope="col">Avatar</th>
@@ -79,17 +81,17 @@
       <th scope="col">Title</th>
       <th scope="col">Message</th>
       <th scope="col">Time</th>
-      <th scope="col"></th>
+      <th scope="col"><button type="button" class="btn btn-success btn-sm" onclick="addMailRow();">Add</button></th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="mailTableBody">
   <tr>
-      <th scope="row" name="mailAvatar">1</th>
+      <td name="mailAvatar"><img src="assets/avatar.png" class="sender_avatar edit_avatar" alt="OOF"></td>
       <td name="mailSender"><input type="text" class="form-control" placeholder="Sender"></td>
       <td name="mailTitle"><input type="text" class="form-control" placeholder="Title"></td>
       <td name="mailMessage"><input type="text" class="form-control" placeholder="Message"></td>
       <td name="mailTime"><input type='time' class="form-control"></td>
-      <td name="mailRemove"><button type="submit" class="btn btn-primary mb-2">Remove</button></td>
+      <td name="mailRemove"><button type="button" name="mailRemoveButton" class="btn btn-danger btn-sm">X</button></td>
     </tr>
   </tbody>
 </table>
@@ -118,12 +120,12 @@
 </div>
 <template id="mailMsgTmp">
   <tr>
-      <th scope="row" name="mailAvatar">1</th>
+      <td name="mailAvatar"><img src="assets/avatar.png" class="sender_avatar edit_avatar" alt="OOF"></td>
       <td name="mailSender"><input type="text" class="form-control" placeholder="Sender"></td>
       <td name="mailTitle"><input type="text" class="form-control" placeholder="Title"></td>
       <td name="mailMessage"><input type="text" class="form-control" placeholder="Message"></td>
-      <td name="mailTime"><input type='text' class="form-control"></td>
-      <td name="mailRemove"><button type="submit" class="btn btn-primary mb-2">Remove</button></td>
+      <td name="mailTime"><input type='time' class="form-control"></td>
+      <td name="mailRemove"><button type="button" name="mailRemoveButton" class="btn btn-danger btn-sm">X</button></td>
     </tr>
 </template>
 </body>

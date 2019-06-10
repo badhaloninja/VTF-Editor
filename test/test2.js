@@ -100,3 +100,46 @@ window.addEventListener( 'keydown', ( { key } ) => {
         $("#office-tab").prop('hidden',false)
     }
 } );
+function addMailRow() {
+  var temp = document.getElementById("mailMsgTmp");
+  var clon = temp.content.cloneNode(true);
+  $("#mailTableBody").append(clon);
+  getMailInfo() 
+}
+$(document).ready(function(){
+  getMailInfo() 
+  $('#mailTable').on('click', '[name="mailRemoveButton"]', function(){
+if ($('#mailTable')[0].rows.length-1 > 1) {
+   $(this).closest('tr').remove()
+  getMailInfo()
+}
+});
+$('#mailTable').on('click', 'input, img', function(){
+  console.log("change")
+  getMailInfo()
+})
+
+})
+let mailTableVar = "oof"
+function getMailInfo() {
+  mailTableVar = $('#mailTable').tableToJSON({
+      ignoreColumns: [5],
+      extractor : function(cellIndex, $cell) {
+       if (cellIndex == 0){
+         tmp=$cell.find('img').attr('src')
+       }
+       if (cellIndex >= 1 && cellIndex <= 4){
+         tmp=($cell.find('input')[0]).value
+       }
+    return tmp
+    /*return {
+      avatar: $cell.find('img').attr('src'),
+      sender: $cell.find('input').text(),
+      title: $cell.find('input').text(),
+      message: $cell.find('input').text(),
+      time: $cell.find('input').text()
+    };*/
+  }
+});
+}
+
