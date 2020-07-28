@@ -1,0 +1,19 @@
+{
+  "name": "vtf-editor",
+  "version": "1.0.0",
+  "description": "Create or view VTF files with js",
+  "main": "vtf.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/badhaloninja/VTF-Editor.git"
+  },
+  "author": "badhaloninja",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/badhaloninja/VTF-Editor/issues"
+  },
+  "homepage": "https://github.com/badhaloninja/VTF-Editor#readme"
+}

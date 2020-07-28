@@ -353,6 +353,209 @@ const uint = number => {
   }
 }
 
+class SVTFFileHeader {
+  constructor({Version=[7,0],HeaderSize=16} = {}) {
+    this.signature = char("VTF\0");//4
+    this.Version = uint(Version);//8
+    this.HeaderSize = uint(HeaderSize);//4
+  }
+  get Array (){
+    var flat = new Uint8Array();
+    var type = Object.prototype.toString.call(this);
+
+    for (var key in this) {
+      type = Object.prototype.toString.call(this[key]);
+      if (type == "[object Object]" || type == "[object Array]"){
+
+        //flat = merge(flat,thing.getArray(thing[key]));
+        console.log("Disabled: "+type+"\nValue: "+this[key]);
+      } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
+        flat = merge(flat,this[key]);
+      } else {
+        flat = new Uint8Array([255]);
+        console.log("Unknown: "+type+"\nValue: "+this[key]);
+      }
+    }
+    return flat;
+
+  }
+}
+class SVTFHeader_70 extends SVTFFileHeader {
+  constructor({Version=[7,0],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
+    super({Version,HeaderSize});//12
+    this.Width = short(shortened ? Width - 4 : Width);//2
+    this.Height = short(Height);//2
+    this.FlagArray = VTFOptions.getflags(FlagArray);//4
+    this.Frames = short(Frames);//2
+    this.StartFrame = short(StartFrame);//2
+    this.padding0 = byte(0,4);//4
+    this.reflectivity = float(reflectivity);//12
+    this.padding1 = byte(0,4);//4
+    this.BumpScale = float(BumpScale);//4
+    this.ImageFormat = uint(ImageFormat);//4
+    this.MipCount = byte(MipCount);//1
+    this.LowResImageFormat = uint(LowResImageFormat);//4
+    this.LowResImageWidth = byte(LowResImageWidth);//1
+    this.lowResImageHeight = byte(LowResImageHeight);//1
+    this.placeholder = new Uint8Array(1);
+  }
+}//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
+
+class SVTFHeader_71 extends SVTFHeader_70 {
+  constructor({Version=[7,1],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
+    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight});
+  }
+}
+
+class SVTFHeader_72 extends SVTFHeader_71 {
+  constructor({Version=[7,2],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth} = {}){
+    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight});
+    this.placeholder = new Uint8Array();
+    this.Depth = byte(Depth);//1                          //!< Depth of the largest image
+  }
+}
+
+class SVTFHeader_73 extends SVTFHeader_72 {
+  constructor({Version=[7,3],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
+    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight,Depth});
+    this.padding2 = byte(0,4);//4 - should be 3
+    this.ResourceCount = uint(ResourceCount);//4                          //!< Number of image resources
+    this.padding3 = byte(0,8);//Most likely will never add resource support
+  }
+}
+
+class SVTFHeader_74 extends SVTFHeader_73 {
+  constructor({Version=[7,4],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
+    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight,Depth,ResourceCount});
+  }
+}
+
+class SVTFHeader_75 extends SVTFHeader_74 {
+  constructor({Version=[7,5],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
+    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight,Depth,ResourceCount});
+  }
+}//       |  -  -  - |       -       |        |   |   |        |   |   |       |          -          -          |       |          |       | |               | | | |       |1 2 3 4|1 2 3 4 5 6 7 8| 1 2 3 4  5 6 7 8|
+function getHeader() {
+  switch (VTFOptions.version[1]) {
+    case 0:
+      return new SVTFHeader_70();
+      break;
+    case 1:
+      return new SVTFHeader_71();
+      break;
+    case 2:
+      return new SVTFHeader_72();
+      break;
+    case 3:
+      return new SVTFHeader_73();
+      break;
+    case 4:
+      return new SVTFHeader_74();
+      break;
+    case 5:
+      return new SVTFHeader_75();
+  }
+}
+
+let ToLuminance = null;
+let FromLuminance = null;
+let ToBlueScreen = null;
+let FromBlueScreen = null;
+let ToFP16 = null;
+let FromFP16 = null;
+const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badhaloninja/vtfedit/blob/master/VTFLib/VTFFile.cpp
+  //[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
+   0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, [ 0,  1,  2,  3], false,  true, [        null,           null]],        // IMAGE_FORMAT_RGBA8888,
+   1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, [ 3,  2,  1,  0], false,  true, [        null,           null]],        // IMAGE_FORMAT_ABGR8888,
+   2 : ["RGB888"            , 24,  3,  8,  8,  8,  0, [ 0,  1,  2, -1], false,  true, [        null,           null]],        // IMAGE_FORMAT_RGB888,
+   3 : ["BGR888"            , 24,  3,  8,  8,  8,  0, [ 2,  1,  0, -1], false,  true, [        null,           null]],        // IMAGE_FORMAT_BGR888,
+   4 : ["RGB565"            , 16,  2,  5,  6,  5,  0, [ 0,  1,  2, -1], false,  true, [        null,           null]],        // IMAGE_FORMAT_RGB565,
+   5 : ["I8"                ,  8,  1,  0,  0,  0,  0, [ 0, -1, -1, -1], false, false, [ ToLuminance,  FromLuminance]],        // IMAGE_FORMAT_I8,
+   6 : ["IA88"              , 16,  2,  0,  0,  0,  8, [ 0, -1, -1,  1], false, false, [ ToLuminance,  FromLuminance]],        // IMAGE_FORMAT_IA88
+   7 : ["P8"                ,  8,  1,  0,  0,  0,  0, [-1, -1, -1, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_P8
+   8 : ["A8"                ,  8,  1,  0,  0,  0,  8, [-1, -1, -1,  0], false, false, [        null,           null]],        // IMAGE_FORMAT_A8
+   9 : ["RGB888 Bluescreen" , 24,  3,  8,  8,  8,  0, [ 0,  1,  2, -1], false, false, [ToBlueScreen, FromBlueScreen]],        // IMAGE_FORMAT_RGB888_BLUESCREEN
+  10 : ["BGR888 Bluescreen" , 24,  3,  8,  8,  8,  0, [ 2,  1,  0, -1], false, false, [ToBlueScreen, FromBlueScreen]],        // IMAGE_FORMAT_BGR888_BLUESCREEN
+  11 : ["ARGB8888"          , 32,  4,  8,  8,  8,  8, [ 3,  0,  1,  2], false,  true, [        null,           null]],        // IMAGE_FORMAT_ARGB8888
+  12 : ["BGRA8888"          , 32,  4,  8,  8,  8,  8, [ 2,  1,  0,  3], false,  true, [        null,           null]],        // IMAGE_FORMAT_BGRA8888
+  13 : ["DXT1"              ,  4,  0,  0,  0,  0,  0, [-1, -1, -1, -1],  true,  true, [        null,           null]],        // IMAGE_FORMAT_DXT1
+  14 : ["DXT3"              ,  8,  0,  0,  0,  0,  8, [-1, -1, -1, -1],  true, false, [        null,           null]],        // IMAGE_FORMAT_DXT3
+  15 : ["DXT5"              ,  8,  0,  0,  0,  0,  8, [-1, -1, -1, -1],  true,  true, [        null,           null]],        // IMAGE_FORMAT_DXT5
+  16 : ["BGRX8888"          , 32,  4,  8,  8,  8,  0, [ 2,  1,  0, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_BGRX8888
+  17 : ["BGR565"            , 16,  2,  5,  6,  5,  0, [ 2,  1,  0, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_BGR565
+  18 : ["BGRX5551"          , 16,  2,  5,  5,  5,  0, [ 2,  1,  0, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_BGRX5551
+  19 : ["BGRA4444"          , 16,  2,  4,  4,  4,  4, [ 2,  1,  0,  3], false,  true, [        null,           null]],        // IMAGE_FORMAT_BGRA4444
+  20 : ["DXT1 One Bit Alpha",  4,  0,  0,  0,  0,  1, [-1, -1, -1, -1],  true, false, [        null,           null]],        // IMAGE_FORMAT_DXT1_ONEBITALPHA
+  21 : ["BGRA5551"          , 16,  2,  5,  5,  5,  1, [ 2,  1,  0,  3], false,  true, [        null,           null]],        // IMAGE_FORMAT_BGRA5551
+  22 : ["UV88"              , 16,  2,  8,  8,  0,  0, [ 0,  1, -1, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_UV88
+  23 : ["UVWQ8888"          , 32,  4,  8,  8,  8,  8, [ 0,  1,  2,  3], false, false, [        null,           null]],        // IMAGE_FORMAT_UVWQ8899
+  24 : ["RGBA16161616F"     , 64,  8, 16, 16, 16, 16, [ 0,  1,  2,  3], false, false, [      ToFP16,       FromFP16]],        // IMAGE_FORMAT_RGBA16161616F
+  25 : ["RGBA16161616"      , 64,  8, 16, 16, 16, 16, [ 0,  1,  2,  3], false, false, [        null,           null]],        // IMAGE_FORMAT_RGBA16161616
+  26 : ["UVLX8888"          , 32,  4,  8,  8,  8,  8, [ 0,  1,  2,  3], false, false, [        null,           null]],        // IMAGE_FORMAT_UVLX8888
+  get Supported(){
+    var tmp=[]
+    Object.values(VTFImageFormatInfo).forEach(function(entry,i){
+      entry[9] ? tmp.push(i) : null;
+    })
+    return tmp
+  },
+  getInfo(format=VTFOptions.ImageFormat) {
+    var info=this[format]
+    if (!(parseInt(Number(format)) == format) && !parseInt(format, 10)) {
+        info=this[VTFImageFormats[format]];
+    }
+    var tmp={Name:info[0], BitsPerPixel:info[1], BytesPerPixel:info[2], RedBitsPerPixel:info[3], GreenBitsPerPixel:info[4], BlueBitsPerPixel:info[5], AlphaBitsPerPixel:info[6], RGBAIndex:info[7], IsCompressed:info[8], IsSupported:info[9], TransformProc:info[10]}
+    return tmp
+  }
+};
+Object.defineProperty(VTFImageFormatInfo, 'Supported', {
+  enumerable: false
+});
+Object.defineProperty(VTFImageFormatInfo, 'Info', {
+  enumerable: false
+});
+
+var foo = [86,84,70,0,7,0,0,0,3,0,0,0,88,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,88,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+var bar = [86,84,70,0,7,0,0,0,2,0,0,0,80,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+var baz = [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
+var qux = [86,84,70,0,7,0,0,0,3,0,0,0,96,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,96,0,0,0,75,86,68,0,112,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0,38,0,0,0,34,73,110,102,111,114,109,97,116,105,111,110,34,13,10,123,13,10,9,34,65,117,116,104,111,114,34,32,34,98,104,110,34,13,10,125,13,10];
+
+var content = {
+      0:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0]",
+      2:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,2,0,0,0,1,255,255,255,255,0,0,1,255,0,0,0,255,0,0,0,255,0,0,0]",
+     12:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,12,0,0,0,1,255,255,255,255,0,0,1,0,0,255,255,0,255,0,255,255,0,0,255,0,0,0,0]",
+     17:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,17,0,0,0,1,255,255,255,255,0,0,1,0,248,224,7,31,0,0,0];"
+  };
+
+
+module.exports.VTFImageFormats = VTFImageFormats;
+module.exports.VTFImageFormatInfo = VTFImageFormatInfo;
+module.exports.TextureFlags = TextureFlags;
+
+
+module.exports.VTFConst = VTFConst;
+module.exports.VTFOptions = VTFOptions;
+
+
+module.exports.getHeader = getHeader;
+module.exports.powerOfTwo = powerOfTwo;
+module.exports.merge = merge;
+module.exports.byte = byte;
+module.exports.short = short;
+module.exports.char = char;
+module.exports.float = float;
+module.exports.uint = uint;
+
+module.exports.SVTFFileHeader = SVTFFileHeader;
+module.exports.SVTFHeader_70 = SVTFHeader_70;
+module.exports.SVTFHeader_71 = SVTFHeader_71;
+module.exports.SVTFHeader_72 = SVTFHeader_72;
+module.exports.SVTFHeader_73 = SVTFHeader_73;
+module.exports.SVTFHeader_74 = SVTFHeader_74;
+module.exports.SVTFHeader_75 = SVTFHeader_75;
+
+module.exports.content = content;
+
 /*var buffer = new ArrayBuffer(24);
 
 // ... read the data into the buffer ...
@@ -473,113 +676,36 @@ this->Header = new SVTFHeader;
 
 */
 
-class SVTFFileHeader {
-  constructor({Version=[7,0],HeaderSize=16} = {}) {
-    this.signature = char("VTF\0");//4
-    this.Version = uint(Version);//8
-    this.HeaderSize = uint(HeaderSize);//4
-  }
-  get Array (){
-    var flat = new Uint8Array();
-    var type = Object.prototype.toString.call(this);
 
-    for (var key in this) {
-      type = Object.prototype.toString.call(this[key]);
-      if (type == "[object Object]" || type == "[object Array]"){
 
-        //flat = merge(flat,thing.getArray(thing[key]));
-        console.log("Disabled: "+type+"\nValue: "+this[key]);
-      } else if (type == "[object Uint8Array]" || type == "[object Uint16Array]" || type == "[object Uint32Array]") {
-        flat = merge(flat,this[key]);
-      } else {
-        flat = new Uint8Array([255]);
-        console.log("Unknown: "+type+"\nValue: "+this[key]);
-      }
-    }
-    return flat;
+/*
+typedef struct tagSVTFImageConvertInfo
+{
+	vlUInt	uiBitsPerPixel;			// Format bytes per pixel.
+	vlUInt	uiBytesPerPixel;		// Format bytes per pixel.
+	vlUInt	uiRBitsPerPixel;		// Format conversion red bits per pixel.  0 for N/A.
+	vlUInt	uiGBitsPerPixel;		// Format conversion green bits per pixel.  0 for N/A.
+	vlUInt	uiBBitsPerPixel;		// Format conversion blue bits per pixel.  0 for N/A.
+	vlUInt	uiABitsPerPixel;		// Format conversion alpha bits per pixel.  0 for N/A.
+	vlInt	iR;						// "Red" index.
+	vlInt	iG;						// "Green" index.
+	vlInt	iB;						// "Blue" index.
+	vlInt	iA;						// "Alpha" index.
+	vlBool	bIsCompressed;			// Format is compressed (DXT).
+	vlBool	bIsSupported;			// Format is supported by VTFLib.
+	TransformProc pToTransform;		// Custom transform to function.
+	TransformProc pFromTransform;	// Custom transform from function.
+	VTFImageFormat Format;
+} SVTFImageConvertInfo;
 
-  }
-}
-class SVTFHeader_70 extends SVTFFileHeader {
-  constructor({Version=[7,0],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
-    super({Version,HeaderSize});//12
-    this.Width = short(shortened ? Width - 4 : Width);//2
-    this.Height = short(Height);//2
-    this.FlagArray = VTFOptions.getflags(FlagArray);//4
-    this.Frames = short(Frames);//2
-    this.StartFrame = short(StartFrame);//2
-    this.padding0 = byte(0,4);//4
-    this.reflectivity = float(reflectivity);//12
-    this.padding1 = byte(0,4);//4
-    this.BumpScale = float(BumpScale);//4
-    this.ImageFormat = uint(ImageFormat);//4
-    this.MipCount = byte(MipCount);//1
-    this.LowResImageFormat = uint(LowResImageFormat);//4
-    this.LowResImageWidth = byte(LowResImageWidth);//1
-    this.lowResImageHeight = byte(LowResImageHeight);//1
-    this.placeholder = new Uint8Array(1);
-  }
-}//https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Inheritance
+static SVTFImageConvertInfo VTFImageConvertInfo[] =
+<<<<<<< HEAD
+{ 
+	*/
+//[255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 0, 0, 0, 0] 
 
-class SVTFHeader_71 extends SVTFHeader_70 {
-  constructor({Version=[7,1],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
-    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight});
-  }
-}
 
-class SVTFHeader_72 extends SVTFHeader_71 {
-  constructor({Version=[7,2],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth} = {}){
-    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight});
-    this.placeholder = new Uint8Array();
-    this.Depth = byte(Depth);//1                          //!< Depth of the largest image
-  }
-}
 
-class SVTFHeader_73 extends SVTFHeader_72 {
-  constructor({Version=[7,3],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
-    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight,Depth});
-    this.padding2 = byte(0,4);//4 - should be 3
-    this.ResourceCount = uint(ResourceCount);//4                          //!< Number of image resources
-    this.padding3 = byte(0,8);//Most likely will never add resource support
-  }
-}
-
-class SVTFHeader_74 extends SVTFHeader_73 {
-  constructor({Version=[7,4],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
-    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight,Depth,ResourceCount});
-  }
-}
-
-class SVTFHeader_75 extends SVTFHeader_74 {
-  constructor({Version=[7,5],HeaderSize=80,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight,Depth=VTFOptions.Depth,ResourceCount=VTFOptions.ResourceCount} = {}){
-    super({Version,HeaderSize,Width,Height,FlagArray,Frames,StartFrame,reflectivity,BumpScale,ImageFormat,MipCount,LowResImageFormat,LowResImageWidth,LowResImageHeight,Depth,ResourceCount});
-  }
-}//       |  -  -  - |       -       |        |   |   |        |   |   |       |          -          -          |       |          |       | |               | | | |       |1 2 3 4|1 2 3 4 5 6 7 8| 1 2 3 4  5 6 7 8|
-var foo = [86,84,70,0,7,0,0,0,3,0,0,0,88,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,88,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
-var bar = [86,84,70,0,7,0,0,0,2,0,0,0,80,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
-var baz = [86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0];
-var qux = [86,84,70,0,7,0,0,0,3,0,0,0,96,0,0,0,2,0,2,0,0,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,96,0,0,0,75,86,68,0,112,0,0,0,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0,38,0,0,0,34,73,110,102,111,114,109,97,116,105,111,110,34,13,10,123,13,10,9,34,65,117,116,104,111,114,34,32,34,98,104,110,34,13,10,125,13,10];
-function getHeader() {
-   switch (VTFOptions.version[1]) {
-  case 0:
-    return new SVTFHeader_70()
-    break;
-  case 1:
-    return new SVTFHeader_71()
-    break;
-  case 2:
-    return new SVTFHeader_72()
-    break;
-  case 3:
-    return new SVTFHeader_73()
-    break;
-  case 4:
-    return new SVTFHeader_74()
-    break;
-  case 5:
-    return new SVTFHeader_75()
-}
-}
 /*
 function objLength(obj){
   var out=0;
@@ -673,91 +799,6 @@ export const VTFHEADER {
     unsigned int    numResources;        // Number of resources this vtf has
 }
 */
-let ToLuminance = null;
-let FromLuminance = null;
-let ToBlueScreen = null;
-let FromBlueScreen = null;
-let ToFP16 = null;
-let FromFP16 = null;
-const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badhaloninja/vtfedit/blob/master/VTFLib/VTFFile.cpp
-  //[Name, BitsPerPixel, BytesPerPixel, RedBitsPerPixel, GreenBitsPerPixel, BlueBitsPerPixel, AlphaBitsPerPixel, IsCompressed, IsSupported]
-   0 : ["RGBA8888"          , 32,  4,  8,  8,  8,  8, [ 0,  1,  2,  3], false,  true, [        null,           null]],        // IMAGE_FORMAT_RGBA8888,
-   1 : ["ABGR8888"          , 32,  4,  8,  8,  8,  8, [ 3,  2,  1,  0], false,  true, [        null,           null]],        // IMAGE_FORMAT_ABGR8888,
-   2 : ["RGB888"            , 24,  3,  8,  8,  8,  0, [ 0,  1,  2, -1], false,  true, [        null,           null]],        // IMAGE_FORMAT_RGB888,
-   3 : ["BGR888"            , 24,  3,  8,  8,  8,  0, [ 2,  1,  0, -1], false,  true, [        null,           null]],        // IMAGE_FORMAT_BGR888,
-   4 : ["RGB565"            , 16,  2,  5,  6,  5,  0, [ 0,  1,  2, -1], false,  true, [        null,           null]],        // IMAGE_FORMAT_RGB565,
-   5 : ["I8"                ,  8,  1,  0,  0,  0,  0, [ 0, -1, -1, -1], false, false, [ ToLuminance,  FromLuminance]],        // IMAGE_FORMAT_I8,
-   6 : ["IA88"              , 16,  2,  0,  0,  0,  8, [ 0, -1, -1,  1], false, false, [ ToLuminance,  FromLuminance]],        // IMAGE_FORMAT_IA88
-   7 : ["P8"                ,  8,  1,  0,  0,  0,  0, [-1, -1, -1, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_P8
-   8 : ["A8"                ,  8,  1,  0,  0,  0,  8, [-1, -1, -1,  0], false, false, [        null,           null]],        // IMAGE_FORMAT_A8
-   9 : ["RGB888 Bluescreen" , 24,  3,  8,  8,  8,  0, [ 0,  1,  2, -1], false, false, [ToBlueScreen, FromBlueScreen]],        // IMAGE_FORMAT_RGB888_BLUESCREEN
-  10 : ["BGR888 Bluescreen" , 24,  3,  8,  8,  8,  0, [ 2,  1,  0, -1], false, false, [ToBlueScreen, FromBlueScreen]],        // IMAGE_FORMAT_BGR888_BLUESCREEN
-  11 : ["ARGB8888"          , 32,  4,  8,  8,  8,  8, [ 3,  0,  1,  2], false,  true, [        null,           null]],        // IMAGE_FORMAT_ARGB8888
-  12 : ["BGRA8888"          , 32,  4,  8,  8,  8,  8, [ 2,  1,  0,  3], false,  true, [        null,           null]],        // IMAGE_FORMAT_BGRA8888
-  13 : ["DXT1"              ,  4,  0,  0,  0,  0,  0, [-1, -1, -1, -1],  true,  true, [        null,           null]],        // IMAGE_FORMAT_DXT1
-  14 : ["DXT3"              ,  8,  0,  0,  0,  0,  8, [-1, -1, -1, -1],  true, false, [        null,           null]],        // IMAGE_FORMAT_DXT3
-  15 : ["DXT5"              ,  8,  0,  0,  0,  0,  8, [-1, -1, -1, -1],  true,  true, [        null,           null]],        // IMAGE_FORMAT_DXT5
-  16 : ["BGRX8888"          , 32,  4,  8,  8,  8,  0, [ 2,  1,  0, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_BGRX8888
-  17 : ["BGR565"            , 16,  2,  5,  6,  5,  0, [ 2,  1,  0, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_BGR565
-  18 : ["BGRX5551"          , 16,  2,  5,  5,  5,  0, [ 2,  1,  0, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_BGRX5551
-  19 : ["BGRA4444"          , 16,  2,  4,  4,  4,  4, [ 2,  1,  0,  3], false,  true, [        null,           null]],        // IMAGE_FORMAT_BGRA4444
-  20 : ["DXT1 One Bit Alpha",  4,  0,  0,  0,  0,  1, [-1, -1, -1, -1],  true, false, [        null,           null]],        // IMAGE_FORMAT_DXT1_ONEBITALPHA
-  21 : ["BGRA5551"          , 16,  2,  5,  5,  5,  1, [ 2,  1,  0,  3], false,  true, [        null,           null]],        // IMAGE_FORMAT_BGRA5551
-  22 : ["UV88"              , 16,  2,  8,  8,  0,  0, [ 0,  1, -1, -1], false, false, [        null,           null]],        // IMAGE_FORMAT_UV88
-  23 : ["UVWQ8888"          , 32,  4,  8,  8,  8,  8, [ 0,  1,  2,  3], false, false, [        null,           null]],        // IMAGE_FORMAT_UVWQ8899
-  24 : ["RGBA16161616F"     , 64,  8, 16, 16, 16, 16, [ 0,  1,  2,  3], false, false, [      ToFP16,       FromFP16]],        // IMAGE_FORMAT_RGBA16161616F
-  25 : ["RGBA16161616"      , 64,  8, 16, 16, 16, 16, [ 0,  1,  2,  3], false, false, [        null,           null]],        // IMAGE_FORMAT_RGBA16161616
-  26 : ["UVLX8888"          , 32,  4,  8,  8,  8,  8, [ 0,  1,  2,  3], false, false, [        null,           null]],        // IMAGE_FORMAT_UVLX8888
-  get Supported(){
-    var tmp=[]
-    Object.values(VTFImageFormatInfo).forEach(function(entry,i){
-      entry[9] ? tmp.push(i) : null;
-    })
-    return tmp
-  },
-  getInfo(format=VTFOptions.ImageFormat) {
-    var info=this[format]
-    var tmp={Name:info[0], BitsPerPixel:info[1], BytesPerPixel:info[2], RedBitsPerPixel:info[3], GreenBitsPerPixel:info[4], BlueBitsPerPixel:info[5], AlphaBitsPerPixel:info[6], RGBAIndex:info[7], IsCompressed:info[8], IsSupported:info[9], TransformProc:info[10]}
-    return tmp
-  }
-};
-Object.defineProperty(VTFImageFormatInfo, 'Supported', {
-  enumerable: false
-});
-Object.defineProperty(VTFImageFormatInfo, 'Info', {
-  enumerable: false
-});
-/*
-typedef struct tagSVTFImageConvertInfo
-{
-	vlUInt	uiBitsPerPixel;			// Format bytes per pixel.
-	vlUInt	uiBytesPerPixel;		// Format bytes per pixel.
-	vlUInt	uiRBitsPerPixel;		// Format conversion red bits per pixel.  0 for N/A.
-	vlUInt	uiGBitsPerPixel;		// Format conversion green bits per pixel.  0 for N/A.
-	vlUInt	uiBBitsPerPixel;		// Format conversion blue bits per pixel.  0 for N/A.
-	vlUInt	uiABitsPerPixel;		// Format conversion alpha bits per pixel.  0 for N/A.
-	vlInt	iR;						// "Red" index.
-	vlInt	iG;						// "Green" index.
-	vlInt	iB;						// "Blue" index.
-	vlInt	iA;						// "Alpha" index.
-	vlBool	bIsCompressed;			// Format is compressed (DXT).
-	vlBool	bIsSupported;			// Format is supported by VTFLib.
-	TransformProc pToTransform;		// Custom transform to function.
-	TransformProc pFromTransform;	// Custom transform from function.
-	VTFImageFormat Format;
-} SVTFImageConvertInfo;
-
-static SVTFImageConvertInfo VTFImageConvertInfo[] =
-<<<<<<< HEAD
-{ 
-	*/
-//[255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 0, 0, 0, 0] 
-var content = {
-      0:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,0,0,0,0,1,255,255,255,255,0,0,1,255,0,0,255,0,255,0,255,0,0,255,255,0,0,0,0]",
-    2:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,2,0,0,0,1,255,255,255,255,0,0,1,255,0,0,0,255,0,0,0,255,0,0,0]",
-    12:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,35,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,12,0,0,0,1,255,255,255,255,0,0,1,0,0,255,255,0,255,0,255,255,0,0,255,0,0,0,0]",
-    17:"[86,84,70,0,7,0,0,0,1,0,0,0,64,0,0,0,2,0,2,0,120,3,0,0,1,0,0,0,0,0,0,0,0,0,128,63,0,0,128,63,0,0,128,63,0,0,0,0,0,0,128,63,17,0,0,0,1,255,255,255,255,0,0,1,0,248,224,7,31,0,0,0];"
-  }
 
 /*
 if(this->GetImageFormatInfo(ImageFormat).uiAlphaBitsPerPixel == 1)
