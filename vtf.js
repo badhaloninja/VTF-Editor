@@ -1,2 +1,5 @@
 const vtf_info = require('./vtf_info.js');
-console.log(vtf_info.VTFImageFormatInfo.getInfo('RGBA8888'))
+const { VTFImageFormats, VTFImageFormatInfo, TextureFlags, getHeader } = require('./vtf_info.js');
+var { VTFOptions } = require('./vtf_info.js');
+VTFOptions.version[1] = 5
+console.log(getHeader())

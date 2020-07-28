@@ -1,4 +1,6 @@
 // module "vtf_info.js"
+const { uint,float,char,short,byte,merge,powerOfTwo,toHexString,fromHexString,getColorDiff } = require('./vtf_util.js');
+
 const VTFImageFormats = {
   '-1': 'NONE',
   0: 'RGBA8888',
@@ -244,9 +246,9 @@ const VTFConst = {
   maxVersion: [7,5],
   maxSizePower: 12
 }
-function powerOfTwo(x) { return Math.log2(x) % 1 === 0; }
 let VTFOptions = {
   safemode: true,
+  shortened: false,
   version: [7,1],
   width: 2,
   height: 2,
@@ -280,78 +282,7 @@ Object.defineProperty(VTFOptions, 'getflags', {
   enumerable: false
 });
 
-let merge = (a, b) => {
-  var c = new a.constructor(a.length + b.length);
-  c.set(a);
-  c.set(b, a.length);
-  return c;
-}
 
-let byte = (value,length=1) => {return new Uint8Array(length).map((_, i) => [value][i])};
-
-let short = number => new Uint8Array([number & 0xFF,(number >>> 8) & 0xff]);
-
-const char = s =>{//uint8array
-  var escstr = encodeURIComponent(s);
-  var binstr = escstr.replace(/%([0-9A-F]{2})/g, function(match, p1) {
-    return String.fromCharCode('0x' + p1);
-  });
-  var ua = new Uint8Array(binstr.length);
-  Array.prototype.forEach.call(binstr, function (ch, i) {
-    ua[i] = ch.charCodeAt(0);
-  });
-  return ua;
-}
-
-const float = (floatnum) => {
-  const getHex = i => ('00' + i.toString(16)).slice(-2);
-  var type = Object.prototype.toString.call(floatnum);
-  if (type == "[object Object]" || type == "[object Array]"){
-    var out = new Uint8Array()
-    for (var key in floatnum) {
-      //console.log("Float")
-      //console.log("Item: "+floatnum[key]+", \nType: "+type);
-      var view = new DataView(new ArrayBuffer(4)),
-        result;
-      view.setFloat32(0, floatnum[key]);
-      result = Array
-        .apply(null, { length: 4})
-        .map((_, i) => getHex(view.getUint8(i)))
-        .join('');
-      out = merge(out, fromHexString(result).reverse())
-    }
-    return out;
-    //console.log("Disabled: "+type+"\nValue: "+thing[key]);
-  } else if (type == "[object Number]") {
-    var view = new DataView(new ArrayBuffer(4)),
-      result;
-    view.setFloat32(0, floatnum);
-    result = Array
-      .apply(null, { length: 4})
-      .map((_, i) => getHex(view.getUint8(i)))
-      .join('');
-    return fromHexString(result).reverse();
-  } else {
-    console.log("Unknown: "+type+"\nValue: "+floatnum);
-  }
-}
-
-const uint = number => {
-  var type = Object.prototype.toString.call(number);
-  if (type == "[object Object]" || type == "[object Array]"){
-    var out = new Uint8Array()
-    for (var key in number) {
-      //console.log("Item: "+number[key]+", \nType: "+type);
-      out = merge(out,(number[key]!=-1)?(new Uint8Array({0:number[key]>>>0,length:4})):(new Uint8Array([255,255,255,255])));
-    }
-    return out;
-    //console.log("Disabled: "+type+"\nValue: "+thing[key]);
-  } else if (type == "[object Number]") {
-    return (number!=-1)?(new Uint8Array({0:number>>>0,length:4})):(new Uint8Array([255,255,255,255]))
-  } else {
-    console.log("Unknown: "+type+"\nValue: "+number);
-  }
-}
 
 class SVTFFileHeader {
   constructor({Version=[7,0],HeaderSize=16} = {}) {
@@ -383,7 +314,7 @@ class SVTFFileHeader {
 class SVTFHeader_70 extends SVTFFileHeader {
   constructor({Version=[7,0],HeaderSize=64,Width=VTFOptions.width,Height=VTFOptions.height,FlagArray=VTFOptions.selectedFlags,Frames=VTFOptions.Frames,StartFrame=VTFOptions.StartFrame,reflectivity=VTFOptions.reflectivity,BumpScale=VTFOptions.BumpScale,ImageFormat=VTFOptions.ImageFormat,MipCount=VTFOptions.MipCount,LowResImageFormat=VTFOptions.LowResImageFormat,LowResImageWidth=VTFOptions.LowResImageWidth,LowResImageHeight=VTFOptions.LowResImageHeight} = {}){
     super({Version,HeaderSize});//12
-    this.Width = short(shortened ? Width - 4 : Width);//2
+    this.Width = short(VTFOptions.shortened ? Width - 4 : Width);//2
     this.Height = short(Height);//2
     this.FlagArray = VTFOptions.getflags(FlagArray);//4
     this.Frames = short(Frames);//2
@@ -504,7 +435,19 @@ const VTFImageFormatInfo = {//tagSVTFImageConvertInfo in https://github.com/badh
     if (!(parseInt(Number(format)) == format) && !parseInt(format, 10)) {
         info=this[VTFImageFormats[format]];
     }
-    var tmp={Name:info[0], BitsPerPixel:info[1], BytesPerPixel:info[2], RedBitsPerPixel:info[3], GreenBitsPerPixel:info[4], BlueBitsPerPixel:info[5], AlphaBitsPerPixel:info[6], RGBAIndex:info[7], IsCompressed:info[8], IsSupported:info[9], TransformProc:info[10]}
+    var tmp={
+      Name:info[0], 
+      BitsPerPixel:info[1], 
+      BytesPerPixel:info[2], 
+      RedBitsPerPixel:info[3], 
+      GreenBitsPerPixel:info[4], 
+      BlueBitsPerPixel:info[5], 
+      AlphaBitsPerPixel:info[6], 
+      RGBAIndex:info[7], 
+      IsCompressed:info[8], 
+      IsSupported:info[9], 
+      TransformProc:info[10]
+    }
     return tmp
   }
 };
@@ -538,13 +481,6 @@ module.exports.VTFOptions = VTFOptions;
 
 
 module.exports.getHeader = getHeader;
-module.exports.powerOfTwo = powerOfTwo;
-module.exports.merge = merge;
-module.exports.byte = byte;
-module.exports.short = short;
-module.exports.char = char;
-module.exports.float = float;
-module.exports.uint = uint;
 
 module.exports.SVTFFileHeader = SVTFFileHeader;
 module.exports.SVTFHeader_70 = SVTFHeader_70;
