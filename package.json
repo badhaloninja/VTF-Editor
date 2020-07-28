@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/badhaloninja/VTF-Editor/issues"
   },
-  "homepage": "https://github.com/badhaloninja/VTF-Editor#readme"
+  "homepage": "https://github.com/badhaloninja/VTF-Editor#readme",
+  "dependencies": {
+    "sharp": "^0.25.4"
+  }
 }
