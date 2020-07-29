@@ -64,12 +64,14 @@ const TextureFlags = {
   POINTSAMPLE:{
     name:"Point Sample",
     comment:"Low quality, 'pixel art' texture filtering.",
+    type:"Sampling",
     value: 0x00000001,
     valueOf: function(){ return this.value }
   },
   TRILINEAR: {
     name:"Trilinear",
     comment:"Medium quality texture filtering.",
+    type:"Sampling",
     value: 0x00000002,
     valueOf: function(){ return this.value }
   },
@@ -88,6 +90,7 @@ const TextureFlags = {
   ANISOTROPIC: {
     name:"Anisotropic",
     comment:"High quality texture filtering.",
+    type:"Sampling",
     value: 0x00000010,
     valueOf: function(){ return this.value }
   },
@@ -136,12 +139,14 @@ const TextureFlags = {
   ONEBITALPHA: {
     name:"One Bit Alpha (Format Specific)",
     comment:"One bit alpha channel used.",
+    type:"FormatSpecific",
     value: 0x00001000,
     valueOf: function(){ return this.value }
   },
   EIGHTBITALPHA: {
     name:"Eight Bit Alpha (Format Specific)",
     comment:"Eight bit alpha channel used.",
+    type:"FormatSpecific",
     value: 0x00002000,
     valueOf: function(){ return this.value }
   },
@@ -178,24 +183,28 @@ const TextureFlags = {
   UNUSED0: {
     name:"Unused",
     comment:"Unused",
+    type:"Unused",
     value: 0x00080000,
     valueOf: function(){ return this.value }
   },
   UNUSED1: {
     name:"Unused",
     comment:"Unused",
+    type:"Unused",
     value: 0x00100000,
     valueOf: function(){ return this.value }
   },
   UNUSED2: {
     name:"Unused",
     comment:"Unused",
+    type:"Unused",
     value: 0x00200000,
     valueOf: function(){ return this.value }
   },
   UNUSED3: {
     name:"Unused",
     comment:"Unused",
+    type:"Unused",
     value: 0x00400000,
     valueOf: function(){ return this.value }
   },
@@ -208,6 +217,7 @@ const TextureFlags = {
   UNUSED4: {
     name:"Unused",
     comment:"Unused",
+    type:"Unused",
     value: 0x01000000,
     valueOf: function(){ return this.value }
   },
@@ -232,6 +242,7 @@ const TextureFlags = {
   UNUSED5: {
     name:"Unused",
     comment:"Unused",
+    type:"Unused",
     value: 0x10000000,
     valueOf: function(){ return this.value }
   },
@@ -247,8 +258,8 @@ const VTFConst = {
   maxSizePower: 12
 }
 let VTFOptions = {
-  safemode: true,
-  shortened: false,
+  safemode: true, // Flag safe mode
+  shortened: false, // ??
   version: [7,1],
   width: 2,
   height: 2,
