@@ -280,16 +280,41 @@ let VTFOptions = {
   get HeaderSize() {
   return (this.version < [7,3]) ? 64 : 80
   },
-  getflags: function(flags=this.selectedFlags) {
+  getFlags: function(flags=this.selectedFlags) {
     var tmp=0;
     flags.forEach(function(entry) {
       tmp = (parseInt(tmp, 16) + TextureFlags[entry]).toString(16);
       while (tmp.length < 8) { tmp = '0' + tmp;} // Zero pad.
     });
     return fromHexString(tmp.toString()).reverse(); //.toString()
+  },
+  setFlags: function(flags,ImageFormat=this.ImageFormat,safe=this.safemode) { // setFlags("ClampT,srgb,NoLOD");
+    let flagArray = new Array();
+    let flagList = Object.keys(TextureFlags);
+    if (!flags){
+      //console.warn(`Please input flags.`);
+      return {status:`NO_FLAGS`};
+    }
+    let inputFlags = flags.toUpperCase().split(",");
+    
+    for (flag of flags.toUpperCase().split(",")) {
+        if (flagList.includes(flag)) {
+          flagArray.push(flag);
+        } else {
+          //console.warn(`\`${flag}\` does not exist.`);
+          return {status:`UNKNOWN_FLAG`,value:flag};
+        }
+    }
+    if (safe) {
+
+    }
+    if (flagArray.length > 0) {
+      this.selectedFlags = flagArray;
+      return {status:"SUCCESS"};
+    }
   }
 }
-Object.defineProperty(VTFOptions, 'getflags', {
+Object.defineProperty(VTFOptions, 'getFlags', {
   enumerable: false
 });
 
@@ -327,7 +352,7 @@ class SVTFHeader_70 extends SVTFFileHeader {
     super({Version,HeaderSize});//12
     this.Width = short(VTFOptions.shortened ? Width - 4 : Width);//2
     this.Height = short(Height);//2
-    this.FlagArray = VTFOptions.getflags(FlagArray);//4
+    this.FlagArray = VTFOptions.getFlags(FlagArray);//4
     this.Frames = short(Frames);//2
     this.StartFrame = short(StartFrame);//2
     this.padding0 = byte(0,4);//4
