@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/badhaloninja/VTF-Editor#readme",
   "dependencies": {
+    "axios": "^0.19.2",
     "sharp": "^0.25.4"
   }
 }
